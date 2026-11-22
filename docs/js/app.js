@@ -21,6 +21,7 @@
   let renderQueued = false;
 
   ui.version.textContent = "v" + cfg.version + (GoogleApi.isDemo ? " · DEMO" : "");
+  if (GoogleApi.isDemo) ui.version.classList.add("badge", "warn", "plain");
   ui.operator.value = CloudDB.operator();
   ui.operator.addEventListener("change", () => CloudDB.setOperator(ui.operator.value));
 
@@ -88,7 +89,7 @@
       return;
     }
     renderTable();
-    if (selectedMemberIndex !== null && members[selectedMemberIndex]) openMemberDetail(selectedMemberIndex);
+    if (selectedMemberIndex !== null && members[selectedMemberIndex]) openMemberDetail(selectedMemberIndex, { keepScroll: true });
     if (excList.length) renderEscursioni();
   }
 
@@ -151,7 +152,10 @@
   // ---- Accesso ----
   function setSignedInUi() {
     const on = GoogleApi.isSignedIn();
-    ui.account.textContent = on ? "👤 " + GoogleApi.email() : "Non connesso";
+    const email = GoogleApi.email();
+    ui.account.innerHTML = on
+      ? `<span class="avatar">${escapeHtml(initials(email.split("@")[0].replace(/[._-]+/g, " ")))}</span><span>${escapeHtml(email)}</span>`
+      : `<span class="avatar" style="background:var(--surface-3);color:var(--muted)">?</span><span class="muted">Non connesso</span>`;
     ui.login.style.display = on ? "none" : "";
     ui.logout.style.display = on ? "" : "none";
   }

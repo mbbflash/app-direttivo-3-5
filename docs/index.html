@@ -2,684 +2,858 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1f6feb" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f5f6" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#100f12" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.1.0" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.1.0" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <script src="js/storage.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/google.js"></script>
-  <script src="js/clouddb.js"></script>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <script>
+    // Applica subito il tema scelto, prima di disegnare la pagina (niente lampo bianco).
+    (function () {
+      try {
+        var t = localStorage.getItem("app35_theme_v1");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <script src="js/storage.js?v=2.1.0"></script>
+  <script src="js/config.js?v=2.1.0"></script>
+  <script src="js/google.js?v=2.1.0"></script>
+  <script src="js/clouddb.js?v=2.1.0"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --text: #18202c;
-      --muted: #5c6778;
-      --border: #dce2ea;
-      --primary: #1f6feb;
-      --primary-hover: #1757c2;
-      --success-bg: #e7f6ec;
-      --success-fg: #136f38;
-      --warn-bg: #fff6e0;
-      --warn-fg: #9a5b00;
-      --danger-bg: #fdecec;
-      --danger-fg: #b42318;
-      --info-bg: #eef4ff;
-      --info-fg: #1d4ed8;
+      color-scheme: light;
+      --bg: #f7f5f6;
+      --bg-grad: radial-gradient(1200px 500px at 10% -10%, #f6e3ea 0%, transparent 60%), radial-gradient(900px 400px at 100% 0%, #f3ece4 0%, transparent 55%);
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --surface-3: #eef2f7;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --primary: #730b2d;
+      --primary-hover: #5a0822;
+      --primary-soft: #f9ecf0;
+      --primary-fg: #ffffff;
+      --success-bg: #e8f7ee; --success-fg: #15803d;
+      --warn-bg: #fff5e0;    --warn-fg: #b45309;
+      --danger-bg: #fdeceb;  --danger-fg: #d1342b;
+      --info-bg: #f6e8ed;    --info-fg: #8c1a40;
+      --ring: 0 0 0 3px rgba(115, 11, 45, 0.22);
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 16px -4px rgba(15, 23, 42, 0.10), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+      --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.22);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --appbar-bg: rgba(247, 245, 246, 0.8);
+      /* Alias usati dal codice esistente */
+      --card: var(--surface);
+      --danger: var(--danger-fg);
+      --accent: var(--primary);
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #100f12;
+      --bg-grad: radial-gradient(1200px 500px at 10% -10%, rgba(196, 50, 98, 0.16) 0%, transparent 60%), radial-gradient(900px 400px at 100% 0%, rgba(214, 150, 90, 0.07) 0%, transparent 55%);
+      --surface: #19171c;
+      --surface-2: #1e1c22;
+      --surface-3: #27242c;
+      --text: #ece8ea;
+      --muted: #a39ba5;
+      --border: #2f2b33;
+      --border-strong: #423d47;
+      --primary: #e0698f;
+      --primary-hover: #ea88a8;
+      --primary-soft: rgba(224, 105, 143, 0.15);
+      --primary-fg: #1c0a11;
+      --success-bg: rgba(34, 197, 94, 0.14); --success-fg: #4ade80;
+      --warn-bg: rgba(245, 158, 11, 0.15);   --warn-fg: #fbbf24;
+      --danger-bg: rgba(239, 68, 68, 0.15);  --danger-fg: #f87171;
+      --info-bg: rgba(224, 105, 143, 0.14);   --info-fg: #f0a3bb;
+      --ring: 0 0 0 3px rgba(224, 105, 143, 0.35);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 18px -6px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+      --appbar-bg: rgba(16, 15, 18, 0.78);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #100f12;
+        --bg-grad: radial-gradient(1200px 500px at 10% -10%, rgba(196, 50, 98, 0.16) 0%, transparent 60%), radial-gradient(900px 400px at 100% 0%, rgba(214, 150, 90, 0.07) 0%, transparent 55%);
+        --surface: #19171c;
+        --surface-2: #1e1c22;
+        --surface-3: #27242c;
+        --text: #ece8ea;
+        --muted: #a39ba5;
+        --border: #2f2b33;
+        --border-strong: #423d47;
+        --primary: #e0698f;
+        --primary-hover: #ea88a8;
+        --primary-soft: rgba(224, 105, 143, 0.15);
+        --primary-fg: #1c0a11;
+        --success-bg: rgba(34, 197, 94, 0.14); --success-fg: #4ade80;
+        --warn-bg: rgba(245, 158, 11, 0.15);   --warn-fg: #fbbf24;
+        --danger-bg: rgba(239, 68, 68, 0.15);  --danger-fg: #f87171;
+        --info-bg: rgba(224, 105, 143, 0.14);   --info-fg: #f0a3bb;
+        --ring: 0 0 0 3px rgba(224, 105, 143, 0.35);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 6px 18px -6px rgba(0, 0, 0, 0.5);
+        --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+        --appbar-bg: rgba(16, 15, 18, 0.78);
+      }
     }
 
     * { box-sizing: border-box; }
-
+    html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-grad), var(--bg);
+      background-attachment: fixed;
       color: var(--text);
-      line-height: 1.45;
+      line-height: 1.5;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
     }
+    ::selection { background: var(--primary-soft); }
+    .ico { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-sm { width: 15px; height: 15px; }
+    .muted { color: var(--muted); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    .container {
-      max-width: 1380px;
-      margin: 0 auto;
-      padding: 20px;
+    /* ---------- Barra in alto ---------- */
+    .appbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(1.6) blur(14px);
+      -webkit-backdrop-filter: saturate(1.6) blur(14px);
+      background: var(--appbar-bg);
+      border-bottom: 1px solid var(--border);
+      padding-top: env(safe-area-inset-top);
     }
-
-    header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
+    .appbar-inner {
+      max-width: 1380px; margin: 0 auto; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
-
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand img { width: 38px; height: 38px; border-radius: 10px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); background: #fff; }
+    .brand-text { min-width: 0; }
+    h1 { margin: 0; font-size: 1.08rem; font-weight: 750; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pill {
+      font-size: 0.68rem; font-weight: 650; padding: 2px 8px; border-radius: 999px;
+      background: var(--surface-3); color: var(--muted); border: 1px solid var(--border);
+      letter-spacing: 0.02em;
     }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
-    .ro-pill {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: var(--info-bg);
-      color: var(--info-fg);
-      border: 1px solid #c7d9ff;
-    }
+    .container { max-width: 1380px; margin: 0 auto; padding: 20px 20px calc(40px + env(safe-area-inset-bottom)); }
 
-    .subtitle {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    button, .btn-label {
+    /* ---------- Pulsanti e campi ---------- */
+    button, .btn, .btn-label {
       appearance: none;
       border: 1px solid var(--border);
-      background: var(--card);
+      background: var(--surface);
       color: var(--text);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 500;
+      padding: 8px 13px;
+      border-radius: var(--radius-sm);
+      font: inherit; font-size: 0.875rem; font-weight: 550;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s, border-color 0.15s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      text-decoration: none; white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+      transition: background .15s, border-color .15s, color .15s, transform .08s, box-shadow .15s;
     }
-
-    button:hover, .btn-label:hover {
-      background: #f0f3f7;
-    }
-
-    button.primary {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-    }
-
-    button.primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-    }
-
-    .sync-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .sync-meta {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      font-size: 0.84rem;
-      color: var(--muted);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .stat-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 1.55rem;
-      font-weight: 700;
-    }
-
-    .filters {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr 1.2fr auto;
-      gap: 10px;
-      align-items: center;
-    }
+    button:hover, .btn:hover, .btn-label:hover { background: var(--surface-3); border-color: var(--border-strong); }
+    button:active, .btn:active, .btn-label:active { transform: translateY(1px); }
+    button:focus-visible, .btn:focus-visible, .btn-label:focus-visible, .stat-box:focus-visible { outline: none; box-shadow: var(--ring); }
+    button:disabled { opacity: .6; cursor: progress; }
+    button.primary, .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-fg); }
+    button.primary:hover, .btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+    button.ghost, .btn.ghost { background: transparent; box-shadow: none; border-color: transparent; }
+    button.ghost:hover, .btn.ghost:hover { background: var(--surface-3); }
+    .btn.wa { color: #128c4b; }
+    :root[data-theme="dark"] .btn.wa { color: #4ade80; }
+    .btn.tg { color: #1b8ac4; }
+    :root[data-theme="dark"] .btn.tg { color: #5ab8e8; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.wa { color: #4ade80; } :root:not([data-theme="light"]) .btn.tg { color: #5ab8e8; } }
+    .mini-links { display: inline-flex; gap: 6px; margin-left: 6px; vertical-align: middle; }
+    .mini-links a { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); }
+    .mini-links a.wa { color: #128c4b; } .mini-links a.tg { color: #1b8ac4; }
+    .mini-links .ico { width: 13px; height: 13px; }
+    .icon-btn { padding: 8px; width: 38px; height: 38px; }
+    .btn.is-loading .ico { animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     input, select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 9px 12px;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      background: #fff;
+      border-radius: var(--radius-sm);
+      font: inherit; font-size: 0.9rem;
+      background: var(--surface);
       color: var(--text);
+      transition: border-color .15s, box-shadow .15s;
     }
+    input::placeholder { color: var(--muted); opacity: .8; }
+    input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: var(--ring); }
+    .search-field { position: relative; }
+    .search-field .ico { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .search-field input { padding-left: 36px; }
+    .kbd { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 5px; padding: 0 5px; background: var(--surface-2); pointer-events: none; }
+    @media (hover: none) { .kbd { display: none; } }
 
-    input:focus, select:focus {
-      outline: 2px solid rgba(31, 111, 235, 0.25);
-      border-color: var(--primary);
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      background: var(--card);
+    /* ---------- Card ---------- */
+    .card {
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.86rem;
-    }
-
-    th, td {
-      padding: 10px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      vertical-align: top;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #f8fafc;
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    td.wrap, th.wrap {
-      white-space: normal;
-      min-width: 150px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .badge-ok { background: var(--success-bg); color: var(--success-fg); }
-    .badge-warn { background: var(--warn-bg); color: var(--warn-fg); }
-    .badge-danger { background: var(--danger-bg); color: var(--danger-fg); }
-    .badge-info { background: var(--info-bg); color: var(--info-fg); }
-
-    th.sortable {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    th.sortable:hover {
-      background: #eef2f6;
-      color: var(--text);
-    }
-
-    th.sortable::after {
-      content: " ↕";
-      font-size: 0.72rem;
-      opacity: 0.55;
-    }
-
-    th.sortable.sort-asc::after {
-      content: " ▲";
-      opacity: 1;
-      color: var(--primary);
-    }
-
-    th.sortable.sort-desc::after {
-      content: " ▼";
-      opacity: 1;
-      color: var(--primary);
-    }
-
-    .member-link {
-      appearance: none;
-      background: none;
-      border: none;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      font-weight: 700;
-      color: var(--primary);
-      cursor: pointer;
-      text-align: left;
-    }
-
-    .member-link:hover {
-      text-decoration: underline;
-      background: none;
-    }
-
-    .detail-view {
-      display: none;
+      border-radius: var(--radius);
+      padding: 16px 18px;
       margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
     }
+    .card-title { margin: 0 0 12px; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
-    .detail-view.active {
-      display: block;
+    /* ---------- Sessione ---------- */
+    .auth-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .auth-account { display: inline-flex; align-items: center; gap: 10px; font-size: 0.88rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: inline-grid; place-items: center; flex: 0 0 auto;
+      background: linear-gradient(135deg, #730b2d, #c4456e); color: #fff;
+      font-weight: 700; font-size: 0.85rem; letter-spacing: 0.02em;
     }
-
-    .detail-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
+    .avatar.lg { width: 64px; height: 64px; font-size: 1.35rem; border-radius: 18px; }
+    .auth-row #operatorName { flex: 1 1 220px; min-width: 0; }
+    .sync-meta {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+      margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border);
+      font-size: 0.82rem; color: var(--muted);
     }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .detail-item {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      background: #f9fbfd;
-    }
-
-    .detail-label {
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .detail-val {
-      font-size: 0.92rem;
-      font-weight: 500;
-      word-break: break-word;
-    }
-
-    .paper-flags {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .flag-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .flag-label input[type="checkbox"] {
-      width: auto;
-      margin: 0;
-      cursor: pointer;
-    }
-
-        .view-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .tab-btn {
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      padding: 8px 14px;
-      border-radius: 9px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .tab-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    .view-section.hidden {
-      display: none;
-    }
-
-    .local-note-input {
-      min-width: 190px;
-      padding: 6px 8px;
-      font-size: 0.82rem;
-      border-radius: 6px;
-    }
-
-    @media (max-width: 820px) {
-      .sync-row, .filters {
-        grid-template-columns: 1fr;
-      }
-    }
-  
-    #tabBtnSoci, #tabBtnEscursioni {
-      appearance: none;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    #tabBtnSoci:hover, #tabBtnEscursioni:hover {
-      background: #eef2f6;
-      border-color: #c5d0de;
-    }
-    #tabBtnSoci.active, #tabBtnEscursioni.active,
-    #tabBtnSoci[aria-selected="true"], #tabBtnEscursioni[aria-selected="true"] {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-    }
-
-    /* Versione, accesso Google e sincronizzazione */
-    .version-pill {
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: #f1f3f6;
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-    .sync-row.auth-row { display: flex; flex-wrap: wrap; align-items: center; }
-    .auth-row > button { flex: 0 0 auto; }
-    .auth-account { font-size: 0.88rem; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
-    .auth-row #operatorName { flex: 1 1 200px; min-width: 0; }
-    @media (max-width: 520px) {
-      .auth-account { flex: 1 1 100%; }
-      .auth-row > button { flex: 1 1 auto; }
-    }
-    .sync-badge { font-size: 0.8rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1px solid transparent; }
+    .sync-meta .right { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .sync-badge { font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
     .sync-badge:empty { display: none; }
     .sync-badge.ok { background: var(--success-bg); color: var(--success-fg); }
     .sync-badge.busy { background: var(--info-bg); color: var(--info-fg); }
     .sync-badge.warn { background: var(--warn-bg); color: var(--warn-fg); cursor: pointer; }
     .sync-badge.err { background: var(--danger-bg); color: var(--danger-fg); cursor: pointer; }
+    @media (max-width: 560px) {
+      .auth-account { flex: 1 1 100%; }
+      .auth-row > button { flex: 1 1 auto; }
+    }
+
+    /* ---------- Schede (tab) ---------- */
+    .view-tabs {
+      display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px;
+      background: var(--surface-3); border: 1px solid var(--border); border-radius: 12px;
+    }
+    .tab-btn {
+      border: 0; background: transparent; box-shadow: none; color: var(--muted);
+      padding: 8px 16px; border-radius: 9px; font-weight: 650;
+    }
+    .tab-btn:hover { background: transparent; color: var(--text); }
+    .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-md); }
+    .tab-btn .count { font-size: 0.72rem; font-weight: 700; padding: 0 7px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); }
+    .tab-btn .count:empty { display: none; }
+    .view-section { animation: fadeIn .25s ease; }
+    .view-section.hidden { display: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- Contatori ---------- */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat-box {
+      position: relative; overflow: hidden; text-align: left;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; box-shadow: var(--shadow-sm);
+      display: flex; align-items: center; gap: 14px; justify-content: flex-start;
+      font-weight: inherit; white-space: normal;
+    }
+    button.stat-box:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); background: var(--surface); transform: translateY(-1px); }
+    .stat-box.selected { border-color: var(--tone, var(--primary)); box-shadow: 0 0 0 1px var(--tone, var(--primary)), var(--shadow-md); }
+    .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--tone-bg, var(--primary-soft)); color: var(--tone, var(--primary)); flex: 0 0 auto; }
+    .stat-icon .ico { width: 21px; height: 21px; }
+    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 550; }
+    .stat-value { font-size: 1.6rem; font-weight: 750; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .tone-ok { --tone: var(--success-fg); --tone-bg: var(--success-bg); }
+    .tone-warn { --tone: var(--warn-fg); --tone-bg: var(--warn-bg); }
+    .tone-danger { --tone: var(--danger-fg); --tone-bg: var(--danger-bg); }
+    .tone-info { --tone: var(--info-fg); --tone-bg: var(--info-bg); }
+
+    /* ---------- Filtri ---------- */
+    .filters { display: grid; grid-template-columns: 2fr 1.1fr 1.3fr auto; gap: 10px; align-items: center; }
+    .list-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 2px 10px; font-size: 0.82rem; color: var(--muted); }
+    @media (max-width: 860px) { .filters { grid-template-columns: 1fr 1fr; } .filters .search-field { grid-column: 1 / -1; } }
+    @media (max-width: 520px) { .filters { grid-template-columns: 1fr; } }
+
+    /* ---------- Tabelle ---------- */
+    .table-wrap {
+      overflow: auto; max-height: min(72vh, 900px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; white-space: nowrap; }
+    th {
+      position: sticky; top: 0; z-index: 2;
+      background: var(--surface-2); color: var(--muted);
+      font-weight: 650; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    tbody tr { transition: background .12s; }
+    tbody tr:hover td { background: var(--surface-2); }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.wrap, th.wrap { white-space: normal; min-width: 160px; }
+    td.num { font-variant-numeric: tabular-nums; font-weight: 650; }
+    td.empty { text-align: center; padding: 34px 16px; color: var(--muted); white-space: normal; }
+    td.empty .ico { width: 30px; height: 30px; display: block; margin: 0 auto 8px; opacity: .6; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: var(--text); }
+    th.sortable::after { content: "↕"; margin-left: 5px; font-size: 0.72rem; opacity: 0.4; }
+    th.sortable.sort-asc::after { content: "▲"; opacity: 1; color: var(--primary); }
+    th.sortable.sort-desc::after { content: "▼"; opacity: 1; color: var(--primary); }
+    .sub { color: var(--muted); font-size: 0.76rem; display: block; margin-top: 1px; }
+
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; font-size: 0.74rem; font-weight: 650; background: var(--surface-3); color: var(--muted); white-space: nowrap; }
+    .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .85; }
+    .badge.plain::before { display: none; }
+    .badge-ok, .badge.ok { background: var(--success-bg); color: var(--success-fg); }
+    .badge-warn, .badge.warn { background: var(--warn-bg); color: var(--warn-fg); }
+    .badge-danger, .badge.danger { background: var(--danger-bg); color: var(--danger-fg); }
+    .badge-info, .badge.info { background: var(--info-bg); color: var(--info-fg); }
+
+    .member-link {
+      appearance: none; background: none; border: none; box-shadow: none; padding: 0; margin: 0;
+      font: inherit; font-weight: 700; color: var(--text); cursor: pointer; text-align: left; white-space: normal;
+    }
+    .member-link:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; background: none; }
+
+    .paper-flags { display: flex; flex-direction: column; gap: 4px; }
+    .flag-label { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; cursor: pointer; user-select: none; }
+    .flag-label input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: var(--primary); }
+    .local-note-input { min-width: 190px; padding: 6px 9px; font-size: 0.82rem; border-radius: 8px; background: var(--surface-2); }
+    .local-note-input:focus { background: var(--surface); }
+
+    /* Su telefono le righe diventano schede, niente scorrimento orizzontale */
+    @media (max-width: 760px) {
+      .table-wrap.responsive { max-height: none; overflow: visible; background: transparent; border: 0; box-shadow: none; }
+      .table-wrap.responsive table, .table-wrap.responsive tbody, .table-wrap.responsive tr, .table-wrap.responsive td { display: block; width: 100%; }
+      .table-wrap.responsive thead { display: none; }
+      .table-wrap.responsive tr {
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+        margin-bottom: 10px; padding: 6px 4px; box-shadow: var(--shadow-sm);
+        display: flex; flex-direction: column;
+      }
+      .table-wrap.responsive td.cell-main { order: -1; }
+      .table-wrap.responsive tbody tr:hover td { background: transparent; }
+      .table-wrap.responsive td { border: 0; padding: 6px 12px; white-space: normal; display: flex; gap: 12px; justify-content: space-between; align-items: center; text-align: right; }
+      .table-wrap.responsive td[data-label]::before { content: attr(data-label); color: var(--muted); font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; text-align: left; flex: 0 0 auto; }
+      .table-wrap.responsive td.cell-main { justify-content: flex-start; text-align: left; font-size: 0.95rem; padding-top: 8px; }
+      .table-wrap.responsive td.cell-main::before { display: none; }
+      .table-wrap.responsive td.empty { display: block; text-align: center; }
+      .table-wrap.responsive td:empty, .table-wrap.responsive td.hide-empty-mobile { display: none; }
+      .table-wrap.responsive .paper-flags { flex-direction: row; gap: 14px; }
+      .table-wrap.responsive .local-note-input { min-width: 0; flex: 1 1 auto; max-width: 70%; }
+    }
+
+    /* ---------- Scheda socio ---------- */
+    .detail-view { display: none; margin-bottom: 16px; animation: fadeIn .25s ease; }
+    .detail-view.active { display: block; }
+    .detail-hero { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin: 12px 0 18px; }
+    .detail-hero-main { display: flex; gap: 14px; align-items: center; min-width: 0; }
+    .detail-hero h2 { margin: 0; font-size: 1.35rem; letter-spacing: -0.01em; }
+    .detail-sub { color: var(--muted); font-size: 0.86rem; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 3px; }
+    .detail-section-title { font-size: 0.78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin: 20px 0 8px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+    .detail-item { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; background: var(--surface-2); }
+    .detail-item.white { background: var(--surface); }
+    .detail-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 3px; font-weight: 600; }
+    .detail-val { font-size: 0.92rem; font-weight: 550; word-break: break-word; }
+    .detail-two { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 10px; }
+    @media (max-width: 700px) { .detail-two { grid-template-columns: 1fr; } }
+    .curriculum { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+    .curriculum-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .chips { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .chips li { padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-size: 0.8rem; }
+
+    /* ---------- Escursioni ---------- */
+    .exc-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .exc-controls select { flex: 1 1 280px; width: auto; }
+    .exc-controls .search-field { flex: 1 1 240px; }
+    .collapsible { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+    .collapsible > summary {
+      cursor: pointer; list-style: none; padding: 11px 14px; font-size: 0.88rem; font-weight: 650;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .collapsible > summary::-webkit-details-marker { display: none; }
+    .collapsible > summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform .2s; }
+    .collapsible[open] > summary::after { transform: rotate(45deg); }
+    .collapsible > .collapsible-body { padding: 0 14px 14px; font-size: 0.86rem; }
+    .collapsible.has-alerts > summary { color: var(--warn-fg); }
+    .alert-list { margin: 0 0 12px; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .alert-list li { padding: 9px 12px; border-radius: 9px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warn-fg); }
+    .alert-list li.ok { border-left-color: var(--success-fg); }
+    .tpl-box { flex-basis: 100%; margin-top: 4px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 9px; background: var(--surface); font-size: 0.85rem; }
+    .tpl-box pre { margin: 6px 0 0; white-space: pre-wrap; font-family: inherit; color: var(--text); }
+    .mail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .mail-actions select { width: auto; max-width: 100%; min-width: 0; }
+
+    /* ---------- Accesso ---------- */
     .login-overlay {
       position: fixed; inset: 0; z-index: 1000;
-      display: none; align-items: center; justify-content: center;
-      padding: 16px;
-      background: rgba(244, 246, 248, 0.97);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+      background: var(--bg-grad), var(--bg);
     }
     .login-overlay.show { display: flex; }
     .login-card {
-      width: 100%; max-width: 420px;
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 28px 24px; text-align: center;
-      box-shadow: 0 10px 30px rgba(24, 32, 44, 0.08);
+      width: 100%; max-width: 410px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 22px;
+      padding: 32px 26px 26px; text-align: center; box-shadow: var(--shadow-lg);
+      animation: pop .35s cubic-bezier(.2, .9, .3, 1.2);
     }
-    .login-card h2 { margin: 8px 0 6px; font-size: 1.35rem; }
-    .login-card p { color: var(--muted); font-size: 0.92rem; margin: 6px 0 18px; }
-    .login-logo { font-size: 2.4rem; }
-    .login-msg { margin-top: 14px; font-size: 0.88rem; color: var(--danger-fg); white-space: pre-wrap; }
+    @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(8px); } to { opacity: 1; transform: none; } }
+    .login-logo { background: #fff; border-radius: 16px; padding: 14px 18px; margin: 0 auto; max-width: 260px; border: 1px solid var(--border); }
+    .login-logo img { display: block; width: 100%; height: auto; }
+    .login-card h2 { margin: 14px 0 6px; font-size: 1.4rem; letter-spacing: -0.01em; }
+    .login-card p { color: var(--muted); font-size: 0.92rem; margin: 6px 0 22px; }
+    .login-msg { margin-top: 14px; font-size: 0.86rem; color: var(--danger-fg); background: var(--danger-bg); border-radius: 10px; padding: 10px 12px; white-space: pre-wrap; text-align: left; }
     .login-msg:empty { display: none; }
-    .btn-google { width: 100%; padding: 11px 14px; font-size: 1rem; }
-</style>
+    .btn-google { width: 100%; padding: 12px 14px; font-size: 1rem; border-radius: 12px; }
+    .login-foot { margin-top: 18px; font-size: 0.76rem; color: var(--muted); }
+
+    /* ---------- Avvisi a comparsa ---------- */
+    .toast-host { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 2000; display: grid; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
+    .toast {
+      pointer-events: auto; display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; border-radius: 12px; font-size: 0.88rem; font-weight: 550;
+      background: #0f172a; color: #f8fafc; box-shadow: var(--shadow-lg);
+      animation: toastIn .25s ease;
+    }
+    :root[data-theme="dark"] .toast { background: #e6eaf2; color: #0f172a; }
+    .toast.ok .ico { color: #4ade80; }
+    .toast.err .ico { color: #f87171; }
+    .toast.leaving { opacity: 0; transform: translateY(6px); transition: all .2s; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 640px) {
+      .container { padding: 14px 12px calc(32px + env(safe-area-inset-bottom)); }
+      .appbar-inner { padding: 8px 12px; }
+      .appbar .toolbar { flex-wrap: nowrap; gap: 6px; }
+      .appbar .toolbar > button, .appbar .toolbar > .btn-label { width: 38px; height: 38px; padding: 8px; }
+      .brand { gap: 10px; }
+      .brand img { width: 34px; height: 34px; }
+      h1 { flex-direction: column; align-items: flex-start; gap: 1px; font-size: 1rem; }
+      h1 .pill { font-size: 0.62rem; padding: 0 7px; }
+      .subtitle, .hide-sm { display: none; }
+      .card { padding: 14px; }
+      .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-box { padding: 12px; gap: 10px; }
+      .stat-icon { width: 36px; height: 36px; border-radius: 10px; }
+      .stat-value { font-size: 1.35rem; }
+      .view-tabs { display: flex; }
+      .tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 8px; }
+      .brand { flex: 1 1 auto; min-width: 0; }
+      .brand-text { overflow: hidden; }
+    }
+    @media (max-width: 360px) { .tab-btn .ico { display: none; } .appbar .toolbar > .btn-label { display: none; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-      <div class="login-card">
-        <div class="login-logo">🥾</div>
-        <h2 id="loginTitle">APP Direttivo 3/5</h2>
-        <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
-        <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
-        <div class="login-msg" id="loginMsg"></div>
-      </div>
-    </div>
-    <header>
-      <div>
-        <h1>
-          APP Direttivo 3/5
-          <span class="ro-pill">SOCI IN SOLA LETTURA</span>
-          <span class="version-pill" id="appVersion">v…</span>
-        </h1>
-        <p class="subtitle">Dati letti direttamente dai Fogli Google dell'associazione · spunte e note condivise con tutto il direttivo</p>
-      </div>
-      <div class="toolbar">
-        <label class="btn-label" for="csvInput">Importa CSV locale</label>
-        <input type="file" id="csvInput" accept=".csv,text/csv" hidden />
-        <button id="btnExport">Esporta CSV</button>
-      </div>
-    </header>
+  <!-- Icone -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14l-3-3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M8 3l-6 3v15l6-3 8 3 6-3V3l-6 3z"/><path d="M8 3v15M16 6v15"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+  </svg>
 
-    <section class="card">
-      <div class="sync-row auth-row">
-        <span id="authAccount" class="auth-account">Non connesso</span>
-        <input type="text" id="operatorName" maxlength="40" placeholder="Il tuo nome (per lo storico modifiche)" />
-        <button class="primary" id="btnLoadSheet">Aggiorna dati</button>
-        <button type="button" id="btnLogin">Accedi con Google</button>
-        <button type="button" id="btnLogout">Esci</button>
-      </div>
-      <div class="sync-meta">
-        <span id="syncStatus">Accedi con l'account dell'associazione per leggere i dati.</span>
-        <span><span id="syncBadge" class="sync-badge" role="status"></span> <span id="lastSyncTime">Ultimo aggiornamento: —</span></span>
-      </div>
-    </section>
-
-    <section class="stats">
-      <div class="stat-box">
-        <div class="stat-label">Totale record</div>
-        <div class="stat-value" id="statTotal">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Attive</div>
-        <div class="stat-value" id="statActive">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">In scadenza (≤ 30 gg)</div>
-        <div class="stat-value" id="statExpiring">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Scadute / Rinnovo</div>
-        <div class="stat-value" id="statExpired">0</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="filters">
-        <input type="search" id="searchInput" placeholder="Cerca per nome, cognome, n° tessera, email, telefono, CF o città..." />
-        <select id="typeFilter">
-          <option value="ALL">Tutte le tipologie</option>
-        </select>
-        <select id="statusFilter">
-          <option value="NON_SCADUTA" selected>Non scadute (Attive + In scadenza)</option>
-          <option value="ATTIVA">Solo Attiva</option>
-          <option value="IN_SCADENZA">Solo In scadenza (≤ 30 gg)</option>
-          <option value="ALL">Tutti gli stati (inclusi scaduti)</option>
-          <option value="SCADUTA">Solo Scaduta / Rinnovo</option>
-          <option value="DA_PREPARARE">Cartacea: Da preparare</option>
-          <option value="PREPARATA_NON_CONSEGNATA">Cartacea: Preparata (da consegnare)</option>
-          <option value="CONSEGNATA">Cartacea: Consegnata</option>
-        </select>
-        <button id="btnClearFilters">Reset filtri</button>
-      </div>
-    </section>
-
-        <div class="view-tabs" role="tablist">
-      <button type="button" id="tabBtnSoci" class="tab-btn active" role="tab" aria-selected="true">Libro Soci</button>
-      <button type="button" id="tabBtnEscursioni" class="tab-btn" role="tab" aria-selected="false">Escursioni (Form)</button>
-    </div>
-
-    <div id="viewSoci" class="view-section">
-<section id="memberDetailView" class="card detail-view" aria-live="polite">
-      <div class="detail-header">
-        <div>
-          <button type="button" id="btnBackToList">← Torna all'elenco</button>
-          <h2 id="detailTitle" style="margin:10px 0 2px;font-size:1.3rem;">Scheda Socio</h2>
-          <div id="detailSubtitle" style="color:var(--muted);font-size:0.86rem;"></div>
-        </div>
-        <div class="toolbar" id="detailActions"></div>
-      </div>
-      <div id="detailBody"></div>
-    </section>
-
-    <div id="listSection">
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th class="sortable" data-sort="tessera">Tessera</th>
-            <th class="sortable" data-sort="nome">Socio / Volontario</th>
-            <th>Tessera cartacea</th>
-            <th class="sortable" data-sort="tesseramento">Tesseramento</th>
-            <th class="sortable" data-sort="scadenza">Scadenza</th>
-            <th class="sortable" data-sort="gg">GG</th>
-            <th class="sortable" data-sort="stato">Stato</th>
-            <th>Solleciti</th>
-            <th class="wrap">Note</th>
-            <th class="wrap">Nota locale</th>
-            <th class="sortable" data-sort="tipo">Tipo tessera</th>
-          </tr>
-        </thead>
-        <tbody id="membersBody"></tbody>
-      </table>
-    </div>
+  <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="login-card">
+      <div class="login-logo"><img src="icons/logo.png?v=2.1.0" alt="Tre Quinti Trekking APS" /></div>
+      <h2 id="loginTitle">APP Direttivo 3/5</h2>
+      <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
+      <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
+      <div class="login-msg" id="loginMsg"></div>
+      <div class="login-foot">Area riservata al direttivo</div>
     </div>
   </div>
 
+  <header class="appbar">
+    <div class="appbar-inner">
+      <div class="brand">
+        <img src="icons/icon-192.png?v=2.1.0" alt="" />
+        <div class="brand-text">
+          <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
+          <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
+        </div>
       </div>
+      <div class="toolbar">
+        <label class="btn-label" for="csvInput" title="Consulta un file CSV senza collegarti ai Fogli Google"><svg class="ico"><use href="#i-upload"/></svg><span class="hide-sm">Importa CSV</span></label>
+        <input type="file" id="csvInput" accept=".csv,text/csv" hidden />
+        <button id="btnExport" title="Scarica l'elenco soci con spunte e note"><svg class="ico"><use href="#i-download"/></svg><span class="hide-sm">Esporta CSV</span></button>
+        <button type="button" id="btnTheme" class="icon-btn" title="Tema: automatico" aria-label="Cambia tema"><svg class="ico"><use href="#i-auto"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="card">
+      <div class="auth-row">
+        <span id="authAccount" class="auth-account">Non connesso</span>
+        <input type="text" id="operatorName" maxlength="40" placeholder="Il tuo nome (per lo storico modifiche)" />
+        <button class="primary btn" id="btnLoadSheet"><svg class="ico"><use href="#i-refresh"/></svg>Aggiorna dati</button>
+        <button type="button" id="btnLogin">Accedi con Google</button>
+        <button type="button" id="btnLogout" class="ghost"><svg class="ico"><use href="#i-logout"/></svg>Esci</button>
+      </div>
+      <div class="sync-meta">
+        <span id="syncStatus">Accedi con l'account dell'associazione per leggere i dati.</span>
+        <span class="right"><span id="syncBadge" class="sync-badge" role="status"></span> <span id="lastSyncTime">Ultimo aggiornamento: —</span></span>
+      </div>
+    </section>
+
+    <div class="view-tabs" role="tablist">
+      <button type="button" id="tabBtnSoci" class="tab-btn active" role="tab" aria-selected="true"><svg class="ico ico-sm"><use href="#i-users"/></svg>Libro Soci <span class="count" id="tabCountSoci"></span></button>
+      <button type="button" id="tabBtnEscursioni" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-map"/></svg>Escursioni <span class="count" id="tabCountEsc"></span></button>
+    </div>
+
+    <div id="viewSoci" class="view-section">
+      <section class="stats" aria-label="Riepilogo tessere">
+        <button type="button" class="stat-box tone-info" data-stat-filter="ALL" title="Mostra tutti">
+          <span class="stat-icon"><svg class="ico"><use href="#i-users"/></svg></span>
+          <span><span class="stat-label">Totale record</span><span class="stat-value" id="statTotal" style="display:block">0</span></span>
+        </button>
+        <button type="button" class="stat-box tone-ok" data-stat-filter="ATTIVA" title="Mostra solo le attive">
+          <span class="stat-icon"><svg class="ico"><use href="#i-check"/></svg></span>
+          <span><span class="stat-label">Attive</span><span class="stat-value" id="statActive" style="display:block">0</span></span>
+        </button>
+        <button type="button" class="stat-box tone-warn" data-stat-filter="IN_SCADENZA" title="Mostra quelle in scadenza">
+          <span class="stat-icon"><svg class="ico"><use href="#i-clock"/></svg></span>
+          <span><span class="stat-label">In scadenza (≤ 30 gg)</span><span class="stat-value" id="statExpiring" style="display:block">0</span></span>
+        </button>
+        <button type="button" class="stat-box tone-danger" data-stat-filter="SCADUTA" title="Mostra scadute / da rinnovare">
+          <span class="stat-icon"><svg class="ico"><use href="#i-alert"/></svg></span>
+          <span><span class="stat-label">Scadute / Rinnovo</span><span class="stat-value" id="statExpired" style="display:block">0</span></span>
+        </button>
+      </section>
+
+      <section id="memberDetailView" class="card detail-view" aria-live="polite">
+        <button type="button" id="btnBackToList" class="ghost"><svg class="ico"><use href="#i-back"/></svg>Torna all'elenco</button>
+        <div class="detail-hero">
+          <div class="detail-hero-main">
+            <span class="avatar lg" id="detailAvatar">?</span>
+            <div>
+              <h2 id="detailTitle">Scheda Socio</h2>
+              <div id="detailSubtitle" class="detail-sub"></div>
+            </div>
+          </div>
+          <div class="toolbar" id="detailActions"></div>
+        </div>
+        <div id="detailBody"></div>
+      </section>
+
+      <div id="listSection">
+        <section class="card">
+          <div class="filters">
+            <div class="search-field">
+              <svg class="ico"><use href="#i-search"/></svg>
+              <input type="search" id="searchInput" placeholder="Cerca nome, n° tessera, email, telefono, CF, città…" aria-label="Cerca socio" />
+              <span class="kbd" aria-hidden="true">/</span>
+            </div>
+            <select id="typeFilter" aria-label="Tipologia tessera">
+              <option value="ALL">Tutte le tipologie</option>
+            </select>
+            <select id="statusFilter" aria-label="Stato tessera">
+              <option value="NON_SCADUTA" selected>Non scadute (Attive + In scadenza)</option>
+              <option value="ATTIVA">Solo Attiva</option>
+              <option value="IN_SCADENZA">Solo In scadenza (≤ 30 gg)</option>
+              <option value="ALL">Tutti gli stati (inclusi scaduti)</option>
+              <option value="SCADUTA">Solo Scaduta / Rinnovo</option>
+              <option value="DA_PREPARARE">Cartacea: Da preparare</option>
+              <option value="PREPARATA_NON_CONSEGNATA">Cartacea: Preparata (da consegnare)</option>
+              <option value="CONSEGNATA">Cartacea: Consegnata</option>
+            </select>
+            <button id="btnClearFilters" class="ghost"><svg class="ico"><use href="#i-x"/></svg>Reset</button>
+          </div>
+        </section>
+
+        <div class="list-meta">
+          <span id="listCount">—</span>
+          <span class="hide-sm">Clic sull'intestazione per ordinare · clic sul nome per la scheda</span>
+        </div>
+        <div class="table-wrap responsive">
+          <table>
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="tessera">Tessera</th>
+                <th class="sortable" data-sort="nome">Socio / Volontario</th>
+                <th>Tessera cartacea</th>
+                <th class="sortable" data-sort="tesseramento">Tesseramento</th>
+                <th class="sortable" data-sort="scadenza">Scadenza</th>
+                <th class="sortable" data-sort="gg">GG</th>
+                <th class="sortable" data-sort="stato">Stato</th>
+                <th>Solleciti</th>
+                <th class="wrap">Note foglio</th>
+                <th class="wrap">Nota direttivo</th>
+                <th class="sortable" data-sort="tipo">Tipo tessera</th>
+              </tr>
+            </thead>
+            <tbody id="membersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <div id="viewEscursioni" class="view-section hidden">
-      <section class="card" style="margin-bottom:16px;">
-        <div class="toolbar" style="justify-content:space-between;">
-          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
-            <label for="excSelect" style="font-weight:600;font-size:0.9rem;">Escursione:</label>
-            <select id="excSelect" style="min-width:260px;">
-              <option value="">— Carica escursioni —</option>
-            </select>
-            <button type="button" id="btnLoadEscursioni" class="primary">Carica Adesioni</button>
-            <input type="search" id="excSearch" placeholder="Cerca partecipante, email, telefono..." style="min-width:230px;" />
+      <section class="card">
+        <div class="exc-controls">
+          <label for="excSelect" class="sr-only">Escursione</label>
+          <select id="excSelect">
+            <option value="">— Carica escursioni —</option>
+          </select>
+          <button type="button" id="btnLoadEscursioni" class="primary btn"><svg class="ico"><use href="#i-refresh"/></svg>Carica adesioni</button>
+          <button type="button" id="btnExportExc" title="Scarica i partecipanti dell'uscita selezionata"><svg class="ico"><use href="#i-download"/></svg><span class="hide-sm">Esporta partecipanti</span></button>
+          <div class="search-field">
+            <svg class="ico"><use href="#i-search"/></svg>
+            <input type="search" id="excSearch" placeholder="Cerca partecipante, email, telefono…" aria-label="Cerca partecipante" />
           </div>
-          <div id="excStatusMsg" style="font-size:0.84rem;color:var(--muted);"></div>
         </div>
+        <div id="excStatusMsg" class="muted" style="font-size:0.82rem;margin-top:10px;"></div>
 
-        <div class="stats" id="excStats" style="margin-top:12px;">
-          <div class="stat"><div class="stat-label">Adesioni nel foglio</div><div class="stat-value" id="excStatCount">0</div></div>
-          <div class="stat"><div class="stat-label">Già Soci</div><div class="stat-value" id="excStatMembers">0</div></div>
-          <div class="stat"><div class="stat-label">Partecipanti unici</div><div class="stat-value" id="excStatTotalTrips">0</div></div>
+        <div class="stats" id="excStats" style="margin:12px 0 0;">
+          <div class="stat-box tone-info"><span class="stat-icon"><svg class="ico"><use href="#i-card"/></svg></span><span><span class="stat-label">Adesioni nel foglio</span><span class="stat-value" id="excStatCount" style="display:block">0</span></span></div>
+          <div class="stat-box tone-ok"><span class="stat-icon"><svg class="ico"><use href="#i-check"/></svg></span><span><span class="stat-label">Già soci</span><span class="stat-value" id="excStatMembers" style="display:block">0</span></span></div>
+          <div class="stat-box tone-warn"><span class="stat-icon"><svg class="ico"><use href="#i-users"/></svg></span><span><span class="stat-label">Escursionisti unici (tutte le uscite)</span><span class="stat-value" id="excStatTotalTrips" style="display:block">0</span></span></div>
         </div>
       </section>
 
-      <section class="card" style="margin-bottom:16px;">
-        <h2 style="margin:0 0 10px;font-size:1.05rem;">Adesioni dell'escursione selezionata</h2>
-        <div class="table-wrap">
+      <section class="card">
+        <h2 class="card-title">Adesioni dell'escursione selezionata</h2>
+        <div class="table-wrap responsive">
           <table>
             <thead>
               <tr>
                 <th>Partecipante</th>
                 <th>Contatti</th>
-                <th>Stato Socio</th>
-                <th>N° Escursioni</th>
-                <th>Nota locale</th>
+                <th>Stato socio</th>
+                <th>N° escursioni</th>
+                <th>Nota</th>
               </tr>
             </thead>
             <tbody id="excRowsBody">
-              <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Clicca "Carica Adesioni" per leggere i Fogli Google del form.</td></tr>
+              <tr><td colspan="5" class="empty">Clicca "Carica adesioni" per leggere i Fogli Google del form.</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
       <section class="card">
-        <h2 style="margin:0 0 10px;font-size:1.05rem;">Contatore partecipazioni per escursionista (tutti i fogli)</h2>
-        <div class="table-wrap">
+        <h2 class="card-title">Contatore partecipazioni per escursionista</h2>
+        <div class="table-wrap responsive">
           <table>
             <thead>
               <tr>
                 <th>Partecipante</th>
-                <th>Escursioni partecipate</th>
+                <th>Uscite</th>
                 <th>Elenco uscite</th>
-                <th>Stato Socio</th>
+                <th>Stato socio</th>
               </tr>
             </thead>
             <tbody id="excCounterBody">
-              <tr><td colspan="4" style="text-align:center;padding:18px;color:var(--muted);">Nessun dato caricato.</td></tr>
+              <tr><td colspan="4" class="empty">Nessun dato caricato.</td></tr>
             </tbody>
           </table>
         </div>
       </section>
     </div>
+  </div>
+
+  <div id="toastHost" class="toast-host" aria-live="polite"></div>
 
 <script>
+    // ===================================================================
+    //  Stato e costanti (usati anche da js/app.js)
+    // ===================================================================
     const STORAGE_KEY = "libro_soci_ro_v2";
-    const URL_KEY = "libro_soci_webapp_url_v1";
     const LOCAL_NOTES_KEY = "libro_soci_local_notes_v1";
     const PAPER_CARDS_KEY = "libro_soci_paper_cards_v1";
-    let localNotes = {};
-    let paperCards = {};
-    const DEFAULT_URL = "";
+    const EXC_LOCAL_KEY = "libro_soci_escursioni_local_v1";
+    const THEME_KEY = "app35_theme_v1";
 
     let members = [];
+    let localNotes = {};
+    let paperCards = {};
+    let excList = [];
+    let excLocalState = {};
     let sortKey = "";
     let sortDir = "asc";
     let selectedMemberIndex = null;
 
+    const byId = (id) => document.getElementById(id);
     const els = {
-      syncStatus: document.getElementById("syncStatus"),
-      lastSyncTime: document.getElementById("lastSyncTime"),
-      btnLoadSheet: document.getElementById("btnLoadSheet"),
-      csvInput: document.getElementById("csvInput"),
-      btnExport: document.getElementById("btnExport"),
-      searchInput: document.getElementById("searchInput"),
-      typeFilter: document.getElementById("typeFilter"),
-      statusFilter: document.getElementById("statusFilter"),
-      btnClearFilters: document.getElementById("btnClearFilters"),
-      membersBody: document.getElementById("membersBody"),
-      statTotal: document.getElementById("statTotal"),
-      statActive: document.getElementById("statActive"),
-      statExpiring: document.getElementById("statExpiring"),
-      statExpired: document.getElementById("statExpired")
+      syncStatus: byId("syncStatus"),
+      lastSyncTime: byId("lastSyncTime"),
+      btnLoadSheet: byId("btnLoadSheet"),
+      csvInput: byId("csvInput"),
+      btnExport: byId("btnExport"),
+      searchInput: byId("searchInput"),
+      typeFilter: byId("typeFilter"),
+      statusFilter: byId("statusFilter"),
+      btnClearFilters: byId("btnClearFilters"),
+      membersBody: byId("membersBody"),
+      statTotal: byId("statTotal"),
+      statActive: byId("statActive"),
+      statExpiring: byId("statExpiring"),
+      statExpired: byId("statExpired"),
+      listCount: byId("listCount"),
+      tabCountSoci: byId("tabCountSoci"),
+      tabCountEsc: byId("tabCountEsc"),
+      btnTheme: byId("btnTheme")
     };
 
+    // ===================================================================
+    //  Utilità
+    // ===================================================================
+    function escapeHtml(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function icon(name, cls) {
+      return `<svg class="ico ${cls || ""}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+    }
+
+    function debounce(fn, ms) {
+      let t = null;
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    }
+
+    function toast(msg, type) {
+      const host = byId("toastHost");
+      if (!host) return;
+      const el = document.createElement("div");
+      el.className = "toast " + (type || "ok");
+      el.innerHTML = icon(type === "err" ? "alert" : "check") + `<span>${escapeHtml(msg)}</span>`;
+      host.appendChild(el);
+      setTimeout(() => { el.classList.add("leaving"); setTimeout(() => el.remove(), 220); }, 2600);
+    }
+
+    async function copyText(text, okMsg) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast(okMsg || "Copiato negli appunti");
+      } catch (_) {
+        prompt("Copia il testo:", text);
+      }
+    }
+
+    function initials(name) {
+      const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+      return ((parts[0] || "?")[0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+    }
+
+    function setBusy(btn, busy) {
+      if (!btn) return;
+      btn.classList.toggle("is-loading", Boolean(busy));
+      btn.disabled = Boolean(busy);
+    }
+
+    function downloadCsv(filename, cols, rows) {
+      const csvCell = (v) => '"' + String(v ?? "").split('"').join('""') + '"';
+      const lines = [cols.map(csvCell).join(",")].concat(rows.map(r => cols.map(c => csvCell(r[c])).join(",")));
+      const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+
+    function todayStamp() {
+      const d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+
+    // Numero per WhatsApp: cellulari italiani senza prefisso → +39.
+    function whatsappNumber(phone) {
+      let d = String(phone || "").replace(/[^0-9+]/g, "");
+      if (d.startsWith("+")) d = d.slice(1);
+      else if (d.startsWith("00")) d = d.slice(2);
+      else if (d.length === 10 && d.startsWith("3")) d = "39" + d;
+      return d.length >= 8 ? d : "";
+    }
+
+    // Telegram apre la chat dal numero (se la persona permette di essere trovata col numero).
+    function telegramLink(phone) {
+      const n = whatsappNumber(phone);
+      return n ? "https://t.me/+" + n : "";
+    }
+
+    async function showNotification(title, body) {
+      // Su Android le notifiche funzionano solo tramite il service worker.
+      try {
+        const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.1.0" }); return; }
+      } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.1.0" }); } catch (_) {}
+    }
+
+    // ===================================================================
+    //  Tema chiaro / scuro / automatico
+    // ===================================================================
+    const THEMES = ["auto", "light", "dark"];
+    const THEME_LABEL = { auto: "automatico", light: "chiaro", dark: "scuro" };
+    const THEME_ICON = { auto: "auto", light: "sun", dark: "moon" };
+    function currentTheme() {
+      try { const t = localStorage.getItem(THEME_KEY); return THEMES.includes(t) ? t : "auto"; } catch (_) { return "auto"; }
+    }
+    function applyTheme(t) {
+      if (t === "auto") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", t);
+      if (els.btnTheme) {
+        els.btnTheme.innerHTML = icon(THEME_ICON[t]);
+        els.btnTheme.title = "Tema: " + THEME_LABEL[t] + " (clic per cambiare)";
+      }
+    }
+    els.btnTheme.addEventListener("click", () => {
+      const next = THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length];
+      try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+      applyTheme(next);
+      toast("Tema " + THEME_LABEL[next]);
+    });
+    applyTheme(currentTheme());
+
+    // ===================================================================
+    //  Date e stato tessera
+    // ===================================================================
     function parseItDate(str) {
       if (!str) return null;
       const s = String(str).trim();
@@ -705,7 +879,6 @@
       const rawStatus = String(member["STATO TESSERA"] || "").trim();
       const upperStatus = rawStatus.toUpperCase();
       const days = diffDaysFromToday(member["DATA SCADENZA"]);
-
       if (upperStatus.includes("SCADUT") || (days !== null && days < 0)) {
         return { category: "SCADUTA", label: rawStatus || "Scaduta", badge: "badge-danger", days };
       }
@@ -715,37 +888,31 @@
       return { category: "ATTIVA", label: rawStatus || "Attiva", badge: "badge-ok", days };
     }
 
-    function saveLocal() {
+    // ===================================================================
+    //  Cache sul dispositivo
+    // ===================================================================
+    function readJsonKey(key, fallback) {
       try {
-        appStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-      } catch (e) {}
+        const raw = appStorage.getItem(key);
+        if (!raw) return fallback;
+        const v = JSON.parse(raw);
+        return v && typeof v === "object" ? v : fallback;
+      } catch (e) { return fallback; }
+    }
+    function writeJsonKey(key, val) {
+      try { appStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
     }
 
+    function saveLocal() { writeJsonKey(STORAGE_KEY, members); }
+    function saveLocalNotes() { writeJsonKey(LOCAL_NOTES_KEY, localNotes); }
+    function saveExcLocalState() { writeJsonKey(EXC_LOCAL_KEY, excLocalState); }
+
     function loadLocal() {
-      try {
-        const raw = appStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) members = parsed;
-        }
-      } catch (e) {}
-
-      try {
-        const rawNotes = appStorage.getItem(LOCAL_NOTES_KEY);
-        if (rawNotes) {
-          const parsedNotes = JSON.parse(rawNotes);
-          if (parsedNotes && typeof parsedNotes === "object") localNotes = parsedNotes;
-        }
-      } catch (e) {}
-
-      try {
-        const rawPaper = appStorage.getItem(PAPER_CARDS_KEY);
-        if (rawPaper) {
-          const parsedPaper = JSON.parse(rawPaper);
-          if (parsedPaper && typeof parsedPaper === "object") paperCards = parsedPaper;
-        }
-      } catch (e) {}
-
+      const m = readJsonKey(STORAGE_KEY, []);
+      if (Array.isArray(m)) members = m;
+      localNotes = readJsonKey(LOCAL_NOTES_KEY, {});
+      paperCards = readJsonKey(PAPER_CARDS_KEY, {});
+      excLocalState = readJsonKey(EXC_LOCAL_KEY, {});
     }
 
     function setStatusText(msg, isError = false) {
@@ -754,21 +921,22 @@
     }
 
     function updateTimestamp(isoOrNow) {
-      if (isoOrNow) {
-        const d = new Date(isoOrNow);
-        if (!isNaN(d.getTime())) {
-          els.lastSyncTime.textContent = "Ultimo aggiornamento: " + d.toLocaleString("it-IT");
-          return;
-        }
-      }
-      els.lastSyncTime.textContent = "Ultimo aggiornamento: " + new Date().toLocaleTimeString("it-IT");
+      const d = isoOrNow ? new Date(isoOrNow) : new Date();
+      els.lastSyncTime.textContent = "Aggiornato: " + (isNaN(d.getTime()) ? new Date() : d).toLocaleString("it-IT", { dateStyle: "short", timeStyle: "short" });
     }
 
+    // ===================================================================
+    //  Tessere cartacee e note
+    // ===================================================================
     function memberNoteKey(m, idx) {
       const tessera = String(m["TESSERA n°"] || "").trim();
       const cf = String(m["CODICE FISCALE"] || "").trim();
       const nome = `${String(m["COGNOME"] || "").trim()}_${String(m["NOME"] || "").trim()}`;
       return tessera ? `tessera_${tessera}` : (cf ? `cf_${cf}` : `${nome}_${idx}`);
+    }
+
+    function memberFullName(m) {
+      return `${m["COGNOME"] || ""} ${m["NOME"] || ""}`.trim();
     }
 
     function getPaperCardState(key) {
@@ -780,10 +948,7 @@
 
     function setPaperCardFlag(key, field, checked) {
       if (!key) return;
-      const cur = getPaperCardState(key);
-      let preparata = cur.preparata;
-      let consegnata = cur.consegnata;
-
+      let { preparata, consegnata } = getPaperCardState(key);
       if (field === "preparata") {
         preparata = Boolean(checked);
         if (!preparata) consegnata = false;
@@ -791,55 +956,63 @@
         consegnata = Boolean(checked);
         if (consegnata) preparata = true;
       }
-
-      if (!preparata && !consegnata) {
-        delete paperCards[key];
-      } else {
-        paperCards[key] = { preparata, consegnata };
-      }
-
-      try {
-        appStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
-      } catch (e) {}
+      if (!preparata && !consegnata) delete paperCards[key];
+      else paperCards[key] = { preparata, consegnata };
+      writeJsonKey(PAPER_CARDS_KEY, paperCards);
       CloudDB.paper(key, paperCards[key] || null);
     }
 
-    function saveLocalNotes() {
-      try {
-        appStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
-      } catch (e) {}
+    function paperFlagsHtml(key, row) {
+      const st = getPaperCardState(key);
+      const k = escapeHtml(key);
+      return `
+        <div class="paper-flags"${row ? ' style="flex-direction:row;gap:18px;"' : ""}>
+          <label class="flag-label"><input type="checkbox" class="paper-flag-cb" data-note-key="${k}" data-flag="preparata" ${st.preparata ? "checked" : ""} /><span>Preparata</span></label>
+          <label class="flag-label"><input type="checkbox" class="paper-flag-cb" data-note-key="${k}" data-flag="consegnata" ${st.consegnata ? "checked" : ""} /><span>Consegnata</span></label>
+        </div>`;
     }
 
-    function escapeHtml(val) {
-      return String(val ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+    function setMemberNote(key, val) {
+      if (!key) return;
+      if (val.trim() === "") delete localNotes[key];
+      else localNotes[key] = val;
+      saveLocalNotes();
+      CloudDB.note(key, val);
+      // Tiene allineati gli altri campi della stessa nota (tabella e scheda).
+      document.querySelectorAll(`[data-note-key="${CSS.escape(key)}"].local-note-input, #detailLocalNoteInput[data-note-key="${CSS.escape(key)}"]`).forEach(el => {
+        if (el !== document.activeElement) el.value = val;
+      });
     }
 
+    // ===================================================================
+    //  Libro soci: filtri, ordinamento, tabella
+    // ===================================================================
+    let typeFilterSig = "";
     function populateTypeFilter() {
+      const types = [...new Set(members.map(m => String(m["TIPO TESSERA"] || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
+      const sig = types.join("\u0001");
+      if (sig === typeFilterSig) return;
+      typeFilterSig = sig;
       const current = els.typeFilter.value;
-      const types = [...new Set(members.map(m => String(m["TIPO TESSERA"] || "").trim()).filter(Boolean))];
       els.typeFilter.innerHTML = `<option value="ALL">Tutte le tipologie</option>` +
         types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
-      if ([...els.typeFilter.options].some(o => o.value === current)) {
-        els.typeFilter.value = current;
-      }
+      if ([...els.typeFilter.options].some(o => o.value === current)) els.typeFilter.value = current;
     }
 
-    function updateStats() {
+    function updateStats(rows) {
       let active = 0, expiring = 0, expired = 0;
-      for (const m of members) {
-        const st = computeStatusCategory(m);
-        if (st.category === "SCADUTA") expired++;
-        else if (st.category === "IN_SCADENZA") expiring++;
+      for (const r of rows) {
+        if (r.st.category === "SCADUTA") expired++;
+        else if (r.st.category === "IN_SCADENZA") expiring++;
         else active++;
       }
-      els.statTotal.textContent = members.length;
+      els.statTotal.textContent = rows.length;
       els.statActive.textContent = active;
       els.statExpiring.textContent = expiring;
       els.statExpired.textContent = expired;
+      els.tabCountSoci.textContent = rows.length ? String(rows.length) : "";
+      const sf = els.statusFilter.value;
+      document.querySelectorAll("[data-stat-filter]").forEach(b => b.classList.toggle("selected", b.getAttribute("data-stat-filter") === sf));
     }
 
     function parseNumberLoose(val) {
@@ -850,208 +1023,174 @@
       return isNaN(n) ? null : n;
     }
 
+    function dateSortValue(v) {
+      const d = parseItDate(v);
+      return d ? d.getTime() : Number.POSITIVE_INFINITY;
+    }
+
     function compareSortRows(a, b) {
       if (!sortKey) return 0;
       const mult = sortDir === "desc" ? -1 : 1;
-
-      if (sortKey === "tessera") {
-        const na = parseNumberLoose(a.member["TESSERA n°"]);
-        const nb = parseNumberLoose(b.member["TESSERA n°"]);
-        if (na !== null && nb !== null && na !== nb) return (na - nb) * mult;
-        return String(a.member["TESSERA n°"] || "").localeCompare(String(b.member["TESSERA n°"] || ""), "it", { numeric: true }) * mult;
-      }
-      if (sortKey === "tipo") {
-        return String(a.member["TIPO TESSERA"] || "").localeCompare(String(b.member["TIPO TESSERA"] || ""), "it") * mult;
-      }
-      if (sortKey === "nome") {
-        const ka = `${String(a.member["COGNOME"] || "")} ${String(a.member["NOME"] || "")}`.trim();
-        const kb = `${String(b.member["COGNOME"] || "")} ${String(b.member["NOME"] || "")}`.trim();
-        return ka.localeCompare(kb, "it") * mult;
-      }
-      if (sortKey === "tesseramento") {
-        const da = parseItDate(a.member["DATA TESSERAMENTO"]);
-        const db = parseItDate(b.member["DATA TESSERAMENTO"]);
-        const ta = da ? da.getTime() : Number.POSITIVE_INFINITY;
-        const tb = db ? db.getTime() : Number.POSITIVE_INFINITY;
-        return (ta - tb) * mult;
-      }
-      if (sortKey === "scadenza") {
-        const da = parseItDate(a.member["DATA SCADENZA"]);
-        const db = parseItDate(b.member["DATA SCADENZA"]);
-        const ta = da ? da.getTime() : Number.POSITIVE_INFINITY;
-        const tb = db ? db.getTime() : Number.POSITIVE_INFINITY;
-        return (ta - tb) * mult;
-      }
-      if (sortKey === "gg") {
-        const ga = a.st.days !== null ? a.st.days : parseNumberLoose(a.member["GG"]);
-        const gb = b.st.days !== null ? b.st.days : parseNumberLoose(b.member["GG"]);
-        const va = ga !== null ? ga : Number.POSITIVE_INFINITY;
-        const vb = gb !== null ? gb : Number.POSITIVE_INFINITY;
-        return (va - vb) * mult;
-      }
-      if (sortKey === "stato") {
-        return String(a.st.label || "").localeCompare(String(b.st.label || ""), "it") * mult;
+      const am = a.member, bm = b.member;
+      switch (sortKey) {
+        case "tessera": {
+          const na = parseNumberLoose(am["TESSERA n°"]), nb = parseNumberLoose(bm["TESSERA n°"]);
+          if (na !== null && nb !== null && na !== nb) return (na - nb) * mult;
+          return String(am["TESSERA n°"] || "").localeCompare(String(bm["TESSERA n°"] || ""), "it", { numeric: true }) * mult;
+        }
+        case "tipo": return String(am["TIPO TESSERA"] || "").localeCompare(String(bm["TIPO TESSERA"] || ""), "it") * mult;
+        case "nome": return memberFullName(am).localeCompare(memberFullName(bm), "it") * mult;
+        case "tesseramento": return (dateSortValue(am["DATA TESSERAMENTO"]) - dateSortValue(bm["DATA TESSERAMENTO"])) * mult || 0;
+        case "scadenza": return (dateSortValue(am["DATA SCADENZA"]) - dateSortValue(bm["DATA SCADENZA"])) * mult || 0;
+        case "gg": {
+          const ga = a.st.days !== null ? a.st.days : parseNumberLoose(am["GG"]);
+          const gb = b.st.days !== null ? b.st.days : parseNumberLoose(bm["GG"]);
+          return ((ga ?? Number.POSITIVE_INFINITY) - (gb ?? Number.POSITIVE_INFINITY)) * mult || 0;
+        }
+        case "stato": return String(a.st.label || "").localeCompare(String(b.st.label || ""), "it") * mult;
       }
       return 0;
     }
 
     function updateSortHeaders() {
       document.querySelectorAll("th.sortable").forEach(th => {
-        th.classList.remove("sort-asc", "sort-desc");
-        if (th.getAttribute("data-sort") === sortKey) {
-          th.classList.add(sortDir === "desc" ? "sort-desc" : "sort-asc");
-        }
+        const on = th.getAttribute("data-sort") === sortKey;
+        th.classList.toggle("sort-asc", on && sortDir !== "desc");
+        th.classList.toggle("sort-desc", on && sortDir === "desc");
+        th.setAttribute("aria-sort", on ? (sortDir === "desc" ? "descending" : "ascending") : "none");
       });
     }
 
+    function sollecitiText(m) {
+      const parts = [];
+      const add = (label, raw) => {
+        const v = String(raw ?? "").trim();
+        if (v.toLowerCase() === "true") parts.push(label + ": sì");
+        else if (v && v.toLowerCase() !== "false") parts.push(`${label}: ${v}`);
+      };
+      add("Mail", m["MAIL RINNOVO"]);
+      add("Msg", m["MESS. RINNOVO"]);
+      return parts.join(" · ");
+    }
+
+    const PAPER_FILTERS = ["DA_PREPARARE", "PREPARATA_NON_CONSEGNATA", "CONSEGNATA"];
+
     function renderTable() {
       populateTypeFilter();
-      updateStats();
       updateSortHeaders();
+
+      // Calcolo una sola volta per socio: indice originale, chiave e stato.
+      const rows = members.map((m, idx) => ({ member: m, idx, key: memberNoteKey(m, idx), st: computeStatusCategory(m) }));
+      updateStats(rows);
 
       const q = els.searchInput.value.trim().toLowerCase();
       const tFilter = els.typeFilter.value;
       const sFilter = els.statusFilter.value;
 
-      const filtered = members.filter(m => {
-        const st = computeStatusCategory(m);
+      const filtered = rows.filter(({ member: m, key, st }) => {
         if (tFilter !== "ALL" && String(m["TIPO TESSERA"] || "").trim() !== tFilter) return false;
-        if (sFilter === "NON_SCADUTA" && st.category === "SCADUTA") return false;
-        if (sFilter === "DA_PREPARARE" || sFilter === "PREPARATA_NON_CONSEGNATA" || sFilter === "CONSEGNATA") {
-          const pKey = memberNoteKey(m, members.indexOf(m));
-          const pState = getPaperCardState(pKey);
-          if (sFilter === "DA_PREPARARE" && pState.preparata) return false;
-          if (sFilter === "PREPARATA_NON_CONSEGNATA" && (!pState.preparata || pState.consegnata)) return false;
-          if (sFilter === "CONSEGNATA" && !pState.consegnata) return false;
-        }
-        if (
-          sFilter !== "ALL" &&
-          sFilter !== "NON_SCADUTA" &&
-          sFilter !== "DA_PREPARARE" &&
-          sFilter !== "PREPARATA_NON_CONSEGNATA" &&
-          sFilter !== "CONSEGNATA" &&
-          st.category !== sFilter
-        ) return false;
+        if (sFilter === "NON_SCADUTA") { if (st.category === "SCADUTA") return false; }
+        else if (PAPER_FILTERS.includes(sFilter)) {
+          const p = getPaperCardState(key);
+          if (sFilter === "DA_PREPARARE" && p.preparata) return false;
+          if (sFilter === "PREPARATA_NON_CONSEGNATA" && (!p.preparata || p.consegnata)) return false;
+          if (sFilter === "CONSEGNATA" && !p.consegnata) return false;
+        } else if (sFilter !== "ALL" && st.category !== sFilter) return false;
         if (q) {
           const hay = [
             m["TESSERA n°"], m["TIPO TESSERA"], m["COGNOME"], m["NOME"],
             m["CELLULARE"], m["E-MAIL CONTATTO"], m["CODICE FISCALE"],
-            m["CITTA RESIDENZA"], m["PROVINCIA RESIDENZA"], m["NOTE"]
+            m["CITTA RESIDENZA"], m["PROVINCIA RESIDENZA"], m["NOTE"], localNotes[key]
           ].join(" ").toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
-      }).map((m, origIdx) => ({ member: m, origIdx, st: computeStatusCategory(m) }));
+      });
 
-      if (sortKey) {
-        filtered.sort((a, b) => {
-          const cmp = compareSortRows(a, b);
-          return cmp !== 0 ? cmp : (a.origIdx - b.origIdx);
-        });
-      }
+      if (sortKey) filtered.sort((a, b) => compareSortRows(a, b) || (a.idx - b.idx));
+
+      els.listCount.textContent = members.length
+        ? (filtered.length === members.length ? `${members.length} soci` : `Mostrati ${filtered.length} di ${members.length} soci`)
+        : "";
 
       if (!filtered.length) {
-        els.membersBody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted);">Nessun record visualizzato. Premi "Aggiorna dati" per leggere il Libro Soci.</td></tr>`;
+        els.membersBody.innerHTML = members.length
+          ? `<tr><td colspan="11" class="empty">${icon("search")}Nessun socio corrisponde ai filtri.<br/><button type="button" class="ghost" data-action="clear-filters" style="margin-top:8px;">Azzera i filtri</button></td></tr>`
+          : `<tr><td colspan="11" class="empty">${icon("users")}Nessun dato ancora. Premi <strong>Aggiorna dati</strong> per leggere il Libro Soci.</td></tr>`;
         return;
       }
 
-      els.membersBody.innerHTML = filtered.map(({ member: m, origIdx: idx, st }) => {
+      els.membersBody.innerHTML = filtered.map(({ member: m, idx, key, st }) => {
         const ggVal = st.days !== null ? st.days : (m["GG"] !== undefined && m["GG"] !== "" ? m["GG"] : "—");
-
-        const sollecitiParts = [];
-        if (String(m["MAIL RINNOVO"]).toLowerCase() === "true") sollecitiParts.push("Mail: sì");
-        else if (String(m["MAIL RINNOVO"]).trim() && String(m["MAIL RINNOVO"]).toLowerCase() !== "false") sollecitiParts.push(`Mail: ${m["MAIL RINNOVO"]}`);
-
-        if (String(m["MESS. RINNOVO"]).toLowerCase() === "true") sollecitiParts.push("Msg: sì");
-        else if (String(m["MESS. RINNOVO"]).trim() && String(m["MESS. RINNOVO"]).toLowerCase() !== "false") sollecitiParts.push(`Msg: ${m["MESS. RINNOVO"]}`);
-
-        const solleciti = sollecitiParts.length ? sollecitiParts.join(" | ") : "—";
-
+        const city = `${m["CITTA RESIDENZA"] || ""}${m["PROVINCIA RESIDENZA"] ? ` (${m["PROVINCIA RESIDENZA"]})` : ""}`;
+        const solleciti = sollecitiText(m);
         return `
           <tr>
-            <td><strong>${escapeHtml(m["TESSERA n°"] || "—")}</strong></td>
-            <td>
-              <button type="button" class="member-link" data-member-idx="${idx}" title="Apri scheda personale">
-                ${escapeHtml(`${m["COGNOME"] || ""} ${m["NOME"] || ""}`.trim() || "Senza nome")}
-              </button><br/>
-              <span style="color:var(--muted);font-size:0.78rem;">${escapeHtml(m["CITTA RESIDENZA"] || "")}${m["PROVINCIA RESIDENZA"] ? ` (${escapeHtml(m["PROVINCIA RESIDENZA"])})` : ""}</span>
-            </td>
-            <td>
-              <div class="paper-flags">
-                <label class="flag-label">
-                  <input type="checkbox" class="paper-flag-cb" data-note-key="${escapeHtml(memberNoteKey(m, idx))}" data-flag="preparata" ${getPaperCardState(memberNoteKey(m, idx)).preparata ? "checked" : ""} />
-                  <span>Preparata</span>
-                </label>
-                <label class="flag-label">
-                  <input type="checkbox" class="paper-flag-cb" data-note-key="${escapeHtml(memberNoteKey(m, idx))}" data-flag="consegnata" ${getPaperCardState(memberNoteKey(m, idx)).consegnata ? "checked" : ""} />
-                  <span>Consegnata</span>
-                </label>
+            <td class="num" data-label="Tessera">${escapeHtml(m["TESSERA n°"] || "—")}</td>
+            <td class="cell-main">
+              <div>
+                <button type="button" class="member-link" data-member-idx="${idx}" title="Apri scheda personale">${escapeHtml(memberFullName(m) || "Senza nome")}</button>
+                ${city.trim() ? `<span class="sub">${escapeHtml(city)}</span>` : ""}
               </div>
             </td>
-            <td>${escapeHtml(m["DATA TESSERAMENTO"] || "—")}</td>
-            <td>${escapeHtml(m["DATA SCADENZA"] || "—")}</td>
-            <td><strong>${escapeHtml(String(ggVal))}</strong></td>
-            <td><span class="badge ${st.badge}">${escapeHtml(st.label)}</span></td>
-            <td>${escapeHtml(solleciti)}</td>
-            <td class="wrap">${escapeHtml(m["NOTE"] || "")}</td>
-            <td class="wrap">
-              <input
-                type="text"
-                class="local-note-input"
-                data-note-key="${escapeHtml(memberNoteKey(m, idx))}"
-                value="${escapeHtml(localNotes[memberNoteKey(m, idx)] || "")}"
-                placeholder="Scrivi nota locale..."
-              />
+            <td data-label="Cartacea">${paperFlagsHtml(key)}</td>
+            <td data-label="Tesseramento">${escapeHtml(m["DATA TESSERAMENTO"] || "—")}</td>
+            <td data-label="Scadenza">${escapeHtml(m["DATA SCADENZA"] || "—")}</td>
+            <td class="num" data-label="Giorni">${escapeHtml(String(ggVal))}</td>
+            <td data-label="Stato"><span class="badge ${st.badge}">${escapeHtml(st.label)}</span></td>
+            <td data-label="Solleciti" class="${solleciti ? "" : "hide-empty-mobile"}">${escapeHtml(solleciti || "—")}</td>
+            <td class="wrap ${m["NOTE"] ? "" : "hide-empty-mobile"}" data-label="Note foglio">${escapeHtml(m["NOTE"] || "")}</td>
+            <td class="wrap" data-label="Nota">
+              <input type="text" class="local-note-input" data-note-key="${escapeHtml(key)}" value="${escapeHtml(localNotes[key] || "")}" placeholder="Nota per il direttivo…" />
             </td>
-            <td>${escapeHtml(m["TIPO TESSERA"] || "—")}</td>
-          </tr>
-        `;
+            <td data-label="Tipo">${escapeHtml(m["TIPO TESSERA"] || "—")}</td>
+          </tr>`;
       }).join("");
     }
 
     async function loadFromSheet() {
-      setStatusText("Caricamento dati in sola lettura dal Foglio...");
+      setStatusText("Caricamento del Libro Soci…");
+      setBusy(els.btnLoadSheet, true);
       try {
         const data = await AppData.loadSoci();
-        if (!data || data.ok === false) {
-          throw new Error((data && data.error) || "Risposta non valida dal Foglio");
-        }
-        const list = Array.isArray(data.members)
-          ? data.members
+        if (!data || data.ok === false) throw new Error((data && data.error) || "Risposta non valida dal Foglio");
+        const list = Array.isArray(data.members) ? data.members
           : (Array.isArray(data.rows) ? data.rows : (Array.isArray(data.data) ? data.data : []));
         members = list;
         saveLocal();
         renderTable();
         updateTimestamp(data.updatedAt);
-        setStatusText(`Caricati ${members.length} record in sola lettura.`);
+        setStatusText(`Caricati ${members.length} soci dal Libro Soci.`);
       } catch (err) {
         if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
         setStatusText("Errore caricamento Foglio: " + (err.message || err), true);
+      } finally {
+        setBusy(els.btnLoadSheet, false);
       }
     }
 
-    function parseCsvLine(line, sep) {
-      const result = [];
-      let cur = "";
-      let inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-          if (inQuotes && line[i + 1] === '"') {
-            cur += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (ch === sep && !inQuotes) {
-          result.push(cur);
-          cur = "";
-        } else {
-          cur += ch;
-        }
+    // ===================================================================
+    //  Import / export CSV
+    // ===================================================================
+    // Analizza tutto il testo, così funzionano anche le celle con "a capo" fra virgolette.
+    function parseCsv(text, sep) {
+      const rows = [];
+      let row = [], cur = "", inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') { cur += '"'; i++; } else inQuotes = false;
+          } else cur += ch;
+        } else if (ch === '"') inQuotes = true;
+        else if (ch === sep) { row.push(cur); cur = ""; }
+        else if (ch === "\n" || ch === "\r") {
+          if (ch === "\r" && text[i + 1] === "\n") i++;
+          row.push(cur); rows.push(row); row = []; cur = "";
+        } else cur += ch;
       }
-      result.push(cur);
-      return result;
+      if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+      return rows;
     }
 
     els.csvInput.addEventListener("change", (e) => {
@@ -1060,173 +1199,165 @@
       const reader = new FileReader();
       reader.onload = () => {
         const rawText = String(reader.result || "");
-        const cleanText = rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText;
-        const lines = cleanText.split(String.fromCharCode(10)).map(l => l.trim()).filter(Boolean);
-        if (lines.length < 2) return;
-        const sep = (lines[0].split(";").length - 1) > (lines[0].split(",").length - 1) ? ";" : ",";
-        const headers = parseCsvLine(lines[0], sep).map(h => h.trim());
-        const imported = [];
-        for (let i = 1; i < lines.length; i++) {
-          const vals = parseCsvLine(lines[i], sep);
+        const text = rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText;
+        const firstLine = text.split(/\r?\n/, 1)[0] || "";
+        const sep = (firstLine.split(";").length) > (firstLine.split(",").length) ? ";" : ",";
+        const grid = parseCsv(text, sep).filter(r => r.some(c => String(c).trim() !== ""));
+        if (grid.length < 2) { toast("Il file CSV non contiene righe di dati", "err"); return; }
+        const headers = grid[0].map(h => h.trim());
+        members = grid.slice(1).map(vals => {
           const obj = {};
-          headers.forEach((h, idx) => { obj[h] = (vals[idx] ?? "").trim(); });
-          if (Object.values(obj).some(v => v !== "")) imported.push(obj);
-        }
-        members = imported;
+          headers.forEach((h, idx) => { obj[h] = String(vals[idx] ?? "").trim(); });
+          return obj;
+        });
         saveLocal();
         renderTable();
-        setStatusText(`Caricate in sola lettura ${members.length} righe da CSV (${file.name}).`);
+        setStatusText(`Caricate ${members.length} righe da CSV (${file.name}).`);
+        toast(`Importate ${members.length} righe`);
       };
       reader.readAsText(file, "utf-8");
       e.target.value = "";
     });
 
     els.btnExport.addEventListener("click", () => {
+      if (!members.length) { toast("Non ci sono dati da esportare", "err"); return; }
       const cols = [
         "TESSERA n°", "TIPO TESSERA", "COGNOME", "NOME", "CELLULARE", "E-MAIL CONTATTO",
         "LUOGO DI NASCITA", "DATA DI NASCITA", "ANNI", "INDIRIZZO RESIDENZA", "CAP RESIDENZA",
         "CITTA RESIDENZA", "PROVINCIA RESIDENZA", "CODICE FISCALE", "DATA TESSERAMENTO",
-        "DATA SCADENZA", "STATO TESSERA", "MAIL RINNOVO", "MESS. RINNOVO", "GG", "TESSERA PREPARATA", "TESSERA CONSEGNATA", "NOTE", "NOTE LOCALI"
+        "DATA SCADENZA", "STATO TESSERA", "MAIL RINNOVO", "MESS. RINNOVO", "GG", "TESSERA PREPARATA", "TESSERA CONSEGNATA", "NOTE", "NOTE DIRETTIVO"
       ];
-      const csvCell = (v) => '"' + String(v ?? "").split('"').join('""') + '"';
-      const lines = [cols.map(csvCell).join(",")];
-      members.forEach((m, idx) => {
+      const rows = members.map((m, idx) => {
         const k = memberNoteKey(m, idx);
-        const pSt = getPaperCardState(k);
-        const rowObj = Object.assign({}, m, {
-          "TESSERA PREPARATA": pSt.preparata ? "SI" : "NO",
-          "TESSERA CONSEGNATA": pSt.consegnata ? "SI" : "NO",
-          "NOTE LOCALI": localNotes[k] || ""
+        const p = getPaperCardState(k);
+        return Object.assign({}, m, {
+          "TESSERA PREPARATA": p.preparata ? "SI" : "NO",
+          "TESSERA CONSEGNATA": p.consegnata ? "SI" : "NO",
+          "NOTE DIRETTIVO": localNotes[k] || ""
         });
-        lines.push(cols.map(c => csvCell(rowObj[c])).join(","));
       });
-      const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "libro-soci-sola-lettura.csv";
-      a.click();
-      URL.revokeObjectURL(a.href);
+      downloadCsv(`libro-soci-${todayStamp()}.csv`, cols, rows);
+      toast(`Esportati ${rows.length} soci`);
     });
 
-
+    // ===================================================================
+    //  Scheda socio
+    // ===================================================================
     const detailEls = {
-      view: document.getElementById("memberDetailView"),
-      listSection: document.getElementById("listSection"),
-      btnBack: document.getElementById("btnBackToList"),
-      title: document.getElementById("detailTitle"),
-      subtitle: document.getElementById("detailSubtitle"),
-      actions: document.getElementById("detailActions"),
-      body: document.getElementById("detailBody")
+      view: byId("memberDetailView"),
+      listSection: byId("listSection"),
+      btnBack: byId("btnBackToList"),
+      avatar: byId("detailAvatar"),
+      title: byId("detailTitle"),
+      subtitle: byId("detailSubtitle"),
+      actions: byId("detailActions"),
+      body: byId("detailBody")
     };
 
-    function openMemberDetail(idx) {
+    function renderMemberCurriculumHtml(info) {
+      if (!info.loaded) {
+        return `
+          <div id="memberCurriculumBox" class="curriculum">
+            <div class="curriculum-head"><strong>Curriculum escursioni</strong><span class="badge info">Caricamento…</span></div>
+            <div class="muted" style="font-size:0.84rem;margin-top:6px;">Verifico le partecipazioni nei fogli delle iscrizioni…</div>
+          </div>`;
+      }
+      const chips = info.trips.length
+        ? `<ul class="chips">${info.trips.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>`
+        : `<div class="muted" style="font-size:0.84rem;margin-top:6px;">Nessuna escursione registrata.</div>`;
+      return `
+        <div id="memberCurriculumBox" class="curriculum">
+          <div class="curriculum-head">
+            <strong>Curriculum escursioni</strong>
+            <span class="badge ${info.count > 0 ? "ok" : "plain"}">Partecipazioni: ${escapeHtml(String(info.count))}</span>
+          </div>
+          ${chips}
+        </div>`;
+    }
+
+    function openMemberDetail(idx, opts) {
       if (idx === null || idx === undefined || !members[idx]) return;
+      const keepScroll = Boolean(opts && opts.keepScroll);
       selectedMemberIndex = idx;
       const m = members[idx];
       const st = computeStatusCategory(m);
       const noteKey = memberNoteKey(m, idx);
-      const fullName = `${m["COGNOME"] || ""} ${m["NOME"] || ""}`.trim() || "Record senza nome";
+      const fullName = memberFullName(m) || "Record senza nome";
 
+      detailEls.avatar.textContent = initials(fullName);
       detailEls.title.textContent = fullName;
-      detailEls.subtitle.innerHTML = `Tessera <strong>#${escapeHtml(m["TESSERA n°"] || "—")}</strong> · <span class="badge ${st.badge}">${escapeHtml(st.label)}</span>`;
+      detailEls.subtitle.innerHTML =
+        `<span>Tessera <strong>#${escapeHtml(m["TESSERA n°"] || "—")}</strong></span>` +
+        `<span class="badge ${st.badge}">${escapeHtml(st.label)}</span>` +
+        (m["TIPO TESSERA"] ? `<span class="badge plain">${escapeHtml(m["TIPO TESSERA"])}</span>` : "") +
+        (st.days !== null ? `<span>${st.days >= 0 ? `scade tra ${st.days} gg` : `scaduta da ${-st.days} gg`}</span>` : "");
 
-      const actionButtons = [];
       const phone = String(m["CELLULARE"] || "").trim();
       const email = String(m["E-MAIL CONTATTO"] || "").trim();
-      if (phone) {
-        actionButtons.push(`<a href="tel:${escapeHtml(phone)}" style="text-decoration:none;"><button type="button">Chiama (${escapeHtml(phone)})</button></a>`);
-      }
-      if (email) {
-        actionButtons.push(`<a href="mailto:${escapeHtml(email)}" style="text-decoration:none;"><button type="button">Invia email</button></a>`);
-      }
-      detailEls.actions.innerHTML = actionButtons.join("");
+      const wa = whatsappNumber(phone);
+      const actions = [];
+      if (phone) actions.push(`<a class="btn" href="tel:${escapeHtml(phone.replace(/\s+/g, ""))}">${icon("phone")}Chiama</a>`);
+      if (wa) actions.push(`<a class="btn wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">${icon("chat")}WhatsApp</a>`);
+      if (wa) actions.push(`<a class="btn tg" href="${telegramLink(phone)}" target="_blank" rel="noopener">${icon("send")}Telegram</a>`);
+      if (email) actions.push(`<a class="btn" href="mailto:${escapeHtml(email)}">${icon("mail")}Email</a>`);
+      detailEls.actions.innerHTML = actions.join("");
 
       const fields = [
-        ["Numero Tessera", m["TESSERA n°"]],
-        ["Tipo Tessera", m["TIPO TESSERA"]],
-        ["Cognome", m["COGNOME"]],
-        ["Nome", m["NOME"]],
-        ["Cellulare", m["CELLULARE"]],
-        ["E-mail contatto", m["E-MAIL CONTATTO"]],
-        ["Luogo di nascita", m["LUOGO DI NASCITA"]],
-        ["Data di nascita", m["DATA DI NASCITA"]],
-        ["Anni", m["ANNI"]],
-        ["Codice Fiscale", m["CODICE FISCALE"]],
-        ["Indirizzo residenza", m["INDIRIZZO RESIDENZA"]],
-        ["CAP residenza", m["CAP RESIDENZA"]],
-        ["Città residenza", m["CITTA RESIDENZA"]],
-        ["Provincia residenza", m["PROVINCIA RESIDENZA"]],
-        ["Data tesseramento", m["DATA TESSERAMENTO"]],
-        ["Data scadenza", m["DATA SCADENZA"]],
-        ["Giorni (GG)", st.days !== null ? st.days : m["GG"]],
-        ["Stato tessera", m["STATO TESSERA"]],
-        ["Mail rinnovo", m["MAIL RINNOVO"]],
-        ["Mess. rinnovo", m["MESS. RINNOVO"]],
+        ["Numero tessera", m["TESSERA n°"]], ["Tipo tessera", m["TIPO TESSERA"]],
+        ["Cognome", m["COGNOME"]], ["Nome", m["NOME"]],
+        ["Cellulare", m["CELLULARE"]], ["E-mail contatto", m["E-MAIL CONTATTO"]],
+        ["Luogo di nascita", m["LUOGO DI NASCITA"]], ["Data di nascita", m["DATA DI NASCITA"]],
+        ["Anni", m["ANNI"]], ["Codice fiscale", m["CODICE FISCALE"]],
+        ["Indirizzo residenza", m["INDIRIZZO RESIDENZA"]], ["CAP residenza", m["CAP RESIDENZA"]],
+        ["Città residenza", m["CITTA RESIDENZA"]], ["Provincia residenza", m["PROVINCIA RESIDENZA"]],
+        ["Data tesseramento", m["DATA TESSERAMENTO"]], ["Data scadenza", m["DATA SCADENZA"]],
+        ["Giorni (GG)", st.days !== null ? st.days : m["GG"]], ["Stato tessera", m["STATO TESSERA"]],
+        ["Mail rinnovo", m["MAIL RINNOVO"]], ["Mess. rinnovo", m["MESS. RINNOVO"]],
         ["Note del foglio", m["NOTE"]]
       ];
-
       const gridHtml = fields.map(([label, val]) => `
         <div class="detail-item">
           <div class="detail-label">${escapeHtml(label)}</div>
-          <div class="detail-val">${escapeHtml(val || "—")}</div>
-        </div>
-      `).join("");
+          <div class="detail-val">${escapeHtml(val === 0 ? "0" : (val || "—"))}</div>
+        </div>`).join("");
 
-      function renderDetailBody(info) {
-        return `
-          <div class="detail-grid">${gridHtml}</div>
-          ${renderMemberCurriculumHtml(info)}
-          <div style="margin-top:16px;">
-            <div class="detail-item" style="background:#fff;margin-bottom:12px;">
-              <div class="detail-label">Tessera associativa cartacea</div>
-              <div class="paper-flags" style="flex-direction:row;gap:18px;margin-top:4px;">
-                <label class="flag-label">
-                  <input type="checkbox" class="paper-flag-cb" data-note-key="${escapeHtml(noteKey)}" data-flag="preparata" ${getPaperCardState(noteKey).preparata ? "checked" : ""} />
-                  <span>Preparata</span>
-                </label>
-                <label class="flag-label">
-                  <input type="checkbox" class="paper-flag-cb" data-note-key="${escapeHtml(noteKey)}" data-flag="consegnata" ${getPaperCardState(noteKey).consegnata ? "checked" : ""} />
-                  <span>Consegnata</span>
-                </label>
-              </div>
-            </div>
-            <div class="detail-item" style="background:#fff;margin-bottom:12px;">
-              <div class="detail-label">Nota locale (salvata nel browser ed inclusa nell'export CSV)</div>
-              <input
-                type="text"
-                id="detailLocalNoteInput"
-                data-note-key="${escapeHtml(noteKey)}"
-                value="${escapeHtml(localNotes[noteKey] || "")}"
-                placeholder="Scrivi qui una nota locale per questo socio..."
-              />
-            </div>
+      const info = getMemberTripsInfo(m);
+      detailEls.body.innerHTML = `
+        <div class="detail-section-title">Per il direttivo</div>
+        <div class="detail-two">
+          <div class="detail-item white">
+            <div class="detail-label">Tessera cartacea</div>
+            <div style="margin-top:6px;">${paperFlagsHtml(noteKey, true)}</div>
           </div>
-        `;
+          <div class="detail-item white">
+            <div class="detail-label">Nota del direttivo · condivisa e inclusa nell'export</div>
+            <input type="text" id="detailLocalNoteInput" data-note-key="${escapeHtml(noteKey)}" value="${escapeHtml(localNotes[noteKey] || "")}" placeholder="Scrivi una nota su questo socio…" style="margin-top:4px;" />
+          </div>
+        </div>
+        ${renderMemberCurriculumHtml(info)}
+        <div class="detail-section-title">Dati dal Libro Soci</div>
+        <div class="detail-grid">${gridHtml}</div>`;
+
+      if (!info.loaded) {
+        ensureEscursioni()
+          .then(() => {
+            const box = byId("memberCurriculumBox");
+            if (!box || selectedMemberIndex !== idx) return;
+            const tmp = document.createElement("div");
+            tmp.innerHTML = renderMemberCurriculumHtml(Object.assign({ count: 0, trips: [] }, getMemberTripsInfo(members[idx]), { loaded: true }));
+            if (tmp.firstElementChild) box.replaceWith(tmp.firstElementChild);
+          })
+          .catch((err) => {
+            const box = byId("memberCurriculumBox");
+            if (!box || selectedMemberIndex !== idx) return;
+            box.innerHTML = `<div class="curriculum-head"><strong>Curriculum escursioni</strong><span class="badge warn">Errore</span></div>` +
+              `<div class="muted" style="font-size:0.82rem;margin-top:6px;">${escapeHtml((err && err.message) || "errore")}</div>`;
+          });
       }
 
-      const tripsInfo = getMemberTripsInfo(m);
-      detailEls.body.innerHTML = renderDetailBody(tripsInfo);
-      (excList.length ? Promise.resolve({ ok: true, escursioni: excList }) : AppData.loadEscursioni())
-        .then(async (j) => {
-          if (Array.isArray(j.escursioni)) excList = j.escursioni;
-          const box = document.getElementById("memberCurriculumBox");
-          if (box && selectedMemberIndex === idx) {
-            const info = Object.assign({ count: 0, trips: [] }, getMemberTripsInfo(members[idx]), { loaded: true });
-            const tmp = document.createElement("div");
-            tmp.innerHTML = renderMemberCurriculumHtml(info);
-            if (tmp.firstElementChild) box.replaceWith(tmp.firstElementChild);
-          }
-        })
-        .catch((err) => {
-          const box = document.getElementById("memberCurriculumBox");
-          if (box && selectedMemberIndex === idx) {
-            const mErr = escapeHtml((err && err.message) || "errore");
-            box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;"><strong style="font-size:0.92rem;">Curriculum escursioni</strong><span class="badge warn">Errore</span></div><div style="font-size:0.82rem;color:var(--muted);margin-top:6px;">' + mErr + '</div>';
-          }
-        });
       detailEls.listSection.style.display = "none";
       detailEls.view.classList.add("active");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function closeMemberDetail() {
@@ -1239,18 +1370,11 @@
     detailEls.btnBack.addEventListener("click", closeMemberDetail);
 
     detailEls.body.addEventListener("input", (e) => {
-      if (e.target && e.target.id === "detailLocalNoteInput") {
-        const key = e.target.getAttribute("data-note-key");
-        if (!key) return;
-        const val = e.target.value;
-        if (val.trim() === "") delete localNotes[key];
-        else localNotes[key] = val;
-        saveLocalNotes();
-        CloudDB.note(key, val);
-      }
+      if (e.target && e.target.id === "detailLocalNoteInput") setMemberNote(e.target.getAttribute("data-note-key"), e.target.value);
     });
 
     els.membersBody.addEventListener("click", (e) => {
+      if (e.target.closest("[data-action='clear-filters']")) { clearFilters(); return; }
       const btn = e.target.closest(".member-link");
       if (!btn) return;
       const idx = Number(btn.getAttribute("data-member-idx"));
@@ -1261,78 +1385,80 @@
       const cb = e.target.closest(".paper-flag-cb");
       if (!cb) return;
       const key = cb.getAttribute("data-note-key");
-      const flag = cb.getAttribute("data-flag");
-      setPaperCardFlag(key, flag, cb.checked);
+      setPaperCardFlag(key, cb.getAttribute("data-flag"), cb.checked);
       const st = getPaperCardState(key);
-      document.querySelectorAll(`.paper-flag-cb[data-note-key="${key.replace(/"/g, '&quot;')}"]`).forEach(el => {
-        const f = el.getAttribute("data-flag");
-        if (f === "preparata") el.checked = st.preparata;
-        if (f === "consegnata") el.checked = st.consegnata;
+      document.querySelectorAll(`.paper-flag-cb[data-note-key="${CSS.escape(key)}"]`).forEach(el => {
+        el.checked = el.getAttribute("data-flag") === "preparata" ? st.preparata : st.consegnata;
       });
     }
-
     els.membersBody.addEventListener("change", handlePaperFlagChange);
     detailEls.body.addEventListener("change", handlePaperFlagChange);
 
     els.membersBody.addEventListener("input", (e) => {
       const inp = e.target.closest(".local-note-input");
-      if (!inp) return;
-      const key = inp.getAttribute("data-note-key");
-      if (!key) return;
-      const val = inp.value;
-      if (val.trim() === "") delete localNotes[key];
-      else localNotes[key] = val;
-      saveLocalNotes();
-      CloudDB.note(key, val);
+      if (inp) setMemberNote(inp.getAttribute("data-note-key"), inp.value);
     });
 
     els.btnLoadSheet.addEventListener("click", loadFromSheet);
 
-    els.searchInput.addEventListener("input", renderTable);
+    const renderTableSoon = debounce(renderTable, 150);
+    els.searchInput.addEventListener("input", renderTableSoon);
     els.typeFilter.addEventListener("change", renderTable);
     els.statusFilter.addEventListener("change", renderTable);
-    els.btnClearFilters.addEventListener("click", () => {
+
+    function clearFilters() {
       els.searchInput.value = "";
       els.typeFilter.value = "ALL";
       els.statusFilter.value = "NON_SCADUTA";
       sortKey = "";
       sortDir = "asc";
       renderTable();
+    }
+    els.btnClearFilters.addEventListener("click", clearFilters);
+
+    // I contatori in alto filtrano l'elenco con un clic.
+    document.querySelectorAll("[data-stat-filter]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const f = btn.getAttribute("data-stat-filter");
+        els.statusFilter.value = els.statusFilter.value === f && f !== "ALL" ? "NON_SCADUTA" : f;
+        if (selectedMemberIndex !== null) closeMemberDetail(); else renderTable();
+        byId("listSection").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
 
     document.querySelectorAll("th.sortable").forEach(th => {
-      th.addEventListener("click", () => {
+      th.tabIndex = 0;
+      const toggle = () => {
         const key = th.getAttribute("data-sort");
         if (!key) return;
-        if (sortKey === key) {
-          sortDir = sortDir === "asc" ? "desc" : "asc";
-        } else {
-          sortKey = key;
-          sortDir = "asc";
-        }
+        if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+        else { sortKey = key; sortDir = "asc"; }
         renderTable();
-      });
+      };
+      th.addEventListener("click", toggle);
+      th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+    });
+
+    // Scorciatoie: "/" per cercare, Esc per chiudere la scheda.
+    document.addEventListener("keydown", (e) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "");
+      if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        const escVisible = !byId("viewEscursioni").classList.contains("hidden");
+        const target = escVisible ? byId("excSearch") : els.searchInput;
+        if (!escVisible && selectedMemberIndex !== null) closeMemberDetail();
+        target.focus();
+      } else if (e.key === "Escape" && selectedMemberIndex !== null && !typing) {
+        closeMemberDetail();
+      }
     });
 
     loadLocal();
     renderTable();
-  
-    const EXC_LOCAL_KEY = "libro_soci_escursioni_local_v1";
-    let excList = [];
-    let excLocalState = {};
 
-    try {
-      const rawExcLocal = appStorage.getItem(EXC_LOCAL_KEY);
-      if (rawExcLocal) {
-        const parsed = JSON.parse(rawExcLocal);
-        if (parsed && typeof parsed === "object") excLocalState = parsed;
-      }
-    } catch (e) {}
-
-    function saveExcLocalState() {
-      try { appStorage.setItem(EXC_LOCAL_KEY, JSON.stringify(excLocalState)); } catch (e) {}
-    }
-
+    // ===================================================================
+    //  Escursioni: lettura dei form e abbinamento ai soci
+    // ===================================================================
     function normalizePersonKey(name, email, phone) {
       const cleanName = String(name || "").toLowerCase().replace(/[^a-zà-öø-ÿ0-9]+/g, " ").trim();
       const cleanEmail = String(email || "").toLowerCase().trim();
@@ -1343,52 +1469,41 @@
       return "";
     }
 
+    const formFieldsCache = new WeakMap();
     function extractFormFields(row) {
-      const keys = Object.keys(row || {});
+      if (row && typeof row === "object" && formFieldsCache.has(row)) return formFieldsCache.get(row);
       let nome = "", cognome = "", fullName = "", email = "", phone = "";
       const extra = [];
-
-      keys.forEach((k) => {
+      Object.keys(row || {}).forEach((k) => {
+        if (k === "_rowNumber") return;
         const kl = k.toLowerCase();
         const val = String(row[k] || "").trim();
         if (!val) return;
         if (kl.includes("informazioni cronologiche") || kl.includes("timestamp")) return;
-        if ((kl.includes("nome") && kl.includes("cognome")) || (kl.includes("cognome") && kl.includes("nome"))) {
-          fullName = val;
-        } else if (kl === "cognome" || kl.startsWith("cognome ")) {
-          cognome = val;
-        } else if (kl === "nome" || kl.startsWith("nome ")) {
-          nome = val;
-        } else if (kl.includes("email") || kl.includes("e-mail") || kl.includes("mail")) {
-          email = val;
-        } else if (kl.includes("telefono") || kl.includes("cellulare") || kl.includes("tel")) {
-          phone = val;
-        } else {
-          extra.push(`${k}: ${val}`);
-        }
+        if (kl.includes("nome") && kl.includes("cognome")) fullName = val;
+        else if (kl === "cognome" || kl.startsWith("cognome ")) cognome = val;
+        else if (kl === "nome" || kl.startsWith("nome ")) nome = val;
+        else if (kl.includes("mail")) email = val;
+        else if (kl.includes("telefono") || kl.includes("cellulare") || kl.includes("tel")) phone = val;
+        else extra.push(`${k}: ${val}`);
       });
-
-      const displayName = fullName || `${cognome} ${nome}`.trim() || "Senza nome";
-      return { displayName, email, phone, extraText: extra.join(" | ") };
+      const f = { displayName: fullName || `${cognome} ${nome}`.trim() || "Senza nome", email, phone, extraText: extra.join(" | ") };
+      if (row && typeof row === "object") formFieldsCache.set(row, f);
+      return f;
     }
 
     function tokenizeName(str) {
       return String(str || "")
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[̀-ͯ]/g, "")
         .replace(/[^a-z0-9]+/g, " ")
         .trim()
         .split(/\s+/)
         .filter(Boolean);
     }
-
-    function sameNameSet(a, b) {
-      const ta = tokenizeName(a).sort();
-      const tb = tokenizeName(b).sort();
-      if (!ta.length || ta.length !== tb.length) return false;
-      return ta.every((tok, idx) => tok === tb[idx]);
-    }
+    function nameKey(str) { return tokenizeName(str).sort().join(" "); }
+    function sameNameSet(a, b) { const ka = nameKey(a); return Boolean(ka) && ka === nameKey(b); }
 
     function normalizePhoneDigits(p) {
       const d = String(p || "").replace(/[^0-9]+/g, "");
@@ -1397,15 +1512,12 @@
     }
 
     function extractMemberContacts(m) {
-      const emails = [];
-      const phones = [];
+      const emails = [], phones = [];
       Object.entries(m || {}).forEach(([k, v]) => {
         const val = String(v || "").trim();
         if (!val) return;
         const kl = k.toLowerCase();
-        if (val.includes("@") || kl.includes("mail")) {
-          emails.push(val.toLowerCase());
-        }
+        if (val.includes("@") || kl.includes("mail")) emails.push(val.toLowerCase());
         if (kl.includes("tel") || kl.includes("cell") || kl.includes("mobile") || kl.includes("whatsapp")) {
           const nd = normalizePhoneDigits(val);
           if (nd.length >= 6) phones.push(nd);
@@ -1414,94 +1526,49 @@
       return { emails, phones };
     }
 
-    function findMatchingMember(name, email, phone) {
-      const list = typeof members !== "undefined" && Array.isArray(members) ? members : [];
-      const targetEmail = String(email || "").toLowerCase().trim();
-      const targetPhone = normalizePhoneDigits(phone);
-
-      // 1. Match diretto su email o telefono
-      for (const m of list) {
+    // Indice email/telefono/nome → socio, ricostruito solo quando cambia il Libro Soci.
+    // Prima ogni abbinamento scorreva tutti i soci: con centinaia di iscritti diventava lento.
+    let matchCache = { members: null };
+    function getMatchCache() {
+      if (matchCache.members === members) return matchCache;
+      const emails = new Map(), phones = new Map(), names = new Map();
+      for (const m of members) {
         const mc = extractMemberContacts(m);
-        if (targetEmail && mc.emails.includes(targetEmail)) return m;
-        if (targetPhone && targetPhone.length >= 6 && mc.phones.includes(targetPhone)) return m;
+        mc.emails.forEach(e => { if (!emails.has(e)) emails.set(e, m); });
+        mc.phones.forEach(p => { if (!phones.has(p)) phones.set(p, m); });
+        [memberFullName(m), m["NOMINATIVO"] || m["SOCIO"] || ""].forEach(n => {
+          const k = nameKey(n);
+          if (k.includes(" ") && !names.has(k)) names.set(k, m);
+        });
       }
-
-      // 2. Match su nome e cognome (anche in ordine invertito)
-      const tTokens = tokenizeName(name);
-      if (tTokens.length >= 2) {
-        for (const m of list) {
-          const fullA = `${m["COGNOME"] || ""} ${m["NOME"] || ""}`.trim();
-          const fullB = `${m["NOME"] || ""} ${m["COGNOME"] || ""}`.trim();
-          const fullC = m["NOMINATIVO"] || m["SOCIO"] || "";
-          if (sameNameSet(name, fullA) || sameNameSet(name, fullB) || (fullC && sameNameSet(name, fullC))) {
-            return m;
-          }
-        }
-      }
-
-      return null;
+      matchCache = { members, emails, phones, names, memo: new Map(), excList: null, counter: null, byMember: null };
+      return matchCache;
     }
 
-    function getMemberTripsInfo(member) {
-      if (!member || !Array.isArray(excList) || !excList.length) {
-        return { count: 0, trips: [], loaded: Array.isArray(excList) && excList.length > 0 };
+    function findMatchingMember(name, email, phone) {
+      const c = getMatchCache();
+      const memoKey = `${name}\u0001${email}\u0001${phone}`;
+      if (c.memo.has(memoKey)) return c.memo.get(memoKey);
+      const e = String(email || "").toLowerCase().trim();
+      const p = normalizePhoneDigits(phone);
+      let m = (e && c.emails.get(e)) || (p.length >= 6 && c.phones.get(p)) || null;
+      if (!m) {
+        const k = nameKey(name);
+        if (k.includes(" ")) m = c.names.get(k) || null;
       }
-      const counterMap = buildParticipationCounter();
-      const targetName = `${member["COGNOME"] || ""} ${member["NOME"] || ""}`.trim() || member["NOMINATIVO"] || member["SOCIO"] || "";
-      const targetEmail = String(member["E-MAIL CONTATTO"] || member["EMAIL"] || "").trim().toLowerCase();
-      const targetPhone = String(member["CELLULARE"] || member["TELEFONO"] || "").replace(/\D+/g, "");
-
-      for (const entry of counterMap.values()) {
-        if (entry.memberMatch === member) {
-          return { count: entry.trips.length, trips: entry.trips.slice(), loaded: true };
-        }
-      }
-
-      for (const entry of counterMap.values()) {
-        const eEmail = String(entry.email || "").trim().toLowerCase();
-        const ePhone = String(entry.phone || "").replace(/\D+/g, "");
-        const sameEmail = targetEmail && eEmail && targetEmail === eEmail;
-        const samePhone = targetPhone && ePhone && targetPhone === ePhone;
-        const sameName = targetName && entry.name && sameNameSet(targetName, entry.name);
-        if (sameEmail || samePhone || sameName) {
-          return { count: entry.trips.length, trips: entry.trips.slice(), loaded: true };
-        }
-      }
-
-      return { count: 0, trips: [], loaded: true };
+      c.memo.set(memoKey, m);
+      return m;
     }
 
-    function renderMemberCurriculumHtml(info) {
-      if (!info.loaded) {
-        return `
-          <div id="memberCurriculumBox" style="margin-top:16px;padding:12px 14px;border:1px solid var(--border,#e2e8f0);border-radius:10px;background:var(--surface-2,#f8fafc);">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
-              <strong style="font-size:0.92rem;">Curriculum escursioni</strong>
-              <span class="badge">Caricamento...</span>
-            </div>
-            <div style="font-size:0.84rem;color:var(--muted);">Verifica partecipazioni dai Fogli Google in corso...</div>
-          </div>
-        `;
-      }
-
-      const badgesHtml = info.trips.length
-        ? `<ul style="list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px;">${
-            info.trips.map(t => `<li style="padding:4px 10px;border-radius:999px;border:1px solid var(--border,#cbd5e1);background:var(--surface,#fff);font-size:0.82rem;">${escapeHtml(t)}</li>`).join("")
-          }</ul>`
-        : `<div style="font-size:0.84rem;color:var(--muted);margin-top:4px;">Nessuna escursione registrata.</div>`;
-
-      return `
-        <div id="memberCurriculumBox" style="margin-top:16px;padding:12px 14px;border:1px solid var(--border,#e2e8f0);border-radius:10px;background:var(--surface-2,#f8fafc);">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-            <strong style="font-size:0.92rem;">Curriculum escursioni</strong>
-            <span class="badge ${info.count > 0 ? "ok" : ""}">Partecipazioni: ${escapeHtml(String(info.count))}</span>
-          </div>
-          ${badgesHtml}
-        </div>
-      `;
+    function personKeyFor(f, matched) {
+      return matched
+        ? "m:" + tokenizeName(memberFullName(matched) || f.displayName).sort().join("_")
+        : normalizePersonKey(f.displayName, f.email, f.phone);
     }
 
     function buildParticipationCounter() {
+      const c = getMatchCache();
+      if (c.counter && c.excList === excList) return c.counter;
       const map = new Map();
       excList.forEach((esc) => {
         if (!esc.ok || !Array.isArray(esc.rows)) return;
@@ -1510,505 +1577,385 @@
         esc.rows.forEach((r) => {
           const f = extractFormFields(r);
           const matched = findMatchingMember(f.displayName, f.email, f.phone);
-          const canonicalName = matched
-            ? (`${matched["COGNOME"] || ""} ${matched["NOME"] || ""}`.trim() || f.displayName)
-            : f.displayName;
-          const pKey = matched
-            ? "m:" + tokenizeName(canonicalName).sort().join("_")
-            : normalizePersonKey(f.displayName, f.email, f.phone);
-
+          const canonicalName = matched ? (memberFullName(matched) || f.displayName) : f.displayName;
+          const pKey = personKeyFor(f, matched);
           if (!pKey || seenInThisEsc.has(pKey)) return;
           seenInThisEsc.add(pKey);
-
-          if (!map.has(pKey)) {
-            map.set(pKey, {
-              key: pKey,
-              name: canonicalName,
-              email: f.email,
-              phone: f.phone,
-              trips: [],
-              memberMatch: matched
-            });
-          } else if (matched && !map.get(pKey).memberMatch) {
-            map.get(pKey).memberMatch = matched;
-            map.get(pKey).name = canonicalName;
+          let entry = map.get(pKey);
+          if (!entry) {
+            entry = { key: pKey, name: canonicalName, email: f.email, phone: f.phone, trips: [], memberMatch: matched };
+            map.set(pKey, entry);
+          } else if (matched && !entry.memberMatch) {
+            entry.memberMatch = matched;
+            entry.name = canonicalName;
           }
-          map.get(pKey).trips.push(tripLabel);
+          entry.trips.push(tripLabel);
         });
       });
+      c.byMember = new Map();
+      for (const entry of map.values()) if (entry.memberMatch && !c.byMember.has(entry.memberMatch)) c.byMember.set(entry.memberMatch, entry);
+      c.counter = map;
+      c.excList = excList;
       return map;
     }
 
-    const prevExcCounts = new Map();
+    function getMemberTripsInfo(member) {
+      if (!member || !excList.length) return { count: 0, trips: [], loaded: excList.length > 0 };
+      const counterMap = buildParticipationCounter();
+      const direct = matchCache.byMember && matchCache.byMember.get(member);
+      if (direct) return { count: direct.trips.length, trips: direct.trips.slice(), loaded: true };
+      const targetName = memberFullName(member) || member["NOMINATIVO"] || member["SOCIO"] || "";
+      const targetEmail = String(member["E-MAIL CONTATTO"] || member["EMAIL"] || "").trim().toLowerCase();
+      const targetPhone = String(member["CELLULARE"] || member["TELEFONO"] || "").replace(/\D+/g, "");
+      for (const entry of counterMap.values()) {
+        const eEmail = String(entry.email || "").trim().toLowerCase();
+        const ePhone = String(entry.phone || "").replace(/\D+/g, "");
+        if ((targetEmail && eEmail === targetEmail) || (targetPhone && ePhone === targetPhone) || (targetName && entry.name && sameNameSet(targetName, entry.name))) {
+          return { count: entry.trips.length, trips: entry.trips.slice(), loaded: true };
+        }
+      }
+      return { count: 0, trips: [], loaded: true };
+    }
 
+    function memberEmail(m) { return m ? (m["E-MAIL CONTATTO"] || m["EMAIL"] || "") : ""; }
+
+    // Una sola lettura alla volta, anche se la chiedono più parti dell'app insieme.
+    let excLoadPromise = null;
+    function ensureEscursioni() {
+      if (excList.length) return Promise.resolve(excList);
+      return loadEscursioniFromServer({ quiet: true }).then(() => excList);
+    }
+
+    const prevExcCounts = new Map();
     function maybeNotifyNewParticipants(list) {
       if (!Array.isArray(list)) return;
-      const newAlerts = [];
+      const alerts = [];
       for (const esc of list) {
         if (!esc || !esc.ok || !Array.isArray(esc.rows)) continue;
         const id = esc.id || esc.titolo || "";
         const count = esc.rows.length;
-        if (prevExcCounts.has(id)) {
-          const prev = prevExcCounts.get(id);
-          if (count > prev) {
-            const diff = count - prev;
-            const nome = formatNomeUscita(esc.titolo || id);
-            newAlerts.push({ nome, diff, count });
-          }
+        if (prevExcCounts.has(id) && count > prevExcCounts.get(id)) {
+          alerts.push({ nome: formatNomeUscita(esc.titolo || id), diff: count - prevExcCounts.get(id), count });
         }
         prevExcCounts.set(id, count);
       }
-      if (newAlerts.length && "Notification" in window && Notification.permission === "granted") {
-        for (const a of newAlerts) {
-          const txt = a.diff === 1 ? ("1 nuova iscrizione su " + a.nome + " (totale: " + a.count + ")") : (a.diff + " nuove iscrizioni su " + a.nome + " (totale: " + a.count + ")");
-          new Notification("Tre Quinti Trekking — Nuove iscrizioni", { body: txt });
-        }
+      if (!alerts.length) return;
+      alerts.forEach(a => toast(`${a.diff} nuov${a.diff === 1 ? "a iscrizione" : "e iscrizioni"} su ${a.nome}`));
+      if ("Notification" in window && Notification.permission === "granted") {
+        alerts.forEach(a => showNotification("Tre Quinti Trekking — Nuove iscrizioni",
+          `${a.diff === 1 ? "1 nuova iscrizione" : a.diff + " nuove iscrizioni"} su ${a.nome} (totale: ${a.count})`));
       }
     }
+
+    // ---- Riquadri "Avvisi uscita" e "Comunicazioni" (creati una volta sola) ----
+    let excMailState = { emails: [], subject: "", body: "" };
+
+    function ensureExcPanels() {
+      let alerts = byId("excAlertsDetails");
+      if (alerts) return;
+      const anchor = byId("excStats");
+      alerts = document.createElement("details");
+      alerts.id = "excAlertsDetails";
+      alerts.className = "collapsible";
+      alerts.innerHTML = `<summary id="excAlertsSummary">${icon("alert", "ico-sm")}<span>Avvisi uscita</span></summary><div class="collapsible-body" id="excAlertsBody"></div>`;
+      const mail = document.createElement("details");
+      mail.id = "excMailBroadcastBar";
+      mail.className = "collapsible";
+      mail.innerHTML = `
+        <summary>${icon("mail", "ico-sm")}<span>Comunicazioni ai partecipanti (CCN)</span></summary>
+        <div class="collapsible-body">
+          <div class="mail-actions">
+            <span id="excMailSummary" class="muted" style="margin-right:auto;">Email partecipanti: —</span>
+            <select id="excMailTemplateSelect" aria-label="Modello di testo">
+              <option value="annullamento">Modello: Annullamento escursione</option>
+              <option value="info">Modello: Avviso / Info uscita</option>
+            </select>
+            <button type="button" id="btnCopyExcEmails">${icon("copy", "ico-sm")}Copia email</button>
+            <button type="button" id="btnCopyExcTemplate">${icon("copy", "ico-sm")}Copia testo</button>
+            <a id="linkShareTelegram" class="btn tg" href="#" target="_blank" rel="noopener" title="Invia il testo in un gruppo, canale o chat Telegram">${icon("send", "ico-sm")}Telegram</a>
+            <a id="linkOpenExcMailto" class="btn primary" href="#">${icon("mail", "ico-sm")}Apri in posta</a>
+            <div id="excMailTemplateBox" class="tpl-box"></div>
+          </div>
+        </div>`;
+      anchor.insertAdjacentElement("afterend", mail);
+      anchor.insertAdjacentElement("afterend", alerts);
+
+      byId("excMailTemplateSelect").addEventListener("change", renderEscursioni);
+      byId("btnCopyExcEmails").addEventListener("click", () => {
+        if (!excMailState.emails.length) { toast("Nessun indirizzo email per questa escursione", "err"); return; }
+        copyText(excMailState.emails.join(", "), `Copiate ${excMailState.emails.length} email`);
+      });
+      byId("btnCopyExcTemplate").addEventListener("click", () => {
+        copyText("Oggetto: " + excMailState.subject + "\n\n" + excMailState.body, "Testo copiato");
+      });
+      byId("linkOpenExcMailto").addEventListener("click", (e) => {
+        if (!excMailState.emails.length) { e.preventDefault(); toast("Nessun indirizzo email per questa escursione", "err"); }
+      });
+      alerts.addEventListener("click", async (e) => {
+        if (!e.target.closest("#btnEnableBrowserNotif")) return;
+        if (!("Notification" in window)) { toast("Questo browser non supporta le notifiche", "err"); return; }
+        const perm = await Notification.requestPermission();
+        if (perm === "granted") showNotification("Tre Quinti Trekking", "Notifiche attivate: ti avviso quando arrivano nuove iscrizioni.");
+        else toast("Notifiche non consentite dal browser", "err");
+        renderEscursioni();
+      });
+    }
+
+    function analyzeEscursione(esc) {
+      const rows = Array.isArray(esc.rows) ? esc.rows : [];
+      const seen = new Set();
+      const emails = [];
+      const notMatched = [], missingEmail = [], cardTodo = [];
+      rows.forEach((r) => {
+        const f = extractFormFields(r);
+        const label = (f.displayName || "Senza nome").trim();
+        const matched = findMatchingMember(f.displayName, f.email, f.phone);
+        const flag = String(r["Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?"] || r["Tessera Scaduta"] || "").trim().toUpperCase();
+        if (!matched) {
+          notMatched.push(label + (flag && flag !== "SI" ? ` [form: ${flag}]` : ""));
+        } else {
+          if (flag === "NO" || flag === "TRUE") notMatched.push(label + " [tessera non attiva/scaduta]");
+          else if (computeStatusCategory(matched).category === "SCADUTA") notMatched.push(label + " [tessera scaduta nel Libro Soci]");
+          const st = getPaperCardState(memberNoteKey(matched, members.indexOf(matched)));
+          if (!st.consegnata) {
+            cardTodo.push(`${memberFullName(matched) || label}${matched["TESSERA n°"] ? " #" + matched["TESSERA n°"] : ""} (${st.preparata ? "preparata, da consegnare" : "da preparare e consegnare"})`);
+          }
+        }
+        const rawMail = String(f.email || memberEmail(matched) || "").trim();
+        if (rawMail.includes("@")) {
+          const k = rawMail.toLowerCase();
+          if (!seen.has(k)) { seen.add(k); emails.push(rawMail); }
+        } else missingEmail.push(label);
+      });
+      return { emails, notMatched, missingEmail, cardTodo };
+    }
+
+    function renderExcPanels(esc, a) {
+      ensureExcPanels();
+      const total = a.notMatched.length + a.missingEmail.length + a.cardTodo.length;
+      const alertsBox = byId("excAlertsDetails");
+      alertsBox.classList.toggle("has-alerts", total > 0);
+      byId("excAlertsSummary").innerHTML = icon(total ? "alert" : "check", "ico-sm") +
+        `<span>${total ? `Avvisi uscita · ${total} da controllare` : "Avvisi uscita · tutto ok"}</span>`;
+
+      const items = [];
+      if (a.notMatched.length) items.push(`<li><strong>Non trovati nel Libro Soci o tessera non attiva (${a.notMatched.length}):</strong> ${escapeHtml(a.notMatched.join(", "))}</li>`);
+      if (a.missingEmail.length) items.push(`<li><strong>Senza email (${a.missingEmail.length}):</strong> ${escapeHtml(a.missingEmail.join(", "))}</li>`);
+      if (a.cardTodo.length) items.push(`<li><strong>Tessera cartacea da gestire (${a.cardTodo.length}):</strong> ${escapeHtml(a.cardTodo.join(", "))}</li>`);
+      if (!items.length) items.push(`<li class="ok">Nessuna criticità sui partecipanti di questa uscita.</li>`);
+
+      const notifState = !("Notification" in window) ? "non supportate"
+        : (Notification.permission === "granted" ? "attive" : (Notification.permission === "denied" ? "bloccate nel browser" : "disattivate"));
+      byId("excAlertsBody").innerHTML =
+        `<ul class="alert-list">${items.join("")}</ul>` +
+        `<div class="mail-actions"><span class="muted">${icon("bell", "ico-sm")} Notifiche nuove iscrizioni: <strong>${escapeHtml(notifState)}</strong></span>` +
+        (("Notification" in window && Notification.permission === "granted") ? "" : `<button type="button" id="btnEnableBrowserNotif">Attiva notifiche</button>`) + `</div>`;
+
+      // Comunicazioni
+      const nome = formatNomeUscita(esc.titolo || esc.id || "Escursione");
+      const mode = byId("excMailTemplateSelect").value;
+      const subject = mode === "annullamento" ? "Annullamento escursione: " + nome : "Informazioni escursione: " + nome;
+      const body = (mode === "annullamento"
+        ? ["Ciao a tutti,", "", `purtroppo siamo costretti ad annullare l'escursione in programma su ${nome}.`,
+           "Ci dispiace per l'inconveniente: vi aggiorneremo non appena ci saranno novità o una nuova data.", "", "Un caro saluto,", "Tre Quinti Trekking APS"]
+        : ["Ciao a tutti,", "", `condividiamo alcune informazioni utili per l'escursione su ${nome}.`, "", "A presto sui sentieri,", "Tre Quinti Trekking APS"]
+      ).join("\n");
+      excMailState = { emails: a.emails, subject, body };
+      byId("excMailSummary").textContent = `Email uniche: ${a.emails.length}` + (a.missingEmail.length ? ` (${a.missingEmail.length} senza mail)` : "");
+      byId("excMailTemplateBox").innerHTML = `<strong>Oggetto: ${escapeHtml(subject)}</strong><pre>${escapeHtml(body)}</pre>`;
+      byId("linkShareTelegram").href = "https://t.me/share/url?url=" + encodeURIComponent(subject) + "&text=" + encodeURIComponent("\n\n" + body);
+      byId("linkOpenExcMailto").href = a.emails.length
+        ? "mailto:?bcc=" + encodeURIComponent(a.emails.join(",")) + "&subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body)
+        : "#";
+    }
+
+    function contactsHtml(f) {
+      const parts = [];
+      if (f.phone) {
+        const wa = whatsappNumber(f.phone);
+        const quick = wa ? `<span class="mini-links"><a class="wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" title="WhatsApp">${icon("chat")}</a><a class="tg" href="${telegramLink(f.phone)}" target="_blank" rel="noopener" title="Telegram">${icon("send")}</a></span>` : "";
+        parts.push(`<a href="tel:${escapeHtml(f.phone.replace(/\s+/g, ""))}" style="color:inherit">${escapeHtml(f.phone)}</a>${quick}`);
+      }
+      if (f.email) parts.push(`<a href="mailto:${escapeHtml(f.email)}" style="color:inherit">${escapeHtml(f.email)}</a>`);
+      return parts.length ? `<div>${parts.join("<br/>")}</div>` : "—";
+    }
+
+    function socioBadge(m) {
+      return m ? `<span class="badge ok">Socio #${escapeHtml(m["TESSERA n°"] || "")}</span>` : `<span class="badge warn">Non socio</span>`;
+    }
+
+    let currentExcRows = [];
 
     function renderEscursioni() {
-      const sel = document.getElementById("excSelect");
-      const tbody = document.getElementById("excRowsBody");
-      const counterBody = document.getElementById("excCounterBody");
-      const statusMsg = document.getElementById("excStatusMsg");
-
-      function collectEscursioneEmails(esc) {
-        if (!esc || !Array.isArray(esc.rows)) return { emails: [], missingCount: 0 };
-        const seen = new Set();
-        const emails = [];
-        let missingCount = 0;
-        for (const r of esc.rows) {
-          const f = extractFormFields(r);
-          const matched = findMatchingMember(f.displayName, f.email, f.phone);
-          const rawMail = (f.email || (matched && (matched["E-MAIL CONTATTO"] || matched["EMAIL"])) || "").trim();
-          const cleanMail = rawMail.toLowerCase();
-          if (cleanMail && cleanMail.includes("@")) {
-            if (!seen.has(cleanMail)) {
-              seen.add(cleanMail);
-              emails.push(rawMail.trim());
-            }
-          } else {
-            missingCount += 1;
-          }
-        }
-        return { emails, missingCount };
-      }
-
-
-      function ensureExcAlertsBox(anchorEl) {
-        let box = document.getElementById("excAlertsDetails");
-        if (!box && anchorEl && anchorEl.parentElement) {
-          box = document.createElement("details");
-          box.id = "excAlertsDetails";
-          box.style.cssText = "margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);";
-          box.innerHTML = [
-            '<summary id="excAlertsSummary" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--muted);list-style:none;">Avvisi e notifiche uscita</summary>',
-            '<div id="excAlertsBody" style="margin-top:10px;font-size:0.84rem;"></div>'
-          ].join("");
-          anchorEl.insertAdjacentElement("beforebegin", box);
-        }
-        return box;
-      }
-
-      function renderExcAlerts(esc, infoMail) {
-        try {
-          const bar = document.getElementById("excMailBroadcastBar");
-          const box = ensureExcAlertsBox(bar);
-          if (!box) return;
-          const sumEl = document.getElementById("excAlertsSummary");
-          const bodyEl = document.getElementById("excAlertsBody");
-          if (!sumEl || !bodyEl) return;
-
-          const notMatchedNames = [];
-          const missingEmailNames = [];
-          const cardTodoItems = [];
-          const rows = (esc && Array.isArray(esc.rows)) ? esc.rows : [];
-
-          for (let i = 0; i < rows.length; i++) {
-            const r = rows[i] || {};
-            const f = extractFormFields(r);
-            const pLabel = (f.displayName || "Senza nome").trim();
-            const matched = findMatchingMember(f.displayName, f.email, f.phone);
-
-            const tesseraFlagVal = String(
-              r["Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?"] ||
-              r["Tessera Scaduta"] ||
-              ""
-            ).trim();
-
-            if (!matched) {
-              const extraFlag = tesseraFlagVal && tesseraFlagVal.toUpperCase() !== "SI"
-                ? (" [form: " + tesseraFlagVal + "]")
-                : "";
-              notMatchedNames.push(pLabel + extraFlag);
-            } else {
-              if (tesseraFlagVal.toUpperCase() === "NO" || String(tesseraFlagVal).toUpperCase() === "TRUE") {
-                notMatchedNames.push(pLabel + " [tessera non attiva/scaduta]");
-              }
-              if (typeof getPaperCardState === "function") {
-                const mIdx = Array.isArray(members) ? members.indexOf(matched) : -1;
-                const nKey = (typeof memberNoteKey === "function")
-                  ? memberNoteKey(matched, mIdx >= 0 ? mIdx : i)
-                  : String(mIdx >= 0 ? mIdx : i);
-                const st = getPaperCardState(nKey);
-                const memberLabel = (`${matched["COGNOME"] || ""} ${matched["NOME"] || ""}`.trim() || pLabel);
-                const tessNum = matched["TESSERA n°"] ? (" #" + matched["TESSERA n°"]) : "";
-                if (st && (!st.preparata || !st.consegnata)) {
-                  const azione = !st.preparata
-                    ? "da preparare e consegnare"
-                    : "già preparata, da consegnare";
-                  cardTodoItems.push(memberLabel + tessNum + " (" + azione + ")");
-                }
-              }
-            }
-
-            const rawMail = (f.email || (matched && (matched["E-MAIL CONTATTO"] || matched["EMAIL"])) || "").trim();
-            if (!(rawMail && rawMail.includes("@"))) {
-              missingEmailNames.push(pLabel);
-            }
-          }
-
-          const totalFlags = notMatchedNames.length + missingEmailNames.length + cardTodoItems.length;
-          sumEl.textContent = totalFlags > 0
-            ? ("Avvisi uscita (" + totalFlags + " da controllare)")
-            : "Avvisi e notifiche uscita (tutto ok)";
-
-          const notifState = !("Notification" in window)
-            ? "Non supportate dal browser"
-            : (Notification.permission === "granted" ? "Attive sul browser" : (Notification.permission === "denied" ? "Bloccate nel browser" : "Disattivate"));
-
-          const items = [];
-          if (notMatchedNames.length) {
-            items.push("Non trovati nel libro soci / non tesserati (" + notMatchedNames.length + "): " + notMatchedNames.join(", "));
-          }
-          if (missingEmailNames.length) {
-            items.push("Senza email rilevata (" + missingEmailNames.length + "): " + missingEmailNames.join(", "));
-          }
-          if (cardTodoItems.length) {
-            items.push("Tessera cartacea da gestire (" + cardTodoItems.length + "): " + cardTodoItems.join(", "));
-          }
-          if (!items.length) {
-            items.push("Nessuna criticità rilevata sui partecipanti di questa uscita.");
-          }
-
-          bodyEl.innerHTML = [
-            '<ul style="margin:0 0 10px 18px;padding:0;">',
-              items.map(it => '<li style="margin-bottom:4px;">' + escapeHtml(it) + '</li>').join(""),
-            '</ul>',
-            '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">',
-              '<span style="color:var(--muted);font-size:0.82rem;">Notifiche browser nuove iscrizioni: <strong>' + escapeHtml(notifState) + '</strong></span>',
-              '<button type="button" id="btnEnableBrowserNotif">Attiva notifiche browser</button>',
-            '</div>'
-          ].join("");
-
-          const btnNotif = document.getElementById("btnEnableBrowserNotif");
-          if (btnNotif) {
-            btnNotif.onclick = async () => {
-              if (!("Notification" in window)) {
-                alert("Questo browser non supporta le notifiche desktop.");
-                return;
-              }
-              const perm = await Notification.requestPermission();
-              if (perm === "granted") {
-                new Notification("Tre Quinti Trekking", { body: "Notifiche browser attivate." });
-              }
-              renderEscursioni();
-            };
-          }
-        } catch (_) {}
-      }
-
-      function ensureExcMailBar() {
-        let bar = document.getElementById("excMailBroadcastBar");
-        if (!bar && sel && sel.parentElement) {
-          bar = document.createElement("details");
-          bar.id = "excMailBroadcastBar";
-          bar.style.cssText = "margin-top:14px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--card);";
-          bar.innerHTML = [
-            '<summary style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--muted);list-style:none;">Comunicazioni email partecipanti (CCN)</summary>',
-            '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px;">',
-              '<span id="excMailSummary" style="font-size:0.84rem;color:var(--muted);margin-right:auto;">Email partecipanti: —</span>',
-              '<select id="excMailTemplateSelect" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:0.85rem;">',
-                '<option value="annullamento">Modello: Annullamento escursione</option>',
-                '<option value="info">Modello: Avviso / Info uscita</option>',
-              '</select>',
-              '<button type="button" id="btnCopyExcEmails">Copia email (CCN)</button>',
-              '<button type="button" id="btnCopyExcTemplate">Copia testo annullamento</button>',
-              '<a id="linkOpenExcMailto" href="#" style="text-decoration:none;"><button type="button" id="btnOpenExcMailto">Apri in posta (CCN)</button></a>',
-              '<div id="excMailTemplateBox" style="flex-basis:100%;margin-top:4px;padding:10px 12px;border:1px dashed var(--border);border-radius:8px;background:var(--bg);font-size:0.84rem;"></div>',
-            '</div>'
-          ].join("");
-          const hostTable = (tbody && tbody.closest("table")) || (counterBody && counterBody.closest("table"));
-          if (hostTable && hostTable.parentElement) {
-            hostTable.parentElement.insertAdjacentElement("afterend", bar);
-          } else if (sel.parentElement) {
-            sel.parentElement.insertAdjacentElement("afterend", bar);
-          }
-        }
-        return bar;
-      }
+      const sel = byId("excSelect");
+      const tbody = byId("excRowsBody");
+      const counterBody = byId("excCounterBody");
+      const statusMsg = byId("excStatusMsg");
       if (!sel || !tbody || !counterBody) return;
 
-      const selectedId = sel.value || (excList[0] ? excList[0].id : "");
-      sel.innerHTML = excList.length
-        ? excList.map(e => `<option value="${escapeHtml(e.id)}" ${e.id === selectedId ? "selected" : ""}>${escapeHtml(formatNomeUscita(e.titolo || e.id))}</option>`).join("")
-        : `<option value="">Nessuna escursione configurata</option>`;
+      els.tabCountEsc.textContent = excList.length ? String(excList.length) : "";
+      // Le uscite più recenti in cima.
+      const ordered = excList.slice().reverse();
+      const selectedId = excList.some(e => e.id === sel.value) ? sel.value : (ordered[0] ? ordered[0].id : "");
+      sel.innerHTML = ordered.length
+        ? ordered.map(e => `<option value="${escapeHtml(e.id)}" ${e.id === selectedId ? "selected" : ""}>${escapeHtml(formatNomeUscita(e.titolo || e.id))}</option>`).join("")
+        : `<option value="">Nessuna escursione trovata</option>`;
 
-      const currentEsc = excList.find(e => e.id === sel.value) || excList[0] || null;
+      const currentEsc = excList.find(e => e.id === selectedId) || null;
       const counterMap = buildParticipationCounter();
-      const q = String((document.getElementById("excSearch") || {}).value || "").toLowerCase().trim();
+      const q = String(byId("excSearch").value || "").toLowerCase().trim();
+      currentExcRows = [];
 
       if (!currentEsc) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Nessuna escursione trovata in escursioni_config.json.</td></tr>`;
-        return;
-      }
-
-      if (!currentEsc.ok) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty">${icon("map")}Nessun foglio "${escapeHtml(APP_CONFIG.escursioniNamePrefix)} …" trovato nel Drive.</td></tr>`;
+      } else if (!currentEsc.ok) {
         if (statusMsg) statusMsg.textContent = "Errore lettura foglio";
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--danger);">Impossibile leggere il foglio: ${escapeHtml(currentEsc.error || "verifica che sia condiviso o accessibile")}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger-fg)">${icon("alert")}Impossibile leggere il foglio: ${escapeHtml(currentEsc.error || "verifica che l'account vi abbia accesso")}</td></tr>`;
       } else {
-        if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} risposte caricate`;
-        const bar = ensureExcMailBar();
-        if (bar) {
-          const infoMail = collectEscursioneEmails(currentEsc);
-          const sumEl = document.getElementById("excMailSummary");
-          const btnCopy = document.getElementById("btnCopyExcEmails");
-          const btnCopyTpl = document.getElementById("btnCopyExcTemplate");
-          const selTpl = document.getElementById("excMailTemplateSelect");
-          const boxTpl = document.getElementById("excMailTemplateBox");
-          const linkMailto = document.getElementById("linkOpenExcMailto");
-          const nomePulito = formatNomeUscita(currentEsc.titolo || currentEsc.id || "Escursione");
-          const tplMode = selTpl ? selTpl.value : "annullamento";
-
-          const subjectText = tplMode === "annullamento"
-            ? ("Annullamento escursione: " + nomePulito)
-            : ("Informazioni escursione: " + nomePulito);
-
-          const bodyText = tplMode === "annullamento"
-            ? [
-                "Ciao a tutti,",
-                "",
-                "purtroppo siamo costretti ad annullare l'escursione in programma su " + nomePulito + ".",
-                "Ci dispiace per l'inconveniente: vi aggiorneremo non appena ci saranno novità o una nuova data.",
-                "",
-                "Un caro saluto,",
-                "Tre Quinti Trekking APS"
-              ].join("\n")
-            : [
-                "Ciao a tutti,",
-                "",
-                "condividiamo alcune informazioni utili per l'escursione su " + nomePulito + ".",
-                "",
-                "A presto sui sentieri,",
-                "Tre Quinti Trekking APS"
-              ].join("\n");
-
-          renderExcAlerts(currentEsc, infoMail);
-          if (sumEl) {
-            const missTxt = infoMail.missingCount ? ` (${infoMail.missingCount} senza mail)` : "";
-            sumEl.textContent = `Email uniche trovate: ${infoMail.emails.length}${missTxt}`;
-          }
-          if (boxTpl) {
-            boxTpl.innerHTML =
-              '<div style="font-weight:600;margin-bottom:4px;">Oggetto: ' + escapeHtml(subjectText) + '</div>' +
-              '<pre style="margin:0;white-space:pre-wrap;font-family:inherit;color:var(--text);">' + escapeHtml(bodyText) + '</pre>';
-          }
-          if (selTpl) {
-            selTpl.onchange = () => renderEscursioni();
-          }
-          if (btnCopyTpl) {
-            btnCopyTpl.textContent = tplMode === "annullamento" ? "Copia testo annullamento" : "Copia testo mail";
-            btnCopyTpl.onclick = async () => {
-              const fullMailText = "Oggetto: " + subjectText + "\n\n" + bodyText;
-              try {
-                await navigator.clipboard.writeText(fullMailText);
-                const prev = btnCopyTpl.textContent;
-                btnCopyTpl.textContent = "Testo copiato";
-                setTimeout(() => { btnCopyTpl.textContent = prev; }, 1800);
-              } catch (_) {
-                prompt("Copia il testo dell'email:", fullMailText);
-              }
-            };
-          }
-          if (linkMailto) {
-            const bccParam = encodeURIComponent(infoMail.emails.join(","));
-            const subjParam = encodeURIComponent(subjectText);
-            const bodyParam = encodeURIComponent(bodyText);
-            linkMailto.href = infoMail.emails.length
-              ? ("mailto:?bcc=" + bccParam + "&subject=" + subjParam + "&body=" + bodyParam)
-              : "#";
-          }
-          if (btnCopy) {
-            btnCopy.onclick = async () => {
-              if (!infoMail.emails.length) {
-                alert("Nessun indirizzo email trovato per questa escursione.");
-                return;
-              }
-              const joined = infoMail.emails.join(", ");
-              try {
-                await navigator.clipboard.writeText(joined);
-                btnCopy.textContent = "Copiate (" + infoMail.emails.length + ")";
-                setTimeout(() => { btnCopy.textContent = "Copia email (CCN)"; }, 1800);
-              } catch (_) {
-                prompt("Copia gli indirizzi email (CCN):", joined);
-              }
-            };
-          }
-        }
-        const filteredRows = (currentEsc.rows || []).filter((r) => {
-          if (!q) return true;
-          const f = extractFormFields(r);
-          return `${f.displayName} ${f.email} ${f.phone}`.toLowerCase().includes(q);
-        });
-
+        renderExcPanels(currentEsc, analyzeEscursione(currentEsc));
         let memberCount = 0;
-
-        tbody.innerHTML = filteredRows.length ? filteredRows.map((r, rIdx) => {
+        currentEsc.rows.forEach((r) => {
           const f = extractFormFields(r);
           const matched = findMatchingMember(f.displayName, f.email, f.phone);
-          const canonicalName = matched
-            ? (`${matched["COGNOME"] || ""} ${matched["NOME"] || ""}`.trim() || f.displayName)
-            : f.displayName;
-          const pKey = matched
-            ? "m:" + tokenizeName(canonicalName).sort().join("_")
-            : normalizePersonKey(f.displayName, f.email, f.phone);
-
+          if (matched) memberCount++;
+          const pKey = personKeyFor(f, matched);
           const statObj = counterMap.get(pKey);
-          const tripsCount = statObj ? statObj.trips.length : 1;
-          if (matched) memberCount += 1;
+          currentExcRows.push({ f, matched, pKey, trips: statObj ? statObj.trips.length : 1, itemKey: `${currentEsc.id}::${pKey || r._rowNumber}` });
+        });
+        const visible = q ? currentExcRows.filter(x => `${x.f.displayName} ${x.f.email} ${x.f.phone}`.toLowerCase().includes(q)) : currentExcRows;
+        const confirmed = currentExcRows.filter(x => (excLocalState[x.itemKey] || {}).confirmed).length;
 
-          const itemKey = `${currentEsc.id}::${pKey || rIdx}`;
-          const loc = excLocalState[itemKey] || { note: "" };
-
-          const contacts = [f.phone, f.email].filter(Boolean).join(" • ") || "—";
-          const socioBadge = matched
-            ? `<span class="badge ok">Socio #${escapeHtml(matched["TESSERA n°"] || "")}</span>`
-            : `<span class="badge warn">Non socio</span>`;
-
+        tbody.innerHTML = visible.length ? visible.map((x) => {
+          const loc = excLocalState[x.itemKey] || {};
+          const k = escapeHtml(x.itemKey);
           return `
             <tr>
-              <td><strong>${escapeHtml(f.displayName)}</strong></td>
-              <td>${escapeHtml(contacts)}</td>
-              <td>${socioBadge}</td>
-              <td><strong>${escapeHtml(String(tripsCount))}</strong></td>
-              <td>
-                <input type="text" class="local-note-input exc-note-inp" data-exc-key="${escapeHtml(itemKey)}" value="${escapeHtml(loc.note || "")}" placeholder="Nota escursione..." />
-              </td>
-            </tr>
-          `;
-        }).join("") : `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Nessun partecipante corrisponde al filtro.</td></tr>`;
+              <td class="cell-main"><div><strong>${escapeHtml(x.f.displayName)}</strong>
+                <label class="flag-label" style="margin-top:4px;display:flex;font-size:0.76rem;color:var(--muted);"><input type="checkbox" class="exc-conf-cb" data-exc-key="${k}" ${loc.confirmed ? "checked" : ""} /><span>Confermato</span></label></div></td>
+              <td data-label="Contatti">${contactsHtml(x.f)}</td>
+              <td data-label="Stato socio">${socioBadge(x.matched)}</td>
+              <td class="num" data-label="Escursioni">${escapeHtml(String(x.trips))}</td>
+              <td data-label="Nota"><input type="text" class="local-note-input exc-note-inp" data-exc-key="${k}" value="${escapeHtml(loc.note || "")}" placeholder="Nota escursione…" /></td>
+            </tr>`;
+        }).join("") : `<tr><td colspan="5" class="empty">${icon("search")}Nessun partecipante corrisponde alla ricerca.</td></tr>`;
 
-        const elCount = document.getElementById("excStatCount");
-        const elMembers = document.getElementById("excStatMembers");
-        if (elCount) elCount.textContent = String(currentEsc.rows.length);
-        if (elMembers) elMembers.textContent = String(memberCount);
+        byId("excStatCount").textContent = String(currentEsc.rows.length);
+        byId("excStatMembers").textContent = String(memberCount);
+        if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} iscritti · ${confirmed} confermati · ${excList.length} uscite nel Drive`;
       }
 
-      const sortedPeople = Array.from(counterMap.values()).sort((a, b) => b.trips.length - a.trips.length || a.name.localeCompare(b.name, "it"));
-      const elTotal = document.getElementById("excStatTotalTrips");
-      if (elTotal) elTotal.textContent = String(sortedPeople.length);
-
-      counterBody.innerHTML = sortedPeople.length ? sortedPeople.map((p) => {
-        const socioTxt = p.memberMatch
-          ? `<span class="badge ok">Socio #${escapeHtml(p.memberMatch["TESSERA n°"] || "")}</span>`
-          : `<span class="badge warn">Non socio</span>`;
-        return `
-          <tr>
-            <td><strong>${escapeHtml(p.name)}</strong></td>
-            <td><strong>${escapeHtml(String(p.trips.length))}</strong></td>
-            <td class="wrap">${escapeHtml(p.trips.join(", "))}</td>
-            <td>${socioTxt}</td>
-          </tr>
-        `;
-      }).join("") : `<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--muted);">Nessuna partecipazione registrata.</td></tr>`;
+      const people = Array.from(counterMap.values()).sort((a, b) => b.trips.length - a.trips.length || a.name.localeCompare(b.name, "it"));
+      byId("excStatTotalTrips").textContent = String(people.length);
+      counterBody.innerHTML = people.length ? people.map((p) => `
+        <tr>
+          <td class="cell-main"><strong>${escapeHtml(p.name)}</strong></td>
+          <td class="num" data-label="Uscite">${escapeHtml(String(p.trips.length))}</td>
+          <td class="wrap" data-label="Elenco">${escapeHtml(p.trips.join(", "))}</td>
+          <td data-label="Stato socio">${socioBadge(p.memberMatch)}</td>
+        </tr>`).join("") : `<tr><td colspan="4" class="empty">Nessuna partecipazione registrata.</td></tr>`;
     }
 
-    async function loadEscursioniFromServer() {
-      const statusMsg = document.getElementById("excStatusMsg");
-      if (statusMsg) statusMsg.textContent = "Caricamento...";
-      try {
-        const data = await AppData.loadEscursioni();
-        excList = Array.isArray(data.escursioni) ? data.escursioni : [];
-        if (statusMsg) statusMsg.textContent = "Caricate " + excList.length + " escursioni · " + new Date().toLocaleTimeString("it-IT");
-        maybeNotifyNewParticipants(excList);
-        renderEscursioni();
-      } catch (err) {
-        if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
-        const errDetail = (err && (err.message || String(err))) || "Errore sconosciuto";
-        if (statusMsg) statusMsg.textContent = "Errore: " + errDetail;
-        const tbody = document.getElementById("excRowsBody");
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="5" style="padding:14px;color:var(--danger);white-space:pre-wrap;font-size:0.8rem;">${escapeHtml((err && err.stack) || errDetail)}</td></tr>`;
+    async function loadEscursioniFromServer(opts) {
+      if (excLoadPromise) return excLoadPromise;
+      const quiet = Boolean(opts && opts.quiet);
+      const statusMsg = byId("excStatusMsg");
+      const btn = byId("btnLoadEscursioni");
+      if (statusMsg) statusMsg.textContent = "Caricamento delle escursioni dal Drive…";
+      setBusy(btn, true);
+      excLoadPromise = (async () => {
+        try {
+          const data = await AppData.loadEscursioni();
+          excList = Array.isArray(data.escursioni) ? data.escursioni : [];
+          maybeNotifyNewParticipants(excList);
+          renderEscursioni();
+        } catch (err) {
+          if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+          const msg = (err && (err.message || String(err))) || "Errore sconosciuto";
+          if (statusMsg) statusMsg.textContent = "Errore: " + msg;
+          byId("excRowsBody").innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger-fg)">${icon("alert")}${escapeHtml(msg)}</td></tr>`;
+          if (quiet) throw err;
+        } finally {
+          setBusy(btn, false);
+          excLoadPromise = null;
         }
-      }
+      })();
+      return excLoadPromise;
     }
 
-    const tabBtnSoci = document.getElementById("tabBtnSoci");
-    const tabBtnEsc = document.getElementById("tabBtnEscursioni");
-    const viewSoci = document.getElementById("viewSoci");
-    const viewEsc = document.getElementById("viewEscursioni");
+    function exportEscursioneCsv() {
+      const esc = excList.find(e => e.id === byId("excSelect").value);
+      if (!esc || !currentExcRows.length) { toast("Carica prima un'escursione", "err"); return; }
+      const cols = ["Partecipante", "Email", "Telefono", "Socio", "Tessera n°", "Escursioni fatte", "Confermato", "Nota"];
+      const rows = currentExcRows.map(x => {
+        const loc = excLocalState[x.itemKey] || {};
+        return {
+          "Partecipante": x.f.displayName, "Email": x.f.email || memberEmail(x.matched), "Telefono": x.f.phone,
+          "Socio": x.matched ? "SI" : "NO", "Tessera n°": x.matched ? x.matched["TESSERA n°"] || "" : "",
+          "Escursioni fatte": x.trips, "Confermato": loc.confirmed ? "SI" : "NO", "Nota": loc.note || ""
+        };
+      });
+      const slug = formatNomeUscita(esc.titolo).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "escursione";
+      downloadCsv(`partecipanti-${slug}.csv`, cols, rows);
+      toast(`Esportati ${rows.length} partecipanti`);
+    }
+
+    // ---- Schede principali ----
+    const tabBtnSoci = byId("tabBtnSoci");
+    const tabBtnEsc = byId("tabBtnEscursioni");
+    const viewSoci = byId("viewSoci");
+    const viewEsc = byId("viewEscursioni");
 
     function switchMainTab(which) {
       const isEsc = which === "escursioni";
-      if (tabBtnSoci) {
-        tabBtnSoci.classList.toggle("active", !isEsc);
-        tabBtnSoci.setAttribute("aria-selected", String(!isEsc));
-      }
-      if (tabBtnEsc) {
-        tabBtnEsc.classList.toggle("active", isEsc);
-        tabBtnEsc.setAttribute("aria-selected", String(isEsc));
-      }
-      if (viewSoci) viewSoci.classList.toggle("hidden", isEsc);
-      if (viewEsc) viewEsc.classList.toggle("hidden", !isEsc);
-      if (isEsc && !excList.length) loadEscursioniFromServer();
+      tabBtnSoci.classList.toggle("active", !isEsc);
+      tabBtnSoci.setAttribute("aria-selected", String(!isEsc));
+      tabBtnEsc.classList.toggle("active", isEsc);
+      tabBtnEsc.setAttribute("aria-selected", String(isEsc));
+      viewSoci.classList.toggle("hidden", isEsc);
+      viewEsc.classList.toggle("hidden", !isEsc);
+      if (isEsc && !excList.length && GoogleApi.isSignedIn()) loadEscursioniFromServer();
     }
 
-    if (tabBtnSoci) tabBtnSoci.addEventListener("click", () => switchMainTab("soci"));
-    if (tabBtnEsc) tabBtnEsc.addEventListener("click", () => switchMainTab("escursioni"));
-    const btnLoadEsc = document.getElementById("btnLoadEscursioni");
-    if (btnLoadEsc) btnLoadEsc.addEventListener("click", loadEscursioniFromServer);
-    const excSel = document.getElementById("excSelect");
-    if (excSel) excSel.addEventListener("change", renderEscursioni);
-    const excSearch = document.getElementById("excSearch");
-    if (excSearch) excSearch.addEventListener("input", renderEscursioni);
+    tabBtnSoci.addEventListener("click", () => switchMainTab("soci"));
+    tabBtnEsc.addEventListener("click", () => switchMainTab("escursioni"));
+    byId("btnLoadEscursioni").addEventListener("click", () => loadEscursioniFromServer());
+    byId("btnExportExc").addEventListener("click", exportEscursioneCsv);
+    byId("excSelect").addEventListener("change", renderEscursioni);
+    byId("excSearch").addEventListener("input", debounce(renderEscursioni, 150));
 
-    if (viewEsc) {
-      viewEsc.addEventListener("change", (e) => {
-        const cb = e.target.closest(".exc-conf-cb");
-        if (!cb) return;
-        const k = cb.getAttribute("data-exc-key");
-        if (!k) return;
-        excLocalState[k] = Object.assign({}, excLocalState[k] || {}, { confirmed: cb.checked });
-        saveExcLocalState();
-        CloudDB.exc(k, excLocalState[k]);
-        renderEscursioni();
-      });
-      viewEsc.addEventListener("input", (e) => {
-        const inp = e.target.closest(".exc-note-inp");
-        if (!inp) return;
-        const k = inp.getAttribute("data-exc-key");
-        if (!k) return;
-        excLocalState[k] = Object.assign({}, excLocalState[k] || {}, { note: inp.value });
-        saveExcLocalState();
-        CloudDB.exc(k, excLocalState[k]);
-      });
+    viewEsc.addEventListener("change", (e) => {
+      const cb = e.target.closest(".exc-conf-cb");
+      if (!cb) return;
+      const k = cb.getAttribute("data-exc-key");
+      if (!k) return;
+      excLocalState[k] = Object.assign({}, excLocalState[k] || {}, { confirmed: cb.checked });
+      saveExcLocalState();
+      CloudDB.exc(k, excLocalState[k]);
+      const confirmed = currentExcRows.filter(x => (excLocalState[x.itemKey] || {}).confirmed).length;
+      const statusMsg = byId("excStatusMsg");
+      if (statusMsg) statusMsg.textContent = statusMsg.textContent.replace(/\d+ confermati/, confirmed + " confermati");
+    });
+    viewEsc.addEventListener("input", (e) => {
+      const inp = e.target.closest(".exc-note-inp");
+      if (!inp) return;
+      const k = inp.getAttribute("data-exc-key");
+      if (!k) return;
+      excLocalState[k] = Object.assign({}, excLocalState[k] || {}, { note: inp.value });
+      saveExcLocalState();
+      CloudDB.exc(k, excLocalState[k]);
+    });
+
+    function formatNomeUscita(titoloRaw) {
+      const s = String(titoloRaw || "").trim();
+      const quoted = s.match(/["«“]([^"»”]+)["»”]/);
+      if (quoted && quoted[1]) return quoted[1].trim();
+      return s
+        .replace(/\(Risposte\)\s*$/i, "")
+        .replace(/^Form\s+Iscrizione[\s._-]*\d{4}[._-]\d{2}[._-]\d{2}[\s._-]*/i, "")
+        .replace(/^[-–—:\s]+|[-–—:\s]+$/g, "")
+        .trim();
     }
-
-  
-function formatNomeUscita(titoloRaw) {
-  const s = String(titoloRaw || "").trim();
-  const quoted = s.match(/["«“]([^"»”]+)["»”]/);
-  if (quoted && quoted[1]) {
-    return quoted[1].trim();
-  }
-  return s
-    .replace(/\(Risposte\)\s*$/i, "")
-    .replace(/^Form\s+Iscrizione[\s._-]*\d{4}[._-]\d{2}[._-]\d{2}[\s._-]*/i, "")
-    .replace(/^[-–—:\s]+|[-–—:\s]+$/g, "")
-    .trim();
-}
-
 </script>
-<script src="js/app.js"></script>
+<script src="js/app.js?v=2.1.0"></script>
 </body>
 </html>

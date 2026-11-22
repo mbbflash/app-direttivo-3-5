@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.0.3-blue)
+![Versione](https://img.shields.io/badge/versione-2.1.0-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -63,13 +63,15 @@ Una web app installabile su PC, Android e Chromebook, collegata direttamente ai 
 | **Colonne** | Tessera, socio, tessera cartacea, tesseramento, scadenza, giorni (GG), stato, solleciti, note, nota, tipo tessera |
 | **Calcolo scadenze** | Calcola i giorni alla scadenza e assegna lo stato con badge colorati |
 | **Reset filtri** | Riporta ricerca e filtri alla situazione iniziale |
+| **Contatori cliccabili** | Clic su *Attive*, *In scadenza* o *Scadute* per filtrare subito l'elenco |
+| **Su telefono** | Ogni socio diventa una scheda leggibile, senza scorrere di lato |
 
 ### 🪪 Scheda socio
 
 Cliccando su un nominativo si apre la scheda personale con:
 
 - 📋 tutti i dati del socio presenti nel Libro Soci;
-- 📞 pulsante **Chiama** (link `tel:`) e ✉️ **Invia email** (link `mailto:`);
+- 📞 pulsanti **Chiama**, 💬 **WhatsApp**, ✈️ **Telegram** e ✉️ **Email**;
 - 🥾 **curriculum escursioni**: a quali uscite ha partecipato e quante sono;
 - ✅ spunte **Preparata** / **Consegnata** per la tessera cartacea, **condivise con il direttivo**;
 - 📝 una **nota** sul socio, **condivisa con il direttivo** e inclusa nell'export CSV.
@@ -79,11 +81,12 @@ Cliccando su un nominativo si apre la scheda personale con:
 | Funzione | Cosa fa |
 |---|---|
 | **Elenco uscite automatico** | Trova da solo nel Drive tutti i fogli risposte *"Form Iscrizione …"*, anche quelli nuovi |
-| **Adesioni** | Tabella dei partecipanti all'uscita scelta, con contatti, stato socio e n° di escursioni fatte |
+| **Adesioni** | Tabella dei partecipanti all'uscita scelta, con contatti (e collegamenti rapidi WhatsApp/Telegram), stato socio e n° di escursioni fatte |
 | **Ricerca partecipanti** | Cerca per nome, email o telefono |
 | **Statistiche uscita** | Adesioni nel foglio, quanti sono **già soci**, partecipanti unici |
 | **Abbinamento al Libro Soci** | Riconosce i soci da email, telefono o nome e cognome (anche in ordine invertito) |
-| **Note per partecipante** | Nota su ogni iscritto all'uscita, **condivisa con il direttivo** |
+| **Note e conferme per partecipante** | Nota e spunta *Confermato* su ogni iscritto, **condivise con il direttivo** |
+| **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli |
 
 ### 🚨 Avvisi uscita
@@ -98,6 +101,7 @@ Per ogni escursione l'app segnala in automatico cosa controllare:
 
 - 📋 **Copia email in CCN** di tutti gli iscritti all'uscita (senza duplicati);
 - ✉️ **Apri in posta (CCN)**: apre il programma di posta con destinatari, oggetto e testo già pronti;
+- ✈️ **Telegram**: invia lo stesso testo in un gruppo, canale o chat Telegram;
 - 📝 **Modelli di testo**: *annullamento escursione* o *informazioni utili*, da copiare con un clic.
 
 ### 🤝 Lavoro di squadra
@@ -107,13 +111,20 @@ Per ogni escursione l'app segnala in automatico cosa controllare:
 - 🔁 tornando sull'app dopo qualche minuto vedi le modifiche fatte dagli altri;
 - 📶 **offline o sessione scaduta**: le modifiche restano in coda sul dispositivo e vengono salvate appena possibile (indicatore *● modifiche da salvare*).
 
+### 🎨 Interfaccia
+
+- Logo e colori **Tre Quinti Trekking** (bordeaux), anche come icona dell'app;
+- Tema **chiaro / scuro / automatico** (pulsante in alto a destra);
+- scorciatoie da tastiera: **/** per cercare, **Esc** per chiudere la scheda socio.
+
 ### 🔔 Notifiche
 
 - Notifiche del browser quando arrivano **nuove iscrizioni** a un'uscita (da attivare con *Attiva notifiche browser*).
 
 ### 💾 Import / Export
 
-- **Esporta CSV** dell'elenco soci, comprese le note;
+- **Esporta CSV** dell'elenco soci, comprese spunte e note;
+- **Esporta partecipanti** di un'escursione;
 - **Importa CSV locale** per consultare un file senza collegarsi ai Fogli Google.
 
 ---
@@ -181,7 +192,7 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 
 ### Per chi sviluppa
 
-Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js`.
+Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js` e il `?v=` degli script in `docs/index.html` (così nessuno resta con file vecchi in cache).
 
 ---
 
