@@ -36,7 +36,7 @@
     if (token.includes("demo-token") || files.includes("\"demo-")) {
       ["app35_token_v1", "app35_file_ids_v1", "app35_pending_v1", "app35_migrated_v1",
         "libro_soci_ro_v2", "libro_soci_paper_cards_v1", "libro_soci_local_notes_v1",
-        "libro_soci_escursioni_local_v1"].forEach((k) => s.removeItem(k));
+        "libro_soci_escursioni_local_v1", "app35_reminders_v1", "app35_watch_v1"].forEach((k) => s.removeItem(k));
     }
   }
 })();

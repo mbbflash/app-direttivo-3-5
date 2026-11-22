@@ -1,0 +1,33 @@
+{
+  "version": "2.3.0",
+  "releases": [
+    {
+      "version": "2.3.0",
+      "date": "22/11/2026",
+      "notes": [
+        "Nuova scheda Statistiche: presenze, km, dislivello e classifica dal foglio \"Tre Quinti Wrapped\"",
+        "L'app segnala le uscite dei form che mancano nel foglio statistiche e ti aiuta ad aggiungerle",
+        "Curriculum del socio con le presenze vere, ore, km e dislivello",
+        "Notifiche per ogni nuova iscrizione a un'escursione e per ogni nuova richiesta di iscrizione all'associazione (campanella in alto)",
+        "Avviso quando esce una nuova versione dell'app, con le novità"
+      ]
+    },
+    {
+      "version": "2.2.0",
+      "date": "22/11/2026",
+      "notes": [
+        "Pulsante \"Sollecita rinnovo\" per i soci in scadenza: WhatsApp, Telegram o email con messaggio già pronto",
+        "I solleciti sono condivisi con il direttivo (scheda \"Solleciti\" del database)",
+        "Filtro \"Rinnovo: da sollecitare\" ed email di gruppo ai soci da rinnovare"
+      ]
+    },
+    {
+      "version": "2.1.0",
+      "date": "22/11/2026",
+      "notes": [
+        "Nuova grafica con i colori e il logo Tre Quinti Trekking, tema chiaro/scuro",
+        "WhatsApp e Telegram nella scheda socio e nelle escursioni"
+      ]
+    }
+  ]
+}

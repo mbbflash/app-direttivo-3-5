@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.1.0-blue)
+![Versione](https://img.shields.io/badge/versione-2.3.0-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -59,6 +59,8 @@ Una web app installabile su PC, Android e Chromebook, collegata direttamente ai 
 | **Filtro per tipologia** | Filtra per tipo di tessera (l'elenco si crea in automatico dai dati) |
 | **Filtro per stato** | Non scadute · Solo attive · In scadenza · Scadute · Tutti |
 | **Filtro tessere cartacee** | *Da preparare* · *Preparata, da consegnare* · *Consegnata* |
+| **Da sollecitare** | Soci in scadenza o scaduti non sollecitati negli ultimi 14 giorni |
+| **Sollecito di gruppo** | Con il filtro *In scadenza*, *Scadute* o *Da sollecitare*: un'email in CCN a tutti, poi l'app li segna come sollecitati |
 | **Tabella ordinabile** | Clic sull'intestazione per ordinare per tessera, nome, data tesseramento, scadenza, giorni rimanenti, stato o tipo |
 | **Colonne** | Tessera, socio, tessera cartacea, tesseramento, scadenza, giorni (GG), stato, solleciti, note, nota, tipo tessera |
 | **Calcolo scadenze** | Calcola i giorni alla scadenza e assegna lo stato con badge colorati |
@@ -76,6 +78,15 @@ Cliccando su un nominativo si apre la scheda personale con:
 - ✅ spunte **Preparata** / **Consegnata** per la tessera cartacea, **condivise con il direttivo**;
 - 📝 una **nota** sul socio, **condivisa con il direttivo** e inclusa nell'export CSV.
 
+### 🔔 Sollecita rinnovo
+
+Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
+
+- messaggio già scritto con nome, n° tessera e data di scadenza, **modificabile** prima dell'invio;
+- invio con **WhatsApp** (testo già pronto), **Telegram** (il testo viene copiato, basta incollarlo) o **Email**;
+- **Segna come sollecitato** per i solleciti fatti a voce o al telefono;
+- ogni sollecito (data, canale, chi) finisce nel database → scheda `Solleciti`, così tutto il direttivo vede chi è già stato contattato e nessuno viene sollecitato due volte.
+
 ### 🗺️ Escursioni (Form)
 
 | Funzione | Cosa fa |
@@ -88,6 +99,16 @@ Cliccando su un nominativo si apre la scheda personale con:
 | **Note e conferme per partecipante** | Nota e spunta *Confermato* su ogni iscritto, **condivise con il direttivo** |
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli |
+
+### 📊 Statistiche
+
+Legge il foglio **"Tre Quinti Wrapped - Foglio Calcolo"** (presenze effettive, una scheda `DatiEscursioniAAAA` per anno), che resta il vostro foglio e si può continuare a modificare a mano.
+
+- scelta dell'**anno** o di tutti gli anni, ricerca per escursionista o uscita;
+- totali: uscite, presenze, escursionisti, media per uscita, km, dislivello e ore;
+- grafico delle **presenze per uscita**, **classifica** degli escursionisti (ordinabile) ed elenco delle uscite;
+- **uscite dei form non ancora nel foglio**: l'app le segnala e, con *Aggiungi al foglio*, propone le righe da scrivere (presenti segnati *Confermato*, più eventuali presenti senza iscrizione, ore, km e dislivello). Scrive solo dopo conferma, nello stesso formato di sempre (`Socio | =UPPER(A) | Data | NomeEscursione | Ore | Km | Dislivello`), riusando la grafia dei nomi già presente nel foglio;
+- nella **scheda socio** il curriculum mostra le presenze vere con ore, km e dislivello totali.
 
 ### 🚨 Avvisi uscita
 
@@ -119,7 +140,13 @@ Per ogni escursione l'app segnala in automatico cosa controllare:
 
 ### 🔔 Notifiche
 
-- Notifiche del browser quando arrivano **nuove iscrizioni** a un'uscita (da attivare con *Attiva notifiche browser*).
+Si attivano con la **campanella** in alto. Con l'app aperta (anche in background) ogni 3 minuti controlla i fogli e avvisa di:
+
+- ogni **nuova iscrizione a un'escursione** (nome e totale iscritti);
+- ogni **nuova richiesta di iscrizione all'associazione** dal foglio *3 - Modulo Iscrizione Tre Quinti Trekking APS (Risposte)* (legge solo data, email, tipo di tessera, nome e cognome);
+- ogni **nuova versione dell'app**, con l'elenco delle novità (e dopo l'aggiornamento un riquadro *Novità della versione*).
+
+L'app ricorda quante righe aveva ogni foglio: alla riapertura avvisa anche delle iscrizioni arrivate mentre era chiusa. Con l'app completamente chiusa le notifiche non possono arrivare (servirebbe un server dedicato).
 
 ### 💾 Import / Export
 
@@ -166,6 +193,8 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 | Spunte tessere cartacee | Foglio *NON TOCCARE - DATABASE APP DI GESTIONE* → `Tessere` | ✅ Sì |
 | Note sui soci | Database → `Note` | ✅ Sì |
 | Note e conferme escursioni | Database → `Conferme_Escursioni` | ✅ Sì |
+| Solleciti di rinnovo | Database → `Solleciti` | ✅ Sì |
+| Presenze e statistiche | Foglio *Tre Quinti Wrapped - Foglio Calcolo* | ✅ Sì |
 | Storico modifiche | Database → `Log` | ✅ Sì |
 | Cache e modifiche in coda | Browser del dispositivo | ❌ No, cancellate con **Esci** |
 
@@ -192,7 +221,7 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 
 ### Per chi sviluppa
 
-Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js` e il `?v=` degli script in `docs/index.html` (così nessuno resta con file vecchi in cache).
+Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js`, il `?v=` di script e icone in `docs/index.html` e `docs/manifest.webmanifest` (così nessuno resta con file vecchi in cache) e di aggiungere le novità in `docs/version.json`: è da lì che l'app avvisa tutti dell'aggiornamento.
 
 ---
 

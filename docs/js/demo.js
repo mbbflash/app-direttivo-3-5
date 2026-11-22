@@ -31,6 +31,21 @@
       files: {
         "demo-soci": { name: cfg.libroSociName, sheets: { [cfg.libroSociSheet]: soci, "Libro Volontari": [[]] } },
         "demo-db": { name: cfg.databaseName, sheets: { "Foglio1": [] } },
+        "demo-iscr": { name: cfg.iscrizioniName, sheets: { "Risposte del modulo 1": [
+          ["er", "Metodo di Pagamento", "Pagamento ricevuto", "Tessera Consegnata", "Bonifici AICS", "Informazioni cronologiche", "Indirizzo email", "Quale tipo di tessera vuoi richiedere?", "Nome", "Cognome"],
+          ["", "Bonifico", "", "", "", "01/11/2026 10.00", "nuovo.socio@esempio.it", "ORDINARIO", "Nuovo", "Socio"]
+        ] } },
+        "demo-stats": { name: cfg.statsName, sheets: {
+          "Totali": [["Socio", "Nome", "Escursioni", "Ore", "Km", "Dislivello"]],
+          [cfg.statsSheetPrefix + "2025"]: [["Socio", "", "Data", "NomeEscursione", "Ore", "Km", "Dislivello"],
+            ["Mario Rossi", "=UPPER(A2)", "14/09/2025", "La Via del Bosco", 5, 12, 500],
+            ["Anna Neri", "=UPPER(A3)", "14/09/2025", "La Via del Bosco", 5, 12, 500],
+            ["Mario Rossi", "=UPPER(A4)", "12/10/2025", "Lago Finto", 6, "8,5", 700]],
+          [cfg.statsSheetPrefix + "2026"]: [["Socio", "", "Data", "NomeEscursione", "Ore", "Km", "Dislivello"],
+            ["Mario Rossi", "=UPPER(A2)", "25/10/2026", "Monte Esempio", 4, "9.5", 650],
+            ["Giulia Bianchi", "=UPPER(A3)", "25/10/2026", "Monte Esempio", 4, "9.5", 650],
+            ["Paolo Gialli", "=UPPER(A4)", "25/10/2026", "Monte Esempio", 4, "9.5", 650]]
+        } },
         "demo-esc-1": { name: `${cfg.escursioniNamePrefix} 2026.10.25 - "Monte Esempio" (Risposte)`, sheets: { "Risposte del modulo 1": form([
           ["25/10/2026 9.00", "Mario Rossi", "mario.rossi@esempio.it", "3330000000", "SI"],
           ["25/10/2026 9.10", "Giulia Bianchi", "giulia.bianchi@esempio.it", "3330000001", "SI"],
@@ -109,7 +124,7 @@
       const contains = /name contains '((?:[^'\\]|\\.)*)'/.exec(q);
       const unq = (s) => s.replace(/\\(.)/g, "$1");
       const files = Object.entries(store.files)
-        .filter(([, f]) => (eq ? f.name === unq(eq[1]) : contains ? f.name.includes(unq(contains[1])) : true))
+        .filter(([, f]) => (!eq && !contains) || (eq && f.name === unq(eq[1])) || (contains && f.name.includes(unq(contains[1]))))
         .map(([id, f]) => ({ id, name: f.name, ownedByMe: true, modifiedTime: new Date().toISOString() }));
       return { files };
     }

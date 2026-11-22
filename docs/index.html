@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.1.0" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.1.0" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.1.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.3.0" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.3.0" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.3.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.1.0"></script>
-  <script src="js/config.js?v=2.1.0"></script>
-  <script src="js/google.js?v=2.1.0"></script>
-  <script src="js/clouddb.js?v=2.1.0"></script>
+  <script src="js/storage.js?v=2.3.0"></script>
+  <script src="js/config.js?v=2.3.0"></script>
+  <script src="js/google.js?v=2.3.0"></script>
+  <script src="js/clouddb.js?v=2.3.0"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -189,7 +189,10 @@
     .mini-links a { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); }
     .mini-links a.wa { color: #128c4b; } .mini-links a.tg { color: #1b8ac4; }
     .mini-links .ico { width: 13px; height: 13px; }
-    .icon-btn { padding: 8px; width: 38px; height: 38px; }
+    .icon-btn { padding: 8px; width: 38px; height: 38px; position: relative; }
+    .icon-btn.notif-on { color: var(--primary); }
+    .icon-btn.notif-off::after { content: ""; position: absolute; width: 22px; height: 2px; background: currentColor; transform: rotate(-45deg); border-radius: 2px; }
+    .icon-btn .dot { position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--danger-fg); border: 2px solid var(--surface); }
     .btn.is-loading .ico { animation: spin 0.9s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -377,6 +380,16 @@
     .detail-val { font-size: 0.92rem; font-weight: 550; word-break: break-word; }
     .detail-two { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 10px; }
     @media (max-width: 700px) { .detail-two { grid-template-columns: 1fr; } }
+    .renew-panel { margin-top: 10px; border-color: var(--warn-fg); }
+    .renew-panel textarea {
+      width: 100%; min-height: 150px; resize: vertical; margin: 4px 0 10px;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font: inherit; font-size: 0.88rem; line-height: 1.5; background: var(--surface); color: var(--text);
+    }
+    .renew-panel textarea:focus { outline: none; border-color: var(--primary); box-shadow: var(--ring); }
+    .renew-last { font-size: 0.82rem; color: var(--muted); margin: 2px 0 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .btn.warn-btn { background: var(--warn-bg); color: var(--warn-fg); border-color: transparent; }
+    .btn.warn-btn:hover { filter: brightness(0.97); background: var(--warn-bg); }
     .curriculum { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
     .curriculum-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
     .chips { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
@@ -403,6 +416,46 @@
     .tpl-box pre { margin: 6px 0 0; white-space: pre-wrap; font-family: inherit; color: var(--text); }
     .mail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
     .mail-actions select { width: auto; max-width: 100%; min-width: 0; }
+
+    /* ---------- Statistiche ---------- */
+    .stats-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .stats-toolbar select { width: auto; flex: 0 1 200px; }
+    .stats-toolbar .search-field { flex: 1 1 220px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+    .kpi { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; background: var(--surface-2); }
+    .kpi .stat-label { display: block; }
+    .kpi .stat-value { font-size: 1.4rem; }
+    .kpi .unit { font-size: 0.8rem; color: var(--muted); font-weight: 600; margin-left: 3px; }
+    .bars { display: grid; gap: 7px; }
+    .bar-row { display: grid; grid-template-columns: minmax(120px, 34%) 1fr 40px; gap: 10px; align-items: center; font-size: 0.82rem; }
+    .bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-label .sub { display: inline; margin-left: 4px; }
+    .bar-track { height: 12px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--primary), #c4456e); }
+    .bar-val { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .rank { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 8px; font-weight: 750; font-size: 0.78rem; background: var(--surface-3); color: var(--muted); }
+    .rank.r1 { background: #f8e7a8; color: #7a5b00; } .rank.r2 { background: #e5e7eb; color: #4b5563; } .rank.r3 { background: #f3d2b5; color: #7c3f12; }
+    .missing-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .missing-list li { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid var(--border); border-left: 3px solid var(--warn-fg); border-radius: 10px; background: var(--surface); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+    .form-grid label { font-size: 0.74rem; font-weight: 650; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; display: grid; gap: 4px; }
+    .people-check { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px; margin: 8px 0 10px; }
+    .people-check label { display: flex; gap: 8px; align-items: center; padding: 7px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); font-size: 0.85rem; cursor: pointer; }
+    .people-check input { width: 16px; height: 16px; accent-color: var(--primary); margin: 0; }
+    .curriculum-totals { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 0.84rem; color: var(--muted); }
+    .curriculum-totals strong { color: var(--text); }
+
+    /* ---------- Novità e aggiornamenti ---------- */
+    .update-card {
+      position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 1500;
+      width: min(92vw, 380px); background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: var(--shadow-lg); padding: 16px; animation: toastIn .3s ease;
+    }
+    .update-card h3 { margin: 0 0 4px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+    .update-card ul { margin: 8px 0 12px; padding-left: 18px; font-size: 0.86rem; max-height: 40vh; overflow: auto; }
+    .update-card li { margin-bottom: 4px; }
+    .update-card .ver { font-size: 0.74rem; color: var(--muted); font-weight: 650; text-transform: uppercase; letter-spacing: .05em; margin-top: 6px; }
+    @media (max-width: 640px) { .update-card { left: 50%; right: auto; transform: translateX(-50%); } }
 
     /* ---------- Accesso ---------- */
     .login-overlay {
@@ -489,12 +542,14 @@
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15v3M12 10v8M17 6v12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
   </svg>
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.1.0" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.3.0" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -506,7 +561,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.1.0" alt="" />
+        <img src="icons/icon-192.png?v=2.3.0" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -516,6 +571,7 @@
         <label class="btn-label" for="csvInput" title="Consulta un file CSV senza collegarti ai Fogli Google"><svg class="ico"><use href="#i-upload"/></svg><span class="hide-sm">Importa CSV</span></label>
         <input type="file" id="csvInput" accept=".csv,text/csv" hidden />
         <button id="btnExport" title="Scarica l'elenco soci con spunte e note"><svg class="ico"><use href="#i-download"/></svg><span class="hide-sm">Esporta CSV</span></button>
+        <button type="button" id="btnNotif" class="icon-btn" title="Notifiche" aria-label="Notifiche"><svg class="ico"><use href="#i-bell"/></svg></button>
         <button type="button" id="btnTheme" class="icon-btn" title="Tema: automatico" aria-label="Cambia tema"><svg class="ico"><use href="#i-auto"/></svg></button>
       </div>
     </div>
@@ -539,6 +595,7 @@
     <div class="view-tabs" role="tablist">
       <button type="button" id="tabBtnSoci" class="tab-btn active" role="tab" aria-selected="true"><svg class="ico ico-sm"><use href="#i-users"/></svg>Libro Soci <span class="count" id="tabCountSoci"></span></button>
       <button type="button" id="tabBtnEscursioni" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-map"/></svg>Escursioni <span class="count" id="tabCountEsc"></span></button>
+      <button type="button" id="tabBtnStats" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-chart"/></svg>Statistiche</button>
     </div>
 
     <div id="viewSoci" class="view-section">
@@ -596,13 +653,17 @@
               <option value="DA_PREPARARE">Cartacea: Da preparare</option>
               <option value="PREPARATA_NON_CONSEGNATA">Cartacea: Preparata (da consegnare)</option>
               <option value="CONSEGNATA">Cartacea: Consegnata</option>
+              <option value="DA_SOLLECITARE">Rinnovo: da sollecitare</option>
             </select>
             <button id="btnClearFilters" class="ghost"><svg class="ico"><use href="#i-x"/></svg>Reset</button>
           </div>
         </section>
 
         <div class="list-meta">
-          <span id="listCount">—</span>
+          <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span id="listCount">—</span>
+            <button type="button" id="btnBulkRenew" class="btn warn-btn" hidden title="Email in CCN a tutti i soci da rinnovare mostrati nell'elenco"><svg class="ico ico-sm"><use href="#i-mail"/></svg><span id="btnBulkRenewText">Sollecita rinnovo via email</span></button>
+          </span>
           <span class="hide-sm">Clic sull'intestazione per ordinare · clic sul nome per la scheda</span>
         </div>
         <div class="table-wrap responsive">
@@ -690,9 +751,67 @@
         </div>
       </section>
     </div>
+
+    <div id="viewStats" class="view-section hidden">
+      <section class="card">
+        <div class="stats-toolbar">
+          <label for="statsYear" class="sr-only">Anno</label>
+          <select id="statsYear"><option value="">Tutti gli anni</option></select>
+          <button type="button" id="btnLoadStats" class="primary btn"><svg class="ico"><use href="#i-refresh"/></svg>Aggiorna</button>
+          <div class="search-field">
+            <svg class="ico"><use href="#i-search"/></svg>
+            <input type="search" id="statsSearch" placeholder="Cerca escursionista o uscita…" aria-label="Cerca nelle statistiche" />
+          </div>
+        </div>
+        <div id="statsStatusMsg" class="muted" style="font-size:0.82rem;margin-top:10px;">Dati dal foglio "Tre Quinti Wrapped": le presenze effettive di ogni uscita.</div>
+        <div class="kpis" id="statsKpis"></div>
+      </section>
+
+      <section class="card" id="statsMissingCard" hidden>
+        <h2 class="card-title"><svg class="ico"><use href="#i-alert"/></svg>Uscite dei form non ancora nel foglio statistiche</h2>
+        <ul class="missing-list" id="statsMissingList"></ul>
+        <div id="statsAddPanel"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Presenze per uscita</h2>
+        <div class="bars" id="statsBars"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Classifica escursionisti</h2>
+        <div class="table-wrap responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="sortable" data-ssort="name">Escursionista</th>
+                <th class="sortable" data-ssort="count">Uscite</th>
+                <th class="sortable" data-ssort="ore">Ore</th>
+                <th class="sortable" data-ssort="km">Km</th>
+                <th class="sortable" data-ssort="disl">Dislivello</th>
+                <th>Stato socio</th>
+              </tr>
+            </thead>
+            <tbody id="statsPeopleBody"><tr><td colspan="7" class="empty">Nessun dato caricato.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Uscite registrate</h2>
+        <div class="table-wrap responsive">
+          <table>
+            <thead><tr><th>Data</th><th>Uscita</th><th>Presenti</th><th>Ore</th><th>Km</th><th>Dislivello</th></tr></thead>
+            <tbody id="statsExcBody"><tr><td colspan="6" class="empty">Nessun dato caricato.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
   </div>
 
   <div id="toastHost" class="toast-host" aria-live="polite"></div>
+  <div id="updateHost"></div>
 
 <script>
     // ===================================================================
@@ -703,12 +822,15 @@
     const PAPER_CARDS_KEY = "libro_soci_paper_cards_v1";
     const EXC_LOCAL_KEY = "libro_soci_escursioni_local_v1";
     const THEME_KEY = "app35_theme_v1";
+    const REMINDERS_KEY = "app35_reminders_v1";
 
     let members = [];
     let localNotes = {};
     let paperCards = {};
     let excList = [];
     let excLocalState = {};
+    let reminders = {};          // ultimo sollecito di rinnovo per socio (database condiviso)
+    let lastFilteredRows = [];
     let sortKey = "";
     let sortDir = "asc";
     let selectedMemberIndex = null;
@@ -821,9 +943,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.1.0" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.3.0" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.1.0" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.3.0" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -913,6 +1035,7 @@
       localNotes = readJsonKey(LOCAL_NOTES_KEY, {});
       paperCards = readJsonKey(PAPER_CARDS_KEY, {});
       excLocalState = readJsonKey(EXC_LOCAL_KEY, {});
+      reminders = readJsonKey(REMINDERS_KEY, {});
     }
 
     function setStatusText(msg, isError = false) {
@@ -1061,7 +1184,163 @@
       });
     }
 
-    function sollecitiText(m) {
+    // ===================================================================
+    //  Solleciti di rinnovo
+    // ===================================================================
+    const CHANNEL_LABEL = { whatsapp: "WhatsApp", telegram: "Telegram", email: "Email", altro: "a voce / altro" };
+    const REMIND_AGAIN_DAYS = 14;
+
+    function needsRenewal(st) { return st.category === "SCADUTA" || st.category === "IN_SCADENZA"; }
+
+    function daysSinceReminder(key) {
+      const r = reminders[key];
+      const d = r && parseItDate(r.data);
+      return d ? -diffDaysFromToday(r.data) : null;
+    }
+
+    // Da sollecitare: in scadenza o scaduta, e nessun sollecito negli ultimi giorni.
+    function isToRemind(key, st) {
+      if (!needsRenewal(st)) return false;
+      const since = daysSinceReminder(key);
+      return since === null || since >= REMIND_AGAIN_DAYS;
+    }
+
+    function reminderLabel(key, short) {
+      const r = reminders[key];
+      if (!r) return "";
+      const ch = CHANNEL_LABEL[r.canale] || r.canale || "";
+      if (short) return `App: ${String(r.data || "").slice(0, 5)}${ch ? " · " + ch : ""}`;
+      const by = r.by ? ` da ${r.by.replace(/\s*\(.*\)$/, "")}` : "";
+      return `Ultimo sollecito: ${r.data}${ch ? " via " + ch : ""}${by}`;
+    }
+
+    function titleCase(str) {
+      return String(str || "").toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g, (m0, a, b) => a + b.toUpperCase());
+    }
+
+    function renewalMessage(m, st) {
+      const nome = titleCase(String(m["NOME"] || "").trim().split(/\s+/)[0] || memberFullName(m));
+      const tess = m["TESSERA n°"] ? ` n° ${m["TESSERA n°"]}` : "";
+      const data = m["DATA SCADENZA"] || "";
+      let quando;
+      if (st.category === "SCADUTA") quando = data ? `è scaduta il ${data}` : "risulta scaduta";
+      else if (st.days === 0) quando = "scade oggi";
+      else if (st.days === 1) quando = "scade domani";
+      else quando = data ? `scadrà il ${data} (tra ${st.days} giorni)` : "è in scadenza";
+      return [
+        `Ciao ${nome}!`,
+        "",
+        `Ti scriviamo dalla Tre Quinti Trekking APS: la tua tessera${tess} ${quando}.`,
+        st.category === "SCADUTA"
+          ? "Per continuare a partecipare alle nostre escursioni e attività ti invitiamo a rinnovarla appena possibile."
+          : "Per continuare a partecipare alle nostre escursioni e attività senza interruzioni ti invitiamo a rinnovarla per tempo.",
+        "Per qualsiasi informazione rispondi pure a questo messaggio.",
+        "",
+        "A presto sui sentieri!",
+        "Il direttivo Tre Quinti Trekking APS"
+      ].join("\n");
+    }
+
+    function recordReminder(key, canale) {
+      if (!key) return;
+      const val = { canale, data: new Date().toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }), by: CloudDB.who() };
+      reminders[key] = val;
+      writeJsonKey(REMINDERS_KEY, reminders);
+      CloudDB.remind(key, { canale: val.canale, data: val.data });
+    }
+
+    function renewPanelHtml(m, st, key) {
+      const phone = String(m["CELLULARE"] || "").trim();
+      const email = String(m["E-MAIL CONTATTO"] || "").trim();
+      const wa = whatsappNumber(phone);
+      const last = reminderLabel(key);
+      const btns = [];
+      if (wa) btns.push(`<button type="button" class="btn wa" data-renew="whatsapp">${icon("chat", "ico-sm")}Invia su WhatsApp</button>`);
+      if (wa) btns.push(`<button type="button" class="btn tg" data-renew="telegram" title="Copia il testo e apre la chat Telegram: incollalo e invia">${icon("send", "ico-sm")}Telegram</button>`);
+      if (email) btns.push(`<button type="button" class="btn" data-renew="email">${icon("mail", "ico-sm")}Email</button>`);
+      btns.push(`<button type="button" class="btn" data-renew="copy">${icon("copy", "ico-sm")}Copia testo</button>`);
+      btns.push(`<button type="button" class="btn ghost" data-renew="altro" title="Segna il sollecito fatto di persona o al telefono">${icon("check", "ico-sm")}Segna come sollecitato</button>`);
+      return `
+        <details class="collapsible renew-panel" id="renewPanel"${needsRenewal(st) ? " open" : ""}>
+          <summary>${icon("bell", "ico-sm")}<span>Sollecita rinnovo</span></summary>
+          <div class="collapsible-body">
+            <div class="renew-last" id="renewLast">${last ? icon("clock", "ico-sm") + escapeHtml(last) : "Nessun sollecito registrato dall'app."}</div>
+            <label class="detail-label" for="renewText">Messaggio (puoi modificarlo prima di inviarlo)</label>
+            <textarea id="renewText">${escapeHtml(renewalMessage(m, st))}</textarea>
+            <div class="mail-actions">${btns.join("")}</div>
+          </div>
+        </details>`;
+    }
+
+    async function handleRenewAction(action) {
+      const idx = selectedMemberIndex;
+      const m = members[idx];
+      if (!m) return;
+      const key = memberNoteKey(m, idx);
+      const text = (byId("renewText") || {}).value || "";
+      const phone = String(m["CELLULARE"] || "").trim();
+      const email = String(m["E-MAIL CONTATTO"] || "").trim();
+      if (action === "whatsapp") {
+        window.open(`https://wa.me/${whatsappNumber(phone)}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+      } else if (action === "telegram") {
+        // Telegram non permette di precompilare il messaggio verso un numero: copio il testo.
+        try { await navigator.clipboard.writeText(text); toast("Testo copiato: incollalo nella chat Telegram"); } catch (_) {}
+        window.open(telegramLink(phone), "_blank", "noopener");
+      } else if (action === "email") {
+        location.href = `mailto:${email}?subject=${encodeURIComponent("Rinnovo tessera Tre Quinti Trekking APS")}&body=${encodeURIComponent(text)}`;
+      } else if (action === "copy") {
+        await copyText(text, "Testo copiato");
+        return; // copiare non vuol dire aver sollecitato
+      }
+      recordReminder(key, action);
+      const lastEl = byId("renewLast");
+      if (lastEl) lastEl.innerHTML = icon("clock", "ico-sm") + escapeHtml(reminderLabel(key));
+      if (action === "altro") toast("Sollecito registrato");
+    }
+
+    function bulkRenewCandidates() {
+      return lastFilteredRows.filter(r => needsRenewal(r.st) && String(r.member["E-MAIL CONTATTO"] || "").includes("@"));
+    }
+
+    function updateBulkRenewButton() {
+      const btn = byId("btnBulkRenew");
+      const sf = els.statusFilter.value;
+      const list = ["IN_SCADENZA", "SCADUTA", "DA_SOLLECITARE"].includes(sf) ? bulkRenewCandidates() : [];
+      btn.hidden = !list.length;
+      byId("btnBulkRenewText").textContent = `Sollecita rinnovo via email (${list.length})`;
+    }
+
+    async function bulkRenew() {
+      const list = bulkRenewCandidates();
+      if (!list.length) return;
+      const emails = [...new Set(list.map(r => String(r.member["E-MAIL CONTATTO"]).trim()))];
+      const subject = "Rinnovo tessera Tre Quinti Trekking APS";
+      const body = [
+        "Ciao,", "",
+        "ti scriviamo dalla Tre Quinti Trekking APS: la tua tessera è scaduta o in scadenza.",
+        "Per continuare a partecipare alle nostre escursioni e attività ti invitiamo a rinnovarla appena possibile.",
+        "Per qualsiasi informazione rispondi pure a questa email.", "",
+        "A presto sui sentieri!", "Il direttivo Tre Quinti Trekking APS"
+      ].join("\n");
+      const bcc = emails.join(",");
+      // Molti programmi di posta tagliano i link troppo lunghi: oltre una certa lunghezza copio gli indirizzi.
+      if (bcc.length > 1500) {
+        try { await navigator.clipboard.writeText(emails.join(", ")); } catch (_) {}
+        toast(`${emails.length} indirizzi copiati: incollali in CCN`);
+        location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      } else {
+        location.href = `mailto:?bcc=${encodeURIComponent(bcc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }
+      setTimeout(() => {
+        if (confirm(`Hai inviato l'email? Segno ${list.length} soci come sollecitati via email, così il direttivo lo vede.`)) {
+          list.forEach(r => recordReminder(r.key, "email"));
+          renderTable();
+          toast(`Registrati ${list.length} solleciti`);
+        }
+      }, 900);
+    }
+
+    function sollecitiText(m, key) {
       const parts = [];
       const add = (label, raw) => {
         const v = String(raw ?? "").trim();
@@ -1070,6 +1349,7 @@
       };
       add("Mail", m["MAIL RINNOVO"]);
       add("Msg", m["MESS. RINNOVO"]);
+      if (key && reminders[key]) parts.push(reminderLabel(key, true));
       return parts.join(" · ");
     }
 
@@ -1090,6 +1370,7 @@
       const filtered = rows.filter(({ member: m, key, st }) => {
         if (tFilter !== "ALL" && String(m["TIPO TESSERA"] || "").trim() !== tFilter) return false;
         if (sFilter === "NON_SCADUTA") { if (st.category === "SCADUTA") return false; }
+        else if (sFilter === "DA_SOLLECITARE") { if (!isToRemind(key, st)) return false; }
         else if (PAPER_FILTERS.includes(sFilter)) {
           const p = getPaperCardState(key);
           if (sFilter === "DA_PREPARARE" && p.preparata) return false;
@@ -1108,6 +1389,8 @@
       });
 
       if (sortKey) filtered.sort((a, b) => compareSortRows(a, b) || (a.idx - b.idx));
+      lastFilteredRows = filtered;
+      updateBulkRenewButton();
 
       els.listCount.textContent = members.length
         ? (filtered.length === members.length ? `${members.length} soci` : `Mostrati ${filtered.length} di ${members.length} soci`)
@@ -1123,7 +1406,7 @@
       els.membersBody.innerHTML = filtered.map(({ member: m, idx, key, st }) => {
         const ggVal = st.days !== null ? st.days : (m["GG"] !== undefined && m["GG"] !== "" ? m["GG"] : "—");
         const city = `${m["CITTA RESIDENZA"] || ""}${m["PROVINCIA RESIDENZA"] ? ` (${m["PROVINCIA RESIDENZA"]})` : ""}`;
-        const solleciti = sollecitiText(m);
+        const solleciti = sollecitiText(m, key);
         return `
           <tr>
             <td class="num" data-label="Tessera">${escapeHtml(m["TESSERA n°"] || "—")}</td>
@@ -1259,7 +1542,22 @@
         return `
           <div id="memberCurriculumBox" class="curriculum">
             <div class="curriculum-head"><strong>Curriculum escursioni</strong><span class="badge info">Caricamento…</span></div>
-            <div class="muted" style="font-size:0.84rem;margin-top:6px;">Verifico le partecipazioni nei fogli delle iscrizioni…</div>
+            <div class="muted" style="font-size:0.84rem;margin-top:6px;">Leggo le presenze dal foglio statistiche…</div>
+          </div>`;
+      }
+      if (info.source === "stats") {
+        const trips = info.trips.slice().sort((a, b) => dateSortValue(b.data) - dateSortValue(a.data));
+        const chipsS = trips.length
+          ? `<ul class="chips">${trips.map(t => `<li title="${escapeHtml(t.data)}">${escapeHtml(t.data.slice(0, 6) + t.data.slice(8))} · ${escapeHtml(t.nome)}</li>`).join("")}</ul>`
+          : `<div class="muted" style="font-size:0.84rem;margin-top:6px;">Nessuna presenza registrata nel foglio statistiche.</div>`;
+        return `
+          <div id="memberCurriculumBox" class="curriculum">
+            <div class="curriculum-head">
+              <strong>Curriculum escursioni</strong>
+              <span class="badge ${info.count > 0 ? "ok" : "plain"}">Presenze: ${escapeHtml(String(info.count))}</span>
+            </div>
+            ${info.count ? `<div class="curriculum-totals"><span><strong>${fmtNum(info.ore)}</strong> ore</span><span><strong>${fmtNum(info.km)}</strong> km</span><span><strong>${fmtNum(info.disl)}</strong> m di dislivello</span></div>` : ""}
+            ${chipsS}
           </div>`;
       }
       const chips = info.trips.length
@@ -1300,6 +1598,7 @@
       if (wa) actions.push(`<a class="btn wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">${icon("chat")}WhatsApp</a>`);
       if (wa) actions.push(`<a class="btn tg" href="${telegramLink(phone)}" target="_blank" rel="noopener">${icon("send")}Telegram</a>`);
       if (email) actions.push(`<a class="btn" href="mailto:${escapeHtml(email)}">${icon("mail")}Email</a>`);
+      if (needsRenewal(st)) actions.unshift(`<button type="button" class="btn warn-btn" data-action="open-renew">${icon("bell")}Sollecita rinnovo</button>`);
       detailEls.actions.innerHTML = actions.join("");
 
       const fields = [
@@ -1321,7 +1620,7 @@
           <div class="detail-val">${escapeHtml(val === 0 ? "0" : (val || "—"))}</div>
         </div>`).join("");
 
-      const info = getMemberTripsInfo(m);
+      const info = getCurriculumInfo(m);
       detailEls.body.innerHTML = `
         <div class="detail-section-title">Per il direttivo</div>
         <div class="detail-two">
@@ -1334,19 +1633,15 @@
             <input type="text" id="detailLocalNoteInput" data-note-key="${escapeHtml(noteKey)}" value="${escapeHtml(localNotes[noteKey] || "")}" placeholder="Scrivi una nota su questo socio…" style="margin-top:4px;" />
           </div>
         </div>
+        ${renewPanelHtml(m, st, noteKey)}
         ${renderMemberCurriculumHtml(info)}
         <div class="detail-section-title">Dati dal Libro Soci</div>
         <div class="detail-grid">${gridHtml}</div>`;
 
       if (!info.loaded) {
-        ensureEscursioni()
-          .then(() => {
-            const box = byId("memberCurriculumBox");
-            if (!box || selectedMemberIndex !== idx) return;
-            const tmp = document.createElement("div");
-            tmp.innerHTML = renderMemberCurriculumHtml(Object.assign({ count: 0, trips: [] }, getMemberTripsInfo(members[idx]), { loaded: true }));
-            if (tmp.firstElementChild) box.replaceWith(tmp.firstElementChild);
-          })
+        // Prima le presenze vere (foglio statistiche); se non c'è, le iscrizioni ai form.
+        ensureStats().catch(() => ensureEscursioni())
+          .then(() => refreshCurriculumBox(idx))
           .catch((err) => {
             const box = byId("memberCurriculumBox");
             if (!box || selectedMemberIndex !== idx) return;
@@ -1359,6 +1654,20 @@
       detailEls.view.classList.add("active");
       if (!keepScroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    detailEls.actions.addEventListener("click", (e) => {
+      if (!e.target.closest("[data-action='open-renew']")) return;
+      const panel = byId("renewPanel");
+      if (!panel) return;
+      panel.open = true;
+      panel.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => byId("renewText") && byId("renewText").focus({ preventScroll: true }), 350);
+    });
+    detailEls.body.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-renew]");
+      if (b) handleRenewAction(b.getAttribute("data-renew"));
+    });
+    byId("btnBulkRenew").addEventListener("click", bulkRenew);
 
     function closeMemberDetail() {
       selectedMemberIndex = null;
@@ -1445,8 +1754,9 @@
       if (e.key === "/" && !typing && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         const escVisible = !byId("viewEscursioni").classList.contains("hidden");
-        const target = escVisible ? byId("excSearch") : els.searchInput;
-        if (!escVisible && selectedMemberIndex !== null) closeMemberDetail();
+        const statsVisible = !byId("viewStats").classList.contains("hidden");
+        const target = statsVisible ? byId("statsSearch") : (escVisible ? byId("excSearch") : els.searchInput);
+        if (!escVisible && !statsVisible && selectedMemberIndex !== null) closeMemberDetail();
         target.focus();
       } else if (e.key === "Escape" && selectedMemberIndex !== null && !typing) {
         closeMemberDetail();
@@ -1624,27 +1934,6 @@
     function ensureEscursioni() {
       if (excList.length) return Promise.resolve(excList);
       return loadEscursioniFromServer({ quiet: true }).then(() => excList);
-    }
-
-    const prevExcCounts = new Map();
-    function maybeNotifyNewParticipants(list) {
-      if (!Array.isArray(list)) return;
-      const alerts = [];
-      for (const esc of list) {
-        if (!esc || !esc.ok || !Array.isArray(esc.rows)) continue;
-        const id = esc.id || esc.titolo || "";
-        const count = esc.rows.length;
-        if (prevExcCounts.has(id) && count > prevExcCounts.get(id)) {
-          alerts.push({ nome: formatNomeUscita(esc.titolo || id), diff: count - prevExcCounts.get(id), count });
-        }
-        prevExcCounts.set(id, count);
-      }
-      if (!alerts.length) return;
-      alerts.forEach(a => toast(`${a.diff} nuov${a.diff === 1 ? "a iscrizione" : "e iscrizioni"} su ${a.nome}`));
-      if ("Notification" in window && Notification.permission === "granted") {
-        alerts.forEach(a => showNotification("Tre Quinti Trekking — Nuove iscrizioni",
-          `${a.diff === 1 ? "1 nuova iscrizione" : a.diff + " nuove iscrizioni"} su ${a.nome} (totale: ${a.count})`));
-      }
     }
 
     // ---- Riquadri "Avvisi uscita" e "Comunicazioni" (creati una volta sola) ----
@@ -1866,7 +2155,7 @@
         try {
           const data = await AppData.loadEscursioni();
           excList = Array.isArray(data.escursioni) ? data.escursioni : [];
-          maybeNotifyNewParticipants(excList);
+          Watcher.absorbForms(excList);
           renderEscursioni();
         } catch (err) {
           if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
@@ -1905,19 +2194,30 @@
     const viewSoci = byId("viewSoci");
     const viewEsc = byId("viewEscursioni");
 
+    const MAIN_TABS = {
+      soci: [byId("tabBtnSoci"), byId("viewSoci")],
+      escursioni: [byId("tabBtnEscursioni"), byId("viewEscursioni")],
+      statistiche: [byId("tabBtnStats"), byId("viewStats")]
+    };
     function switchMainTab(which) {
-      const isEsc = which === "escursioni";
-      tabBtnSoci.classList.toggle("active", !isEsc);
-      tabBtnSoci.setAttribute("aria-selected", String(!isEsc));
-      tabBtnEsc.classList.toggle("active", isEsc);
-      tabBtnEsc.setAttribute("aria-selected", String(isEsc));
-      viewSoci.classList.toggle("hidden", isEsc);
-      viewEsc.classList.toggle("hidden", !isEsc);
-      if (isEsc && !excList.length && GoogleApi.isSignedIn()) loadEscursioniFromServer();
+      Object.entries(MAIN_TABS).forEach(([name, [btn, view]]) => {
+        const on = name === which;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-selected", String(on));
+        view.classList.toggle("hidden", !on);
+      });
+      if (!GoogleApi.isSignedIn()) return;
+      if (which === "escursioni" && !excList.length) loadEscursioniFromServer();
+      if (which === "statistiche") {
+        if (!statsData) loadStats();
+        else renderStats();
+        if (!excList.length) ensureEscursioni().then(renderStats).catch(() => {});
+      }
     }
 
     tabBtnSoci.addEventListener("click", () => switchMainTab("soci"));
     tabBtnEsc.addEventListener("click", () => switchMainTab("escursioni"));
+    byId("tabBtnStats").addEventListener("click", () => switchMainTab("statistiche"));
     byId("btnLoadEscursioni").addEventListener("click", () => loadEscursioniFromServer());
     byId("btnExportExc").addEventListener("click", exportEscursioneCsv);
     byId("excSelect").addEventListener("change", renderEscursioni);
@@ -1945,6 +2245,609 @@
       CloudDB.exc(k, excLocalState[k]);
     });
 
+    // ===================================================================
+    //  Statistiche dal foglio "Tre Quinti Wrapped" (presenze effettive)
+    // ===================================================================
+    let statsData = null;          // { years: [{ year, title, rows: [{socio,data,nome,ore,km,disl}] }] }
+    let statsLoadPromise = null;
+    let statsYear = null;          // null = non ancora scelto, "" = tutti gli anni
+    let statsSort = { key: "count", dir: "desc" };
+    let statsAggCache = new Map();
+    let statsAggFor = { data: null, members: null };
+
+    function fmtNum(n, dec) {
+      const v = Number(n) || 0;
+      return v.toLocaleString("it-IT", { maximumFractionDigits: dec === undefined ? (Number.isInteger(v) ? 0 : 1) : dec });
+    }
+
+    function loadStats(opts) {
+      if (statsLoadPromise) return statsLoadPromise;
+      const quiet = Boolean(opts && opts.quiet);
+      const btn = byId("btnLoadStats");
+      const msg = byId("statsStatusMsg");
+      setBusy(btn, true);
+      if (msg) msg.textContent = "Lettura del foglio statistiche…";
+      statsLoadPromise = (async () => {
+        try {
+          statsData = await AppData.loadStats();
+          const years = statsData.years.map(y => y.year);
+          if (statsYear === null || (statsYear && !years.includes(Number(statsYear)))) {
+            const cur = new Date().getFullYear();
+            statsYear = years.includes(cur) ? String(cur) : (years.length ? String(Math.max(...years)) : "");
+          }
+          renderStats();
+          if (selectedMemberIndex !== null) refreshCurriculumBox(selectedMemberIndex);
+        } catch (err) {
+          if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+          if (msg) msg.textContent = "Errore: " + ((err && err.message) || err);
+          if (quiet) throw err;
+        } finally {
+          setBusy(btn, false);
+          statsLoadPromise = null;
+        }
+      })();
+      return statsLoadPromise;
+    }
+    function ensureStats() { return statsData ? Promise.resolve(statsData) : loadStats({ quiet: true }); }
+
+    function aggregateStats(year) {
+      if (statsAggFor.data !== statsData || statsAggFor.members !== members) {
+        statsAggCache = new Map();
+        statsAggFor = { data: statsData, members };
+      }
+      const ck = String(year || "");
+      if (statsAggCache.has(ck)) return statsAggCache.get(ck);
+      const exc = new Map(), people = new Map();
+      let presences = 0;
+      (statsData ? statsData.years : []).filter(y => !year || String(y.year) === String(year)).forEach(y => {
+        y.rows.forEach(r => {
+          presences++;
+          const ek = y.year + "|" + r.data + "|" + r.nome.toLowerCase();
+          let e = exc.get(ek);
+          if (!e) { e = { key: ek, year: y.year, data: r.data, nome: r.nome, ore: r.ore, km: r.km, disl: r.disl, people: [] }; exc.set(ek, e); }
+          e.people.push(r.socio);
+          const pk = nameKey(r.socio);
+          if (!pk) return;
+          let p = people.get(pk);
+          if (!p) { p = { key: pk, name: r.socio, count: 0, ore: 0, km: 0, disl: 0, trips: [] }; people.set(pk, p); }
+          p.count++; p.ore += r.ore; p.km += r.km; p.disl += r.disl;
+          p.trips.push({ data: r.data, nome: r.nome, year: y.year });
+        });
+      });
+      const persons = [...people.values()];
+      persons.forEach(p => { p.member = findMatchingMember(p.name, "", ""); });
+      const excursions = [...exc.values()].sort((a, b) => dateSortValue(a.data) - dateSortValue(b.data));
+      const res = { excursions, persons, presences };
+      statsAggCache.set(ck, res);
+      return res;
+    }
+
+    function memberStatsInfo(member) {
+      const all = aggregateStats("");
+      const fullA = nameKey(memberFullName(member));
+      const p = all.persons.find(x => x.member === member) || all.persons.find(x => fullA && x.key === fullA);
+      return p ? { count: p.count, ore: p.ore, km: p.km, disl: p.disl, trips: p.trips.slice() } : { count: 0, ore: 0, km: 0, disl: 0, trips: [] };
+    }
+
+    function getCurriculumInfo(m) {
+      if (statsData) return Object.assign({ loaded: true, source: "stats" }, memberStatsInfo(m));
+      if (excList.length) return Object.assign({}, getMemberTripsInfo(m), { loaded: true, source: "form" });
+      return { loaded: false };
+    }
+
+    function refreshCurriculumBox(idx) {
+      const box = byId("memberCurriculumBox");
+      if (!box || selectedMemberIndex !== idx || !members[idx]) return;
+      const info = getCurriculumInfo(members[idx]);
+      if (!info.loaded) return;
+      const tmp = document.createElement("div");
+      tmp.innerHTML = renderMemberCurriculumHtml(info);
+      if (tmp.firstElementChild) box.replaceWith(tmp.firstElementChild);
+    }
+
+    // ---- Uscite dei form che mancano nel foglio statistiche ----
+    function formDateFromTitle(t) {
+      const m = /(\d{4})[._-](\d{1,2})[._-](\d{1,2})/.exec(String(t || ""));
+      return m ? `${m[3].padStart(2, "0")}/${m[2].padStart(2, "0")}/${m[1]}` : "";
+    }
+
+    function missingFromStats() {
+      if (!statsData || !excList.length) return [];
+      const all = aggregateStats("").excursions;
+      const dates = new Set(all.map(e => e.data));
+      const names = new Set(all.map(e => e.year + "|" + nameKey(e.nome)));
+      const years = statsData.years.map(y => y.year);
+      const firstYear = years.length ? Math.min(...years) : new Date().getFullYear();
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      return excList.filter(esc => {
+        if (!esc.ok || !esc.rows.length) return false;
+        const d = formDateFromTitle(esc.titolo);
+        const dt = parseItDate(d);
+        if (!dt || dt > today || dt.getFullYear() < firstYear) return false;   // futura o precedente al foglio
+        if (dates.has(d)) return false;
+        return !names.has(dt.getFullYear() + "|" + nameKey(formatNomeUscita(esc.titolo)));
+      }).sort((a, b) => dateSortValue(formDateFromTitle(b.titolo)) - dateSortValue(formDateFromTitle(a.titolo)));
+    }
+
+    function renderStats() {
+      const sel = byId("statsYear");
+      const years = statsData ? statsData.years.map(y => y.year).sort((a, b) => b - a) : [];
+      sel.innerHTML = `<option value="">Tutti gli anni</option>` + years.map(y => `<option value="${y}">${y}</option>`).join("");
+      sel.value = statsYear || "";
+      const msg = byId("statsStatusMsg");
+      if (!statsData) return;
+
+      const agg = aggregateStats(statsYear);
+      const q = String(byId("statsSearch").value || "").trim().toLowerCase();
+      const totKm = agg.excursions.reduce((s, e) => s + e.km, 0);
+      const totDisl = agg.excursions.reduce((s, e) => s + e.disl, 0);
+      const totOre = agg.excursions.reduce((s, e) => s + e.ore, 0);
+      if (msg) msg.textContent = `Foglio "${APP_CONFIG.statsName}" · ${statsYear ? "anno " + statsYear : "tutti gli anni"} · aggiornato ${new Date(statsData.updatedAt || Date.now()).toLocaleTimeString("it-IT", { timeStyle: "short" })}`;
+      const kpi = (label, val, unit) => `<div class="kpi"><span class="stat-label">${label}</span><span class="stat-value">${val}${unit ? `<span class="unit">${unit}</span>` : ""}</span></div>`;
+      byId("statsKpis").innerHTML =
+        kpi("Uscite", fmtNum(agg.excursions.length)) +
+        kpi("Presenze", fmtNum(agg.presences)) +
+        kpi("Escursionisti", fmtNum(agg.persons.length)) +
+        kpi("Media per uscita", fmtNum(agg.excursions.length ? agg.presences / agg.excursions.length : 0, 1)) +
+        kpi("Km percorsi", fmtNum(totKm), "km") +
+        kpi("Dislivello", fmtNum(totDisl), "m") +
+        kpi("Ore di cammino", fmtNum(totOre), "h");
+
+      // Uscite mancanti
+      const missing = missingFromStats();
+      byId("statsMissingCard").hidden = !missing.length;
+      byId("statsMissingList").innerHTML = missing.map(esc => `
+        <li>
+          <span><strong>${escapeHtml(formatNomeUscita(esc.titolo))}</strong> <span class="muted">· ${escapeHtml(formDateFromTitle(esc.titolo))} · ${esc.rows.length} iscritti</span></span>
+          <button type="button" class="btn" data-stats-add="${escapeHtml(esc.id)}">${icon("plus", "ico-sm")}Aggiungi al foglio</button>
+        </li>`).join("");
+
+      // Grafico presenze per uscita
+      const excF = q ? agg.excursions.filter(e => e.nome.toLowerCase().includes(q)) : agg.excursions;
+      const max = Math.max(1, ...excF.map(e => e.people.length));
+      byId("statsBars").innerHTML = excF.length ? excF.map(e => `
+        <div class="bar-row" title="${escapeHtml(e.people.join(", "))}">
+          <span class="bar-label">${escapeHtml(e.nome)}<span class="sub">${escapeHtml(e.data.slice(0, 5))}${statsYear ? "" : "/" + escapeHtml(e.data.slice(8))}</span></span>
+          <span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.round(e.people.length / max * 100)}%"></span></span>
+          <span class="bar-val">${e.people.length}</span>
+        </div>`).join("") : `<div class="muted">Nessuna uscita.</div>`;
+
+      // Classifica
+      const dir = statsSort.dir === "asc" ? 1 : -1;
+      const ranked = agg.persons.slice().sort((a, b) => (b.count - a.count) || (b.km - a.km) || a.name.localeCompare(b.name, "it"));
+      const pos = new Map(ranked.map((p, i) => [p.key, i + 1]));
+      const people = agg.persons.slice().sort((a, b) => {
+        const k = statsSort.key;
+        const c = k === "name" ? a.name.localeCompare(b.name, "it") : (a[k] - b[k]);
+        return (c * dir) || (pos.get(a.key) - pos.get(b.key));
+      }).filter(p => !q || p.name.toLowerCase().includes(q) || p.trips.some(t => t.nome.toLowerCase().includes(q)));
+      document.querySelectorAll("th[data-ssort]").forEach(th => {
+        const on = th.getAttribute("data-ssort") === statsSort.key;
+        th.classList.toggle("sort-asc", on && statsSort.dir === "asc");
+        th.classList.toggle("sort-desc", on && statsSort.dir === "desc");
+      });
+      byId("statsPeopleBody").innerHTML = people.length ? people.map(p => {
+        const n = pos.get(p.key);
+        return `
+          <tr>
+            <td data-label="Posizione"><span class="rank ${n <= 3 ? "r" + n : ""}">${n}</span></td>
+            <td class="cell-main"><strong title="${escapeHtml(p.trips.map(t => t.nome).join(", "))}">${escapeHtml(p.name)}</strong></td>
+            <td class="num" data-label="Uscite">${p.count}</td>
+            <td class="num" data-label="Ore">${fmtNum(p.ore)}</td>
+            <td class="num" data-label="Km">${fmtNum(p.km)}</td>
+            <td class="num" data-label="Dislivello">${fmtNum(p.disl)} m</td>
+            <td data-label="Stato socio">${socioBadge(p.member)}</td>
+          </tr>`;
+      }).join("") : `<tr><td colspan="7" class="empty">Nessun escursionista trovato.</td></tr>`;
+
+      // Elenco uscite (più recenti in alto)
+      byId("statsExcBody").innerHTML = excF.length ? excF.slice().reverse().map(e => `
+        <tr>
+          <td data-label="Data">${escapeHtml(e.data)}</td>
+          <td class="cell-main"><strong>${escapeHtml(e.nome)}</strong></td>
+          <td class="num" data-label="Presenti">${e.people.length}</td>
+          <td class="num" data-label="Ore">${fmtNum(e.ore)}</td>
+          <td class="num" data-label="Km">${fmtNum(e.km)}</td>
+          <td class="num" data-label="Dislivello">${fmtNum(e.disl)} m</td>
+        </tr>`).join("") : `<tr><td colspan="6" class="empty">Nessuna uscita registrata.</td></tr>`;
+    }
+
+    // ---- Aggiunta di un'uscita al foglio statistiche ----
+    let statsAddState = null;
+
+    function statsNameFor(f, matched) {
+      // Riuso la grafia già presente nel foglio, così i totali della stessa persona restano uniti.
+      const all = aggregateStats("").persons;
+      const candidates = [f.displayName];
+      if (matched) candidates.unshift(`${matched["NOME"] || ""} ${matched["COGNOME"] || ""}`);
+      for (const c of candidates) {
+        const ex = all.find(p => p.key === nameKey(c));
+        if (ex) return ex.name;
+      }
+      return titleCase(matched ? `${matched["NOME"] || ""} ${matched["COGNOME"] || ""}`.trim() : f.displayName.trim());
+    }
+
+    function openStatsAdd(escId) {
+      const esc = excList.find(e => e.id === escId);
+      if (!esc) return;
+      const seen = new Set();
+      const people = [];
+      esc.rows.forEach(r => {
+        const f = extractFormFields(r);
+        const matched = findMatchingMember(f.displayName, f.email, f.phone);
+        const name = statsNameFor(f, matched);
+        const k = nameKey(name);
+        if (!k || seen.has(k)) return;
+        seen.add(k);
+        const confirmed = Boolean((excLocalState[`${esc.id}::${personKeyFor(f, matched)}`] || {}).confirmed);
+        people.push({ name, confirmed });
+      });
+      const anyConfirmed = people.some(p => p.confirmed);
+      statsAddState = { escId, people };
+      const data = formDateFromTitle(esc.titolo);
+      byId("statsAddPanel").innerHTML = `
+        <div class="collapsible" style="background:var(--surface-2);margin-top:14px;">
+          <div class="collapsible-body" style="padding-top:14px;">
+            <strong>Aggiungi "${escapeHtml(formatNomeUscita(esc.titolo))}" al foglio statistiche</strong>
+            <div class="form-grid">
+              <label>Data<input type="text" id="saData" value="${escapeHtml(data)}" placeholder="gg/mm/aaaa" /></label>
+              <label style="grid-column: span 2;">Nome uscita<input type="text" id="saNome" value="${escapeHtml(formatNomeUscita(esc.titolo))}" /></label>
+              <label>Ore<input type="text" inputmode="decimal" id="saOre" placeholder="es. 5" /></label>
+              <label>Km<input type="text" inputmode="decimal" id="saKm" placeholder="es. 8,5" /></label>
+              <label>Dislivello (m)<input type="text" inputmode="numeric" id="saDisl" placeholder="es. 650" /></label>
+            </div>
+            <div class="detail-label">Presenti ${anyConfirmed ? "(pre-selezionati quelli segnati «Confermato»)" : "(nessuno segnato «Confermato»: togli chi non è venuto)"}</div>
+            <div class="people-check" id="saPeople">
+              ${people.map((p, i) => `<label><input type="checkbox" data-sa-person="${i}" ${(!anyConfirmed || p.confirmed) ? "checked" : ""} />${escapeHtml(p.name)}</label>`).join("")}
+            </div>
+            <div class="mail-actions">
+              <input type="text" id="saExtra" placeholder="Aggiungi un presente senza iscrizione (Nome Cognome)" style="flex:1 1 260px;width:auto;" />
+              <button type="button" class="btn" id="saAddExtra">${icon("plus", "ico-sm")}Aggiungi</button>
+            </div>
+            <div class="mail-actions" style="margin-top:12px;">
+              <button type="button" class="btn primary" id="saSave">${icon("check", "ico-sm")}<span id="saSaveText">Scrivi nel foglio</span></button>
+              <button type="button" class="btn ghost" id="saCancel">Annulla</button>
+            </div>
+          </div>
+        </div>`;
+      updateStatsAddCount();
+      byId("statsAddPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function selectedStatsPeople() {
+      return [...document.querySelectorAll("[data-sa-person]")].filter(cb => cb.checked).map(cb => statsAddState.people[Number(cb.getAttribute("data-sa-person"))].name);
+    }
+    function updateStatsAddCount() {
+      const t = byId("saSaveText");
+      if (t) t.textContent = `Scrivi ${selectedStatsPeople().length} presenze nel foglio`;
+    }
+
+    async function saveStatsAdd() {
+      const data = byId("saData").value.trim();
+      const nome = byId("saNome").value.trim();
+      const dt = parseItDate(data);
+      const num = (id) => { const v = byId(id).value.trim().replace(",", "."); return v === "" ? NaN : Number(v); };
+      const ore = num("saOre"), km = num("saKm"), disl = num("saDisl");
+      const names = selectedStatsPeople();
+      if (!dt || !/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(data)) { toast("Data non valida (gg/mm/aaaa)", "err"); return; }
+      if (!nome) { toast("Manca il nome dell'uscita", "err"); return; }
+      if ([ore, km, disl].some(v => isNaN(v) || v < 0)) { toast("Inserisci ore, km e dislivello", "err"); return; }
+      if (!names.length) { toast("Seleziona almeno un presente", "err"); return; }
+      const year = dt.getFullYear();
+      const tab = APP_CONFIG.statsSheetPrefix + year;
+      const exists = statsData.years.some(y => y.year === year);
+      if (!confirm(`Aggiungo ${names.length} righe nella scheda "${tab}"${exists ? "" : " (nuova scheda)"} del foglio statistiche?\n\n${nome} · ${data} · ${ore} h · ${km} km · ${disl} m\n\nPotrai sempre correggerle a mano nel foglio.`)) return;
+      const btn = byId("saSave");
+      setBusy(btn, true);
+      try {
+        const res = await AppData.appendStatsRows(year, names.map(n => ({ socio: n, data, nome, ore, km, disl })));
+        toast(`Aggiunte ${res.count} presenze in ${res.title}`);
+        byId("statsAddPanel").innerHTML = "";
+        statsAddState = null;
+        await loadStats();
+      } catch (err) {
+        if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+        toast("Scrittura non riuscita: " + ((err && err.message) || err), "err");
+      } finally {
+        setBusy(btn, false);
+      }
+    }
+
+    byId("statsYear").addEventListener("change", (e) => { statsYear = e.target.value; renderStats(); });
+    byId("statsSearch").addEventListener("input", debounce(renderStats, 150));
+    byId("btnLoadStats").addEventListener("click", () => { loadStats(); if (GoogleApi.isSignedIn()) loadEscursioniFromServer().then(renderStats).catch(() => {}); });
+    document.querySelectorAll("th[data-ssort]").forEach(th => {
+      th.tabIndex = 0;
+      const go = () => {
+        const k = th.getAttribute("data-ssort");
+        statsSort = statsSort.key === k ? { key: k, dir: statsSort.dir === "asc" ? "desc" : "asc" } : { key: k, dir: k === "name" ? "asc" : "desc" };
+        renderStats();
+      };
+      th.addEventListener("click", go);
+      th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+    byId("viewStats").addEventListener("click", (e) => {
+      const add = e.target.closest("[data-stats-add]");
+      if (add) { openStatsAdd(add.getAttribute("data-stats-add")); return; }
+      if (e.target.closest("#saCancel")) { byId("statsAddPanel").innerHTML = ""; statsAddState = null; return; }
+      if (e.target.closest("#saSave")) { saveStatsAdd(); return; }
+      if (e.target.closest("#saAddExtra")) {
+        const inp = byId("saExtra");
+        const name = titleCase(inp.value.trim().replace(/\s+/g, " "));
+        if (!name) return;
+        if (statsAddState.people.some(p => nameKey(p.name) === nameKey(name))) { toast("È già nell'elenco", "err"); return; }
+        statsAddState.people.push({ name, confirmed: true });
+        const i = statsAddState.people.length - 1;
+        byId("saPeople").insertAdjacentHTML("beforeend", `<label><input type="checkbox" data-sa-person="${i}" checked />${escapeHtml(name)}</label>`);
+        inp.value = "";
+        updateStatsAddCount();
+      }
+    });
+    byId("viewStats").addEventListener("change", (e) => { if (e.target.closest("[data-sa-person]")) updateStatsAddCount(); });
+
+    // ===================================================================
+    //  Aggiornamenti dell'app: notifica e "Novità"
+    // ===================================================================
+    const SEEN_VERSION_KEY = "app35_seen_version_v1";
+    const NOTIFIED_VERSION_KEY = "app35_notified_version_v1";
+    let lastUpdateCheck = 0;
+
+    function cmpVersion(a, b) {
+      const pa = String(a || "0").split(".").map(Number), pb = String(b || "0").split(".").map(Number);
+      for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+        const d = (pa[i] || 0) - (pb[i] || 0);
+        if (d) return d > 0 ? 1 : -1;
+      }
+      return 0;
+    }
+    function lsGet(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+
+    async function fetchVersionInfo() {
+      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }
+
+    function releaseNotesBetween(info, fromExcl, toIncl) {
+      return (info.releases || []).filter(r => cmpVersion(r.version, fromExcl) > 0 && cmpVersion(r.version, toIncl) <= 0);
+    }
+
+    function showUpdateCard(title, releases, primaryLabel, onPrimary) {
+      const host = byId("updateHost");
+      const notifBtn = ("Notification" in window && Notification.permission === "default")
+        ? `<button type="button" class="btn ghost" data-upd="notif">${icon("bell", "ico-sm")}Avvisami</button>` : "";
+      host.innerHTML = `
+        <div class="update-card" role="dialog" aria-label="${escapeHtml(title)}">
+          <h3>${icon("bell")}${escapeHtml(title)}</h3>
+          ${releases.map(r => `<div class="ver">Versione ${escapeHtml(r.version)}${r.date ? " · " + escapeHtml(r.date) : ""}</div><ul>${(r.notes || []).map(n => `<li>${escapeHtml(n)}</li>`).join("")}</ul>`).join("")}
+          <div class="mail-actions">
+            <button type="button" class="btn primary" data-upd="primary">${escapeHtml(primaryLabel)}</button>
+            <button type="button" class="btn ghost" data-upd="close">Chiudi</button>
+            ${notifBtn}
+          </div>
+        </div>`;
+      host.onclick = async (e) => {
+        const b = e.target.closest("[data-upd]");
+        if (!b) return;
+        const a = b.getAttribute("data-upd");
+        if (a === "primary") { host.innerHTML = ""; onPrimary && onPrimary(); }
+        else if (a === "close") host.innerHTML = "";
+        else if (a === "notif") {
+          const perm = await Notification.requestPermission();
+          toast(perm === "granted" ? "Ti avviserò a ogni aggiornamento" : "Notifiche non consentite dal browser", perm === "granted" ? "ok" : "err");
+          b.remove();
+        }
+      };
+    }
+
+    async function applyUpdate() {
+      try {
+        const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+        if (reg) await reg.update();
+      } catch (_) {}
+      location.reload();
+    }
+
+    async function checkForUpdate() {
+      lastUpdateCheck = Date.now();
+      let info;
+      try { info = await fetchVersionInfo(); } catch (_) { return; }
+      if (cmpVersion(info.version, APP_CONFIG.version) <= 0) return;
+      const notes = releaseNotesBetween(info, APP_CONFIG.version, info.version);
+      showUpdateCard(`È disponibile la versione ${info.version}`, notes.length ? notes : [{ version: info.version, notes: [] }], "Aggiorna ora", applyUpdate);
+      if (lsGet(NOTIFIED_VERSION_KEY) !== info.version && "Notification" in window && Notification.permission === "granted") {
+        lsSet(NOTIFIED_VERSION_KEY, info.version);
+        const first = (notes[0] && notes[0].notes && notes[0].notes[0]) || "apri l'app per aggiornarla";
+        showNotification("APP Direttivo 3/5 — nuova versione " + info.version, first);
+      }
+    }
+
+    // Dopo un aggiornamento mostra una volta sola le novità.
+    async function showWhatsNewIfUpdated() {
+      const seen = lsGet(SEEN_VERSION_KEY);
+      lsSet(SEEN_VERSION_KEY, APP_CONFIG.version);
+      if (!seen || cmpVersion(APP_CONFIG.version, seen) <= 0) return;
+      try {
+        const info = await fetchVersionInfo();
+        const notes = releaseNotesBetween(info, seen, APP_CONFIG.version);
+        if (notes.length) showUpdateCard(`Novità della versione ${APP_CONFIG.version}`, notes, "Ok, grazie", null);
+      } catch (_) {}
+    }
+
+    if (location.protocol !== "file:") {
+      showWhatsNewIfUpdated().then(() => setTimeout(checkForUpdate, 4000));
+      setInterval(checkForUpdate, 30 * 60 * 1000);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && Date.now() - lastUpdateCheck > 10 * 60 * 1000) checkForUpdate();
+      });
+    }
+
+    // ===================================================================
+    //  Notifiche nuove iscrizioni (escursioni e associazione)
+    // ===================================================================
+    // Ogni pochi minuti chiede a Drive quali fogli sono cambiati e rilegge solo quelli.
+    // Ricorda quante righe aveva ogni foglio, così all'apertura avvisa anche di quelle
+    // arrivate mentre l'app era chiusa.
+    const Watcher = (() => {
+      const KEY = "app35_watch_v1";
+      const INTERVAL = 3 * 60 * 1000;
+      let state = readJsonKey(KEY, { files: {} });
+      if (!state.files) state = { files: {} };
+      let timer = null, running = false, lastRun = 0;
+
+      function save() { writeJsonKey(KEY, state); }
+      function personName(rec) {
+        const n = `${rec["Nome"] || ""} ${rec["Cognome"] || ""}`.trim();
+        return titleCase(n || extractFormFields(rec).displayName);
+      }
+      function notify(title, body) {
+        toast(body);
+        markUnread();
+        if ("Notification" in window && Notification.permission === "granted") showNotification(title, body);
+      }
+      function listNames(names) {
+        return names.length <= 3 ? names.join(", ") : names.slice(0, 3).join(", ") + ` e altri ${names.length - 3}`;
+      }
+
+      // Confronta il numero di righe con l'ultima volta e avvisa delle nuove.
+      function diff(id, kind, label, records, silent) {
+        const prev = state.files[id];
+        const count = records.length;
+        state.files[id] = Object.assign({}, prev || {}, { count, kind, label });
+        if (!prev || typeof prev.count !== "number" || silent) return;   // primo giro: solo memorizzo
+        if (count <= prev.count) return;
+        const fresh = records.slice(prev.count);
+        const names = fresh.map(personName).filter(Boolean);
+        if (kind === "form") {
+          notify(`Nuove iscrizioni · ${label}`,
+            `${fresh.length === 1 ? "Nuova iscrizione" : fresh.length + " nuove iscrizioni"} a ${label}: ${listNames(names)} (totale ${count})`);
+        } else {
+          const tipo = fresh.length === 1 ? String(fresh[0]["Quale tipo di tessera vuoi richiedere?"] || "").trim() : "";
+          notify("Nuova richiesta di iscrizione all'associazione",
+            `${fresh.length === 1 ? "Nuovo socio" : fresh.length + " nuovi soci"}: ${listNames(names)}${tipo ? " · " + tipo : ""}`);
+        }
+      }
+
+      async function check() {
+        if (running || !GoogleApi.isSignedIn() || navigator.onLine === false) return;
+        running = true;
+        lastRun = Date.now();
+        try {
+          const files = await AppData.watchFiles();
+          const firstRun = !Object.keys(state.files).length;
+          const jobs = [];
+          files.forms.forEach(f => {
+            const known = state.files[f.id];
+            if (!known || known.mt !== f.modifiedTime) jobs.push({ f, kind: "form" });
+          });
+          if (files.iscrizioni) {
+            const known = state.files[files.iscrizioni.id];
+            if (!known || known.mt !== files.iscrizioni.modifiedTime) jobs.push({ f: files.iscrizioni, kind: "iscr" });
+          }
+          for (const { f, kind } of jobs) {
+            try {
+              const records = kind === "form" ? await AppData.readFormRows(f.id) : await AppData.readIscrizioni(f.id);
+              const label = kind === "form" ? formatNomeUscita(f.name) : "Iscrizioni associazione";
+              // Un form appena creato non è una "nuova iscrizione" per ogni riga che contiene.
+              diff(f.id, kind, label, records, firstRun || !state.files[f.id]);
+              state.files[f.id].mt = f.modifiedTime;
+              if (kind === "form") refreshFormInApp(f, records);
+            } catch (e) {
+              if (e instanceof GoogleApi.AuthError) throw e;
+            }
+          }
+          save();
+          updateNotifButton();
+        } catch (e) {
+          // In background non disturbo: la sessione scaduta la segnala già il resto dell'app.
+        } finally {
+          running = false;
+        }
+      }
+
+      // Se l'elenco escursioni è già caricato, aggiorno quell'uscita senza rileggere tutto.
+      function refreshFormInApp(f, records) {
+        if (!excList.length) return;
+        const i = excList.findIndex(e => e.id === f.id);
+        const fresh = { id: f.id, titolo: f.name, data: "", ok: true, headers: [], rows: records };
+        if (i >= 0 && excList[i].rows.length === records.length) return;
+        excList = i >= 0 ? excList.map((e, j) => (j === i ? Object.assign({}, e, fresh) : e)) : excList.concat([fresh]);
+        renderEscursioni();
+        if (!byId("viewStats").classList.contains("hidden")) renderStats();
+      }
+
+      // Dopo un "Carica adesioni" manuale: aggiorno i conteggi (e avviso con un toast se qualcosa è nuovo).
+      function absorbForms(list) {
+        const firstRun = !Object.keys(state.files).length;
+        list.forEach(esc => {
+          if (!esc || !esc.ok) return;
+          const prev = state.files[esc.id];
+          if (prev && !firstRun && esc.rows.length > prev.count) {
+            const n = esc.rows.length - prev.count;
+            toast(`${n} nuov${n === 1 ? "a iscrizione" : "e iscrizioni"} su ${formatNomeUscita(esc.titolo)}`);
+          }
+          state.files[esc.id] = Object.assign({}, prev || {}, { count: esc.rows.length, kind: "form", label: formatNomeUscita(esc.titolo) });
+        });
+        save();
+      }
+
+      function start() {
+        if (timer) return;
+        setTimeout(check, 5000);
+        timer = setInterval(check, INTERVAL);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            clearUnread();
+            if (Date.now() - lastRun > 60 * 1000) check();
+          }
+        });
+        window.addEventListener("online", () => setTimeout(check, 2000));
+      }
+
+      return { start, check, absorbForms };
+    })();
+
+    // ---- Pulsante campanella: stato notifiche e avvisi non letti ----
+    let unread = 0;
+    function markUnread() {
+      if (document.visibilityState === "visible") return;
+      unread++;
+      try { if (navigator.setAppBadge) navigator.setAppBadge(unread); } catch (_) {}
+      document.title = `(${unread}) APP Direttivo 3/5 — Soci ed Escursioni`;
+    }
+    function clearUnread() {
+      unread = 0;
+      try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (_) {}
+      document.title = "APP Direttivo 3/5 — Soci ed Escursioni";
+    }
+    function updateNotifButton() {
+      const b = byId("btnNotif");
+      if (!b) return;
+      const supported = "Notification" in window;
+      const perm = supported ? Notification.permission : "denied";
+      b.classList.toggle("notif-on", perm === "granted");
+      b.classList.toggle("notif-off", perm === "denied");
+      b.title = !supported ? "Notifiche non supportate da questo browser"
+        : perm === "granted" ? "Notifiche attive: nuove iscrizioni alle escursioni, nuovi soci e aggiornamenti dell'app"
+        : perm === "denied" ? "Notifiche bloccate: riattivale dalle impostazioni del sito nel browser"
+        : "Attiva le notifiche (nuove iscrizioni, nuovi soci, aggiornamenti)";
+    }
+    byId("btnNotif").addEventListener("click", async () => {
+      if (!("Notification" in window)) { toast("Questo browser non supporta le notifiche", "err"); return; }
+      if (Notification.permission === "granted") {
+        showNotification("APP Direttivo 3/5", "Le notifiche sono attive: ti avviso di nuove iscrizioni, nuovi soci e aggiornamenti.");
+        toast("Notifiche già attive: ti ho mandato una prova");
+        return;
+      }
+      if (Notification.permission === "denied") { toast("Notifiche bloccate: riattivale dalle impostazioni del sito", "err"); return; }
+      const perm = await Notification.requestPermission();
+      updateNotifButton();
+      if (perm === "granted") showNotification("APP Direttivo 3/5", "Notifiche attivate: nuove iscrizioni alle escursioni, nuovi soci e aggiornamenti dell'app.");
+      else toast("Notifiche non consentite", "err");
+    });
+    updateNotifButton();
+
     function formatNomeUscita(titoloRaw) {
       const s = String(titoloRaw || "").trim();
       const quoted = s.match(/["«“]([^"»”]+)["»”]/);
@@ -1956,6 +2859,6 @@
         .trim();
     }
 </script>
-<script src="js/app.js?v=2.1.0"></script>
+<script src="js/app.js?v=2.3.0"></script>
 </body>
 </html>

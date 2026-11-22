@@ -9,17 +9,18 @@
     paper: { name: "Tessere", headers: ["chiave", "tessera", "socio", "preparata", "consegnata", "aggiornato_il", "aggiornato_da"] },
     note: { name: "Note", headers: ["chiave", "tessera", "socio", "nota", "aggiornato_il", "aggiornato_da"] },
     exc: { name: "Conferme_Escursioni", headers: ["chiave", "escursione", "partecipante", "confermato", "nota", "aggiornato_il", "aggiornato_da"] },
+    remind: { name: "Solleciti", headers: ["chiave", "tessera", "socio", "canale", "data_sollecito", "aggiornato_il", "aggiornato_da"] },
     log: { name: "Log", headers: ["quando", "chi", "tipo", "chiave", "valore"] }
   };
 
   let dbId = "";
   let schemaReady = false;
-  const rowIndex = { paper: {}, note: {}, exc: {} };
+  const rowIndex = { paper: {}, note: {}, exc: {}, remind: {} };
   let pending = readPending();
   let flushing = false;
   let flushTimer = null;
   let retryTimer = null;
-  let resolver = { paper: () => ({}), note: () => ({}), exc: () => ({}) };
+  let resolver = { paper: () => ({}), note: () => ({}), exc: () => ({}), remind: () => ({}) };
   let statusCb = () => {};
   let lastStatus = { state: "idle", pending: 0, message: "" };
 
@@ -65,6 +66,7 @@
     const op = operator();
     return op ? (email ? `${op} (${email})` : op) : email;
   }
+  function whoShort() { return operator() || window.GoogleApi.email(); }
 
   async function ensureSchema() {
     if (schemaReady) return;
@@ -110,6 +112,10 @@
         const confirmed = yes(r[3]);
         const note = String(r[4] || "");
         if (confirmed || note.trim()) map[key] = { confirmed, note }; else delete map[key];
+      } else if (type === "remind") {
+        const canale = String(r[3] || "").trim();
+        const data = String(r[4] || "").trim();
+        if (canale || data) map[key] = { canale, data, by: String(r[6] || "").trim() }; else delete map[key];
       }
     }
     rowIndex[type] = idx;
@@ -131,12 +137,13 @@
     setStatus("loading", "Lettura database condiviso…");
     try {
       await openDb();
-      const res = await GoogleApi.Sheets.batchGet(dbId, [tabRange("paper"), tabRange("note"), tabRange("exc")]);
+      const res = await GoogleApi.Sheets.batchGet(dbId, [tabRange("paper"), tabRange("note"), tabRange("exc"), tabRange("remind")]);
       const vr = res.valueRanges || [];
       const data = {
         paper: parseTab("paper", vr[0] && vr[0].values),
         note: parseTab("note", vr[1] && vr[1].values),
-        exc: parseTab("exc", vr[2] && vr[2].values)
+        exc: parseTab("exc", vr[2] && vr[2].values),
+        remind: parseTab("remind", vr[3] && vr[3].values)
       };
       overlayPending(data);
       setStatus(pendingCount() ? "pending" : "idle");
@@ -158,6 +165,10 @@
     if (type === "note") {
       return [key, info.tessera || "", info.socio || "", value || "", ...stamp];
     }
+    if (type === "remind") {
+      const v = value || {};
+      return [key, info.tessera || "", info.socio || "", v.canale || "", v.data || "", ...stamp];
+    }
     const v = value || { confirmed: false, note: "" };
     return [key, info.escursione || "", info.partecipante || "", yn(v.confirmed), v.note || "", ...stamp];
   }
@@ -165,6 +176,7 @@
   function logValue(type, value) {
     if (type === "paper") return value ? `preparata=${yn(value.preparata)} consegnata=${yn(value.consegnata)}` : "nessuna spunta";
     if (type === "note") return value || "(nota cancellata)";
+    if (type === "remind") return value ? `sollecito ${value.canale || ""} del ${value.data || ""}` : "(sollecito annullato)";
     return value ? `confermato=${yn(value.confirmed)} nota=${value.note || ""}` : "(cancellato)";
   }
 
@@ -247,12 +259,14 @@
     paper: (key, value) => queue("paper", key, value, 300),
     note: (key, text) => queue("note", key, String(text || "").trim() ? text : null, 1000),
     exc: (key, value) => queue("exc", key, value, 1000),
+    remind: (key, value) => queue("remind", key, value, 300),
     pendingCount,
     status: () => lastStatus,
     onStatus: (cb) => { statusCb = cb || (() => {}); },
     setResolver: (r) => { resolver = Object.assign(resolver, r || {}); },
     operator,
     setOperator,
+    who: whoShort,
     reset: () => { dbId = ""; schemaReady = false; }
   };
 })();

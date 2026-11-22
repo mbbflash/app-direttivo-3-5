@@ -211,6 +211,13 @@
     meta: (id) => apiJson(sheetUrl(id, "?fields=" + encodeURIComponent("properties.title,sheets.properties(sheetId,title)"))),
     get: (id, range) => apiJson(sheetUrl(id, "/values/" + encodeURIComponent(range))),
     batchGet: (id, ranges) => apiJson(sheetUrl(id, "/values:batchGet?" + ranges.map(r => "ranges=" + encodeURIComponent(r)).join("&"))),
+    // Numeri come numeri (5.2) e date come testo (01/02/2026): niente sorprese con virgole e punti.
+    batchGetRaw: (id, ranges) => apiJson(sheetUrl(id, "/values:batchGet?valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING&" +
+      ranges.map(r => "ranges=" + encodeURIComponent(r)).join("&"))),
+    // Come se si scrivesse a mano nel foglio: date e formule vengono interpretate.
+    updateUser: (id, range, values) => apiJson(
+      sheetUrl(id, "/values/" + encodeURIComponent(range) + "?valueInputOption=USER_ENTERED"),
+      { method: "PUT", body: JSON.stringify({ range, majorDimension: "ROWS", values }) }),
     update: (id, range, values) => apiJson(
       sheetUrl(id, "/values/" + encodeURIComponent(range) + "?valueInputOption=RAW"),
       { method: "PUT", body: JSON.stringify({ range, majorDimension: "ROWS", values }) }),
@@ -262,6 +269,19 @@
     return out;
   }
 
+  // "5,2", "8.5", "1.300" o 5.2 → numero.
+  function looseNumber(v) {
+    if (typeof v === "number") return isFinite(v) ? v : 0;
+    let s = String(v ?? "").trim().replace(/\s+/g, "");
+    if (!s) return 0;
+    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, "").replace(",", ".");
+    else s = s.replace(",", ".");
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function quoteSheet(t) { return "'" + String(t).replace(/'/g, "''") + "'"; }
+  function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
   const AppData = {
     async loadSoci() {
       return withRetryOnMissingFile(cfg.libroSociName, async (id) => {
@@ -289,6 +309,73 @@
         }
       });
       return { ok: true, escursioni, updatedAt: new Date().toISOString() };
+    },
+
+    // Per le notifiche: una sola chiamata a Drive dice quali fogli sono cambiati.
+    async watchFiles() {
+      const q = "name contains " + driveQuoted(cfg.escursioniNamePrefix) + " or name = " + driveQuoted(cfg.iscrizioniName);
+      const files = await listSpreadsheets(q);
+      const prefix = cfg.escursioniNamePrefix.toLowerCase();
+      return {
+        forms: files.filter(f => f.name.toLowerCase().startsWith(prefix)),
+        iscrizioni: files.filter(f => f.name === cfg.iscrizioniName).sort((a, b) => Number(b.ownedByMe) - Number(a.ownedByMe))[0] || null
+      };
+    },
+    async readFormRows(id) {
+      const data = await Sheets.get(id, "A1:AZ");
+      return rowsToRecords(data.values).records;
+    },
+    // Solo data, email, tipo tessera, nome e cognome: per avvisare basta questo.
+    async readIscrizioni(id) {
+      const data = await Sheets.get(id, "F1:J");
+      return rowsToRecords(data.values).records;
+    },
+
+    // Foglio delle presenze effettive: una scheda per anno (DatiEscursioni2025, DatiEscursioni2026, ...).
+    async loadStats() {
+      return withRetryOnMissingFile(cfg.statsName, async (id) => {
+        const meta = await Sheets.meta(id);
+        const re = new RegExp("^" + escapeRe(cfg.statsSheetPrefix) + "(\\d{4})$");
+        const tabs = (meta.sheets || [])
+          .map(s => { const m = re.exec(s.properties.title); return m ? { title: s.properties.title, year: Number(m[1]) } : null; })
+          .filter(Boolean)
+          .sort((a, b) => a.year - b.year);
+        if (!tabs.length) return { ok: true, years: [] };
+        const res = await Sheets.batchGetRaw(id, tabs.map(t => quoteSheet(t.title) + "!A1:G"));
+        const years = tabs.map((t, i) => {
+          const values = ((res.valueRanges || [])[i] || {}).values || [];
+          const rows = [];
+          for (let r = 1; r < values.length; r++) {
+            const v = values[r] || [];
+            const socio = String(v[0] ?? "").trim();
+            if (!socio) continue;
+            rows.push({ socio, data: String(v[2] ?? "").trim(), nome: String(v[3] ?? "").trim(),
+              ore: looseNumber(v[4]), km: looseNumber(v[5]), disl: looseNumber(v[6]), row: r + 1 });
+          }
+          return { year: t.year, title: t.title, rows };
+        });
+        return { ok: true, years, updatedAt: new Date().toISOString() };
+      });
+    },
+
+    // Aggiunge le presenze di un'uscita in fondo alla scheda dell'anno, nello stesso formato
+    // usato a mano: Socio | =UPPER(A) | Data | NomeEscursione | Ore | Km | Dislivello.
+    async appendStatsRows(year, rows) {
+      if (!rows.length) return { ok: true, count: 0 };
+      return withRetryOnMissingFile(cfg.statsName, async (id) => {
+        const title = cfg.statsSheetPrefix + year;
+        const q = quoteSheet(title);
+        const meta = await Sheets.meta(id);
+        if (!(meta.sheets || []).some(s => s.properties.title === title)) {
+          await Sheets.batchUpdate(id, [{ addSheet: { properties: { title, gridProperties: { frozenRowCount: 1 } } } }]);
+          await Sheets.update(id, q + "!A1:G1", [["Socio", "", "Data", "NomeEscursione", "Ore", "Km", "Dislivello"]]);
+        }
+        const col = await Sheets.get(id, q + "!A1:A");
+        const start = Math.max(2, (col.values || []).length + 1);
+        const values = rows.map((r, i) => [r.socio, `=UPPER(A${start + i})`, r.data, r.nome, r.ore, r.km, r.disl]);
+        await Sheets.updateUser(id, `${q}!A${start}:G${start + rows.length - 1}`, values);
+        return { ok: true, title, start, count: rows.length };
+      });
     }
   };
 

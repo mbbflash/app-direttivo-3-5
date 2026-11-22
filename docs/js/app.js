@@ -34,6 +34,7 @@
   CloudDB.setResolver({
     paper: memberInfo,
     note: memberInfo,
+    remind: memberInfo,
     exc: (key) => {
       const sep = key.indexOf("::");
       const escId = sep >= 0 ? key.slice(0, sep) : key;
@@ -97,6 +98,7 @@
     try {
       appStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
       appStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
+      appStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
     } catch (e) {}
     saveExcLocalState();
   }
@@ -131,6 +133,7 @@
       paperCards = data.paper;
       localNotes = data.note;
       excLocalState = data.exc;
+      reminders = data.remind || {};
       cacheMaps();
       lastCloudLoad = Date.now();
       rerender();
@@ -141,7 +144,7 @@
   }
 
   async function refreshAll() {
-    await Promise.all([loadFromSheet(), loadCloud(), excList.length ? loadEscursioniFromServer() : null]);
+    await Promise.all([loadFromSheet(), loadCloud(), excList.length ? loadEscursioniFromServer() : null, statsData ? loadStats() : null]);
   }
   els.btnLoadSheet.removeEventListener("click", loadFromSheet);
   els.btnLoadSheet.addEventListener("click", () => {
@@ -177,6 +180,7 @@
       setStatusText("Caricamento dati…");
       await Promise.all([loadFromSheet(), loadCloud()]);
       CloudDB.flush();
+      Watcher.start();
     } catch (e) {
       require(e.message);
     } finally {
@@ -191,7 +195,7 @@
     if (!n && !confirm("Uscire? Dal dispositivo verranno cancellati anche i dati in cache.")) return;
     await GoogleApi.signOut();
     // Sul dispositivo non deve restare nessun dato dei soci.
-    [STORAGE_KEY, PAPER_CARDS_KEY, LOCAL_NOTES_KEY, EXC_LOCAL_KEY, "app35_pending_v1"].forEach(k => {
+    [STORAGE_KEY, PAPER_CARDS_KEY, LOCAL_NOTES_KEY, EXC_LOCAL_KEY, REMINDERS_KEY, "app35_pending_v1", "app35_watch_v1"].forEach(k => {
       try { appStorage.removeItem(k); } catch (e) {}
     });
     location.reload();
@@ -225,6 +229,7 @@
       ui.overlay.classList.remove("show");
       setStatusText("Caricamento dati…");
       await Promise.all([loadFromSheet(), loadCloud()]);
+      Watcher.start();
     } else {
       require();
     }

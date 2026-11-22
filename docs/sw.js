@@ -1,7 +1,7 @@
 // Service worker di APP Direttivo 3/5.
 // Strategia "prima la rete": con internet si carica sempre l'ultima versione pubblicata,
 // senza internet si apre l'ultima copia salvata. I dati Google non vengono mai messi in cache qui.
-const CACHE = "app35-shell-v4";
+const CACHE = "app35-shell-v6";
 const SHELL = [
   "./",
   "index.html",
@@ -11,6 +11,7 @@ const SHELL = [
   "js/google.js",
   "js/clouddb.js",
   "js/app.js",
+  "js/demo.js",
   "icons/icon-192.png",
   "icons/icon-512.png",
   "icons/favicon-48.png",
@@ -44,5 +45,16 @@ self.addEventListener("fetch", (event) => {
         return res;
       })
       .catch(() => caches.match(req, { ignoreSearch: true }).then((r) => r || caches.match("index.html")))
+  );
+});
+
+// Clic su una notifica: riporta in primo piano l'app (o la apre).
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      const win = list.find((c) => "focus" in c);
+      return win ? win.focus() : self.clients.openWindow("./");
+    })
   );
 });
