@@ -13,7 +13,7 @@ Il direttivo sceglie la prossima escursione "a memoria": quali percorsi non si f
 
 Fogli Google:
 - letto: "Tre Quinti Trekking - Schede Tecniche Escursioni …" (primo foglio, colonne A:K) — NUOVO, sola lettura;
-- letti come già oggi: "Tre Quinti Wrapped - Foglio Calcolo" e i fogli "Form Iscrizione …" (per date e presenze);
+- letti come già oggi: "Tre Quinti Wrapped - Foglio Calcolo" e i fogli risposte delle uscite "Iscrizioni AAAA.MM.GG - …" o "Form Iscrizione AAAA.MM.GG - …" (per date e presenze);
 - nessuna scrittura; lo schema del database condiviso NON cambia.
 
 Fuori da questa modifica:

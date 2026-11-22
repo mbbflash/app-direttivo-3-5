@@ -34,14 +34,14 @@ Il sistema SHALL ordinare i percorsi con un punteggio da 0 a 100 calcolato con r
 - **THEN** il punteggio si abbassa e la motivazione indica quanti mesi sono passati
 
 ### Requirement: Incrocio con presenze e iscrizioni
-Il sistema SHALL ricavare la data dell'ultima volta e le presenze medie di ogni percorso dal foglio statistiche e dai fogli "Form Iscrizione …", abbinando i nomi per parole in comune, e SHALL funzionare anche senza queste fonti usando la colonna Anno. I percorsi che hanno un form con data futura SHALL essere esclusi con l'indicazione "già in programma".
+Il sistema SHALL ricavare la data dell'ultima volta e le presenze medie di ogni percorso dal foglio statistiche e dai fogli risposte delle uscite ("Iscrizioni AAAA.MM.GG - …" o "Form Iscrizione AAAA.MM.GG - …"), abbinando i nomi per parole in comune, e SHALL funzionare anche senza queste fonti usando la colonna Anno. I percorsi che hanno un form con data futura SHALL essere esclusi con l'indicazione "già in programma".
 
 #### Scenario: Statistiche non disponibili
 - **WHEN** il foglio statistiche non si riesce a leggere
 - **THEN** l'assistente propone comunque i percorsi usando l'anno della scheda tecnica
 
 #### Scenario: Uscita già in programma
-- **WHEN** esiste un form "Form Iscrizione" con data futura per quel percorso
+- **WHEN** esiste un foglio risposte di un'uscita con data futura per quel percorso
 - **THEN** il percorso non compare tra le proposte e risulta "già in programma"
 
 ### Requirement: Annuncio pronto

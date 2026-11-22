@@ -2,7 +2,7 @@
 // Nessun dato reale, nessuna chiamata a Google. Serve per provare l'app senza account.
 (function () {
   const cfg = window.APP_CONFIG;
-  const STORE_KEY = "app35_demo_store_v1";
+  const STORE_KEY = "app35_demo_store_v2";
 
   function fmt(d) {
     return String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
@@ -59,18 +59,24 @@
           ["2024", "Il Borgo Abbandonato", "Facile", "7 km", "3 h senza pause", "300 m", "760 m s.l.m.", "480 m s.l.m.", "Paese Vecchio (LU)", "il supermercato del paese alle ore 9:15", "Tra borghi abbandonati e castagneti secolari..."]
         ] } },
         // Uscita futura: l'assistente "Prossima uscita" la deve segnare come già in programma.
-        "demo-esc-3": { name: `${cfg.escursioniNamePrefix} ${futureStamp(20)} - "Il Borgo Abbandonato" (Risposte)`, sheets: { "Risposte del modulo 1": form([
+        "demo-esc-3": { name: `Iscrizioni ${futureStamp(20)} - Il Borgo Abbandonato (Risposte)`, sheets: { "Risposte del modulo 1": form([
           [fmt(shift(-1)) + " 18.00", "Anna Neri", "anna.neri@esempio.it", "3330000003", "SI"]
         ]) } },
-        "demo-esc-1": { name: `${cfg.escursioniNamePrefix} 2026.10.25 - "Monte Esempio" (Risposte)`, sheets: { "Risposte del modulo 1": form([
+        // Sintassi vecchia, con il nome tra virgolette: l'app la riconosce ancora.
+        "demo-esc-1": { name: `Form Iscrizione 2026.10.25 - "Monte Esempio" (Risposte)`, sheets: { "Risposte del modulo 1": form([
           ["25/10/2026 9.00", "Mario Rossi", "mario.rossi@esempio.it", "3330000000", "SI"],
           ["25/10/2026 9.10", "Giulia Bianchi", "giulia.bianchi@esempio.it", "3330000001", "SI"],
           ["25/10/2026 9.20", "Ospite Esterno", "", "3471112222", "NO"]
         ]) } },
-        "demo-esc-2": { name: `${cfg.escursioniNamePrefix} 2026.11.15 - "Il Sentiero Finto" (Risposte)`, sheets: { "Risposte del modulo 1": form([
+        "demo-esc-2": { name: `Iscrizioni 2026.11.15 - Il Sentiero Finto (Risposte)`, sheets: { "Risposte del modulo 1": form([
           ["15/11/2026 8.00", "Rossi Mario", "mario.rossi@esempio.it", "", "SI"],
           ["15/11/2026 8.30", "Luca Verdi", "luca.verdi@esempio.it", "3330000002", "SI"],
           ["15/11/2026 8.45", "Sara Blu", "sara.blu@esempio.it", "3330000005", "SI"]
+        ]) } },
+        // Uscita di due giorni: la data è il primo giorno.
+        "demo-esc-4": { name: `Iscrizioni 2026.09.05-06 - Due giorni, Crinale Finto (Risposte)`, sheets: { "Risposte del modulo 1": form([
+          ["01/09/2026 21.00", "Elena Marrone", "elena.marrone@esempio.it", "3330000006", "SI"],
+          ["02/09/2026 10.15", "Marco Viola", "marco.viola@esempio.it", "3330000007", "SI"]
         ]) } }
       }
     };
@@ -137,10 +143,11 @@
     if (u.hostname === "www.googleapis.com" && u.pathname === "/drive/v3/files") {
       const q = u.searchParams.get("q") || "";
       const eq = /name = '((?:[^'\\]|\\.)*)'/.exec(q);
-      const contains = /name contains '((?:[^'\\]|\\.)*)'/.exec(q);
+      // Anche più condizioni "name contains" unite da "or".
+      const contains = [...q.matchAll(/name contains '((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
       const unq = (s) => s.replace(/\\(.)/g, "$1");
       const files = Object.entries(store.files)
-        .filter(([, f]) => (!eq && !contains) || (eq && f.name === unq(eq[1])) || (contains && f.name.includes(unq(contains[1]))))
+        .filter(([, f]) => (!eq && !contains.length) || (eq && f.name === unq(eq[1])) || contains.some(c => f.name.includes(unq(c))))
         .map(([id, f]) => ({ id, name: f.name, ownedByMe: true, modifiedTime: new Date().toISOString() }));
       return { files };
     }

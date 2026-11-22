@@ -3,7 +3,7 @@
 // dell'account con cui si accede, e solo chi ha accesso a quei fogli vede i dati.
 window.APP_CONFIG = {
   appName: "APP Direttivo 3/5",
-  version: "2.4.1",
+  version: "2.4.2",
 
   // OAuth Client ID creato nella Google Cloud Console (vedi SETUP-GOOGLE.md).
   // Il Client ID è pubblico per natura: non dà accesso a niente senza login.
@@ -16,7 +16,9 @@ window.APP_CONFIG = {
   libroSociName: "2 - Libro Soci e Volontari",
   libroSociSheet: "Libro Soci",
   databaseName: "NON TOCCARE - DATABASE APP DI GESTIONE",
-  escursioniNamePrefix: "Form Iscrizione",
+  // Fogli risposte delle uscite: "Iscrizioni AAAA.MM.GG - Nome (Risposte)" oppure
+  // "Form Iscrizione AAAA.MM.GG - "Nome" (Risposte)". Dopo il prefisso ci deve essere la data.
+  escursioniNamePrefixes: ["Iscrizioni", "Form Iscrizione"],
 
   // Foglio delle presenze effettive (statistiche): una scheda per anno, es. "DatiEscursioni2026".
   statsName: "Tre Quinti Wrapped - Foglio Calcolo",

@@ -10,7 +10,7 @@ Il foglio delle schede tecniche ha una riga per uscita con le colonne: Anno, Esc
 
 ## Decisions
 
-- **Ricerca per prefisso** del nome del foglio (come per i "Form Iscrizione"), perché il titolo contiene gli anni; se ce ne sono più di uno si usa quello dell'account modificato più di recente.
+- **Ricerca per prefisso** del nome del foglio (come per i fogli risposte delle uscite), perché il titolo contiene gli anni; se ce ne sono più di uno si usa quello dell'account modificato più di recente.
 - **Parsing tollerante**: si prende il primo numero di ogni campo; la durata "5.30 h" vale 5,5 ore; la difficoltà si porta su una scala 1-5 (Facile 1, Medio-Facile 2, Medio 3, Medio+ 3,5, Medio-Difficile 4, Difficile 5) cercando le parole nel testo.
 - **Percorsi unificati** per nome normalizzato (parole senza articoli/preposizioni, ordine ignorato): si usano i dati dell'anno più recente.
 - **Abbinamento a presenze e form** per somiglianza delle parole significative del nome (≥ 60% di parole in comune o nome contenuto nell'altro): i nomi nel foglio statistiche e nei form non sono sempre identici.

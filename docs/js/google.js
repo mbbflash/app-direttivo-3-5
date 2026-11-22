@@ -227,6 +227,36 @@
     batchUpdate: (id, requests) => apiJson(sheetUrl(id, ":batchUpdate"), { method: "POST", body: JSON.stringify({ requests }) })
   };
 
+  // ---- Nomi dei fogli delle uscite ----
+  // "Iscrizioni 2026.11.21 - Il Monte Fiocca (Risposte)" oppure
+  // "Form Iscrizione 2026.10.25 - "Monte Cella" (Risposte)"; per più giorni "2026.09.05-06".
+  const EXC_NAME_RE = new RegExp(
+    "^\\s*(?:" + (cfg.escursioniNamePrefixes || []).map(p => escapeRe(p).replace(/\s+/g, "\\s+")).join("|") + ")" +
+    "\\s+(\\d{4})\\.(\\d{2})\\.(\\d{2})(?:-(\\d{2}))?\\s*-\\s*(.+?)\\s*(?:\\(Risposte\\))?\\s*$", "i");
+
+  // Restituisce { data: "GG/MM/AAAA", dataIso: "AAAA-MM-GG", nome } oppure null se non è un'uscita.
+  function parseExcursionName(fileName) {
+    const m = EXC_NAME_RE.exec(String(fileName || ""));
+    if (!m) return null;
+    const [, y, mo, d, , rest] = m;
+    const quoted = rest.match(/["«“]([^"»”]+)["»”]/);
+    const nome = (quoted ? quoted[1] : rest).trim();
+    return { data: `${d}/${mo}/${y}`, dataIso: `${y}-${mo}-${d}`, nome };
+  }
+
+  function excursionDriveQuery() {
+    return (cfg.escursioniNamePrefixes || []).map(p => "name contains " + driveQuoted(p)).join(" or ");
+  }
+
+  // Solo i fogli che sono davvero uscite, dalla più vecchia alla più recente.
+  function excursionFiles(files) {
+    return files
+      .map(f => ({ f, info: parseExcursionName(f.name) }))
+      .filter(x => x.info)
+      .sort((a, b) => a.info.dataIso.localeCompare(b.info.dataIso) || a.info.nome.localeCompare(b.info.nome, "it"))
+      .map(x => x.f);
+  }
+
   function rowsToRecords(values) {
     const rows = Array.isArray(values) ? values : [];
     if (!rows.length) return { headers: [], records: [] };
@@ -292,11 +322,7 @@
     },
 
     async loadEscursioni() {
-      const files = await listSpreadsheets("name contains " + driveQuoted(cfg.escursioniNamePrefix));
-      const prefix = cfg.escursioniNamePrefix.toLowerCase();
-      const list = files
-        .filter(f => f.name.toLowerCase().startsWith(prefix))
-        .sort((a, b) => a.name.localeCompare(b.name, "it"));
+      const list = excursionFiles(await listSpreadsheets(excursionDriveQuery()));
       const escursioni = await mapLimit(list, 4, async (f) => {
         try {
           // Senza nome di scheda l'intervallo si riferisce al primo foglio (le risposte del modulo).
@@ -313,11 +339,10 @@
 
     // Per le notifiche: una sola chiamata a Drive dice quali fogli sono cambiati.
     async watchFiles() {
-      const q = "name contains " + driveQuoted(cfg.escursioniNamePrefix) + " or name = " + driveQuoted(cfg.iscrizioniName);
+      const q = excursionDriveQuery() + " or name = " + driveQuoted(cfg.iscrizioniName);
       const files = await listSpreadsheets(q);
-      const prefix = cfg.escursioniNamePrefix.toLowerCase();
       return {
-        forms: files.filter(f => f.name.toLowerCase().startsWith(prefix)),
+        forms: excursionFiles(files),
         iscrizioni: files.filter(f => f.name === cfg.iscrizioniName).sort((a, b) => Number(b.ownedByMe) - Number(a.ownedByMe))[0] || null
       };
     },
@@ -399,7 +424,7 @@
     AuthError, isDemo, isConfigured, init, signIn, signOut,
     isSignedIn: tokenValid,
     email: () => (token ? token.email : ""),
-    findSpreadsheetId, forgetSpreadsheetId, Sheets, rowsToRecords
+    findSpreadsheetId, forgetSpreadsheetId, Sheets, rowsToRecords, parseExcursionName
   };
   window.AppData = AppData;
 })();

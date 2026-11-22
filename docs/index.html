@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.1" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.1" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.2" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.4.1"></script>
-  <script src="js/config.js?v=2.4.1"></script>
-  <script src="js/google.js?v=2.4.1"></script>
-  <script src="js/clouddb.js?v=2.4.1"></script>
+  <script src="js/storage.js?v=2.4.2"></script>
+  <script src="js/config.js?v=2.4.2"></script>
+  <script src="js/google.js?v=2.4.2"></script>
+  <script src="js/clouddb.js?v=2.4.2"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -587,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.4.1" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.4.2" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +599,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.4.1" alt="" />
+        <img src="icons/icon-192.png?v=2.4.2" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1043,9 +1043,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.1" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.2" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.1" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.2" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2147,7 +2147,7 @@
       currentExcRows = [];
 
       if (!currentEsc) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty">${icon("map")}Nessun foglio "${escapeHtml(APP_CONFIG.escursioniNamePrefix)} …" trovato nel Drive.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty">${icon("map")}Nessun foglio "Iscrizioni AAAA.MM.GG - Nome (Risposte)" trovato nel Drive.</td></tr>`;
       } else if (!currentEsc.ok) {
         if (statusMsg) statusMsg.textContent = "Errore lettura foglio";
         tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger-fg)">${icon("alert")}Impossibile leggere il foglio: ${escapeHtml(currentEsc.error || "verifica che l'account vi abbia accesso")}</td></tr>`;
@@ -2404,8 +2404,8 @@
 
     // ---- Uscite dei form che mancano nel foglio statistiche ----
     function formDateFromTitle(t) {
-      const m = /(\d{4})[._-](\d{1,2})[._-](\d{1,2})/.exec(String(t || ""));
-      return m ? `${m[3].padStart(2, "0")}/${m[2].padStart(2, "0")}/${m[1]}` : "";
+      const info = GoogleApi.parseExcursionName(t);
+      return info ? info.data : "";
     }
 
     function missingFromStats() {
@@ -3189,6 +3189,9 @@
         const fresh = { id: f.id, titolo: f.name, data: "", ok: true, headers: [], rows: records };
         if (i >= 0 && excList[i].rows.length === records.length) return;
         excList = i >= 0 ? excList.map((e, j) => (j === i ? Object.assign({}, e, fresh) : e)) : excList.concat([fresh]);
+        // Un'uscita nuova va al suo posto in ordine di data, non in fondo.
+        const iso = (e) => { const p = GoogleApi.parseExcursionName(e.titolo); return p ? p.dataIso : ""; };
+        excList.sort((a, b) => iso(a).localeCompare(iso(b)));
         renderEscursioni();
         if (!byId("viewStats").classList.contains("hidden")) renderStats();
       }
@@ -3266,15 +3269,14 @@
 
     function formatNomeUscita(titoloRaw) {
       const s = String(titoloRaw || "").trim();
+      const info = GoogleApi.parseExcursionName(s);
+      if (info) return info.nome;
+      // Nome che non segue le sintassi delle uscite: testo tra virgolette o tutto, senza "(Risposte)".
       const quoted = s.match(/["«“]([^"»”]+)["»”]/);
       if (quoted && quoted[1]) return quoted[1].trim();
-      return s
-        .replace(/\(Risposte\)\s*$/i, "")
-        .replace(/^Form\s+Iscrizione[\s._-]*\d{4}[._-]\d{2}[._-]\d{2}[\s._-]*/i, "")
-        .replace(/^[-–—:\s]+|[-–—:\s]+$/g, "")
-        .trim();
+      return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.4.1"></script>
+<script src="js/app.js?v=2.4.2"></script>
 </body>
 </html>

@@ -1,6 +1,15 @@
 {
-  "version": "2.4.1",
+  "version": "2.4.2",
   "releases": [
+    {
+      "version": "2.4.2",
+      "date": "23/11/2026",
+      "notes": [
+        "Le uscite si riconoscono con la nuova sintassi dei fogli: \"Iscrizioni AAAA.MM.GG - Nome (Risposte)\"",
+        "I fogli con la vecchia sintassi \"Form Iscrizione …\" continuano a funzionare",
+        "Elenco delle uscite in ordine di data, anche per le uscite di due giorni"
+      ]
+    },
     {
       "version": "2.4.1",
       "date": "22/11/2026",

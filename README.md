@@ -90,7 +90,7 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 
 | Funzione | Cosa fa |
 |---|---|
-| **Elenco uscite automatico** | Trova da solo nel Drive tutti i fogli risposte *"Form Iscrizione …"*, anche quelli nuovi |
+| **Elenco uscite automatico** | Trova da solo nel Drive tutti i fogli risposte *"Iscrizioni AAAA.MM.GG - Nome (Risposte)"* (riconosce ancora anche la vecchia sintassi *"Form Iscrizione AAAA.MM.GG - "Nome" (Risposte)"*), anche quelli nuovi, in ordine di data |
 | **Adesioni** | Tabella dei partecipanti all'uscita scelta, con contatti (e collegamenti rapidi WhatsApp/Telegram), stato socio e n° di escursioni fatte |
 | **Ricerca partecipanti** | Cerca per nome, email o telefono |
 | **Statistiche uscita** | Adesioni nel foglio, quanti sono **già soci**, partecipanti unici |
@@ -199,7 +199,7 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 | Dato | Dove sta | Condiviso con il direttivo? |
 |---|---|---|
 | Soci | Foglio *2 - Libro Soci e Volontari* (solo lettura) | ✅ Sì, è la fonte comune |
-| Iscrizioni escursioni | Fogli *Form Iscrizione …* (solo lettura) | ✅ Sì |
+| Iscrizioni escursioni | Fogli *Iscrizioni AAAA.MM.GG - …* o *Form Iscrizione AAAA.MM.GG - …* (solo lettura) | ✅ Sì |
 | Spunte tessere cartacee | Foglio *NON TOCCARE - DATABASE APP DI GESTIONE* → `Tessere` | ✅ Sì |
 | Note sui soci | Database → `Note` | ✅ Sì |
 | Note e conferme escursioni | Database → `Conferme_Escursioni` | ✅ Sì |
