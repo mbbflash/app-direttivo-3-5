@@ -179,4 +179,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-http.server.ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+print("APP Direttivo 3/5 attiva su http://localhost:8000/gestione-soci-associazione.html")
+print("Premi CTRL+C per fermarla.", flush=True)
+try:
+    http.server.ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
+except KeyboardInterrupt:
+    print("\nAPP Direttivo 3/5 fermata.")
