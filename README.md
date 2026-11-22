@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.4.0-blue)
+![Versione](https://img.shields.io/badge/versione-2.4.1-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -159,11 +159,10 @@ Si attivano con la **campanella** in alto. Con l'app aperta (anche in background
 
 L'app ricorda quante righe aveva ogni foglio: alla riapertura avvisa anche delle iscrizioni arrivate mentre era chiusa. Con l'app completamente chiusa le notifiche non possono arrivare (servirebbe un server dedicato).
 
-### 💾 Import / Export
+### 💾 Export
 
 - **Esporta CSV** dell'elenco soci, comprese spunte e note;
-- **Esporta partecipanti** di un'escursione;
-- **Importa CSV locale** per consultare un file senza collegarsi ai Fogli Google.
+- **Esporta partecipanti** di un'escursione.
 
 ---
 

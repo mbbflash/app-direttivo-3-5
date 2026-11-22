@@ -1,6 +1,14 @@
 {
-  "version": "2.4.0",
+  "version": "2.4.1",
   "releases": [
+    {
+      "version": "2.4.1",
+      "date": "22/11/2026",
+      "notes": [
+        "Pulizia: tolto il pulsante \"Importa CSV\", non più necessario con l'accesso Google",
+        "Tolto il codice per i dati della vecchia versione solo locale, ormai già trasferiti nel database"
+      ]
+    },
     {
       "version": "2.4.0",
       "date": "22/11/2026",

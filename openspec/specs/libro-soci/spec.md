@@ -80,8 +80,8 @@ Il sistema SHALL permettere una nota libera per socio, salvata nel database cond
 - **WHEN** un socio ha una nota ed esporto l'elenco in CSV
 - **THEN** il CSV contiene la nota del socio
 
-### Requirement: Import ed export CSV
-Il sistema SHALL esportare in CSV l'elenco soci filtrato, comprese spunte e note, e SHALL permettere di importare un CSV locale per consultarlo senza collegarsi ai Fogli Google.
+### Requirement: Export CSV
+Il sistema SHALL esportare in CSV l'elenco soci filtrato, comprese spunte e note.
 
 #### Scenario: Export
 - **WHEN** l'utente preme "Esporta CSV"

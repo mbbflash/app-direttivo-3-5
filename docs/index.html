@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.0" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.0" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.1" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.1" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.4.0"></script>
-  <script src="js/config.js?v=2.4.0"></script>
-  <script src="js/google.js?v=2.4.0"></script>
-  <script src="js/clouddb.js?v=2.4.0"></script>
+  <script src="js/storage.js?v=2.4.1"></script>
+  <script src="js/config.js?v=2.4.1"></script>
+  <script src="js/google.js?v=2.4.1"></script>
+  <script src="js/clouddb.js?v=2.4.1"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -158,7 +158,7 @@
     .container { max-width: 1380px; margin: 0 auto; padding: 20px 20px calc(40px + env(safe-area-inset-bottom)); }
 
     /* ---------- Pulsanti e campi ---------- */
-    button, .btn, .btn-label {
+    button, .btn {
       appearance: none;
       border: 1px solid var(--border);
       background: var(--surface);
@@ -172,9 +172,9 @@
       box-shadow: var(--shadow-sm);
       transition: background .15s, border-color .15s, color .15s, transform .08s, box-shadow .15s;
     }
-    button:hover, .btn:hover, .btn-label:hover { background: var(--surface-3); border-color: var(--border-strong); }
-    button:active, .btn:active, .btn-label:active { transform: translateY(1px); }
-    button:focus-visible, .btn:focus-visible, .btn-label:focus-visible, .stat-box:focus-visible { outline: none; box-shadow: var(--ring); }
+    button:hover, .btn:hover { background: var(--surface-3); border-color: var(--border-strong); }
+    button:active, .btn:active { transform: translateY(1px); }
+    button:focus-visible, .btn:focus-visible, .stat-box:focus-visible { outline: none; box-shadow: var(--ring); }
     button:disabled { opacity: .6; cursor: progress; }
     button.primary, .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-fg); }
     button.primary:hover, .btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
@@ -535,7 +535,7 @@
       .container { padding: 14px 12px calc(32px + env(safe-area-inset-bottom)); }
       .appbar-inner { padding: 8px 12px; }
       .appbar .toolbar { flex-wrap: nowrap; gap: 6px; }
-      .appbar .toolbar > button, .appbar .toolbar > .btn-label { width: 38px; height: 38px; padding: 8px; }
+      .appbar .toolbar > button { width: 38px; height: 38px; padding: 8px; }
       .brand { gap: 10px; }
       .brand img { width: 34px; height: 34px; }
       h1 { flex-direction: column; align-items: flex-start; gap: 1px; font-size: 1rem; }
@@ -552,7 +552,7 @@
       .brand { flex: 1 1 auto; min-width: 0; }
       .brand-text { overflow: hidden; }
     }
-    @media (max-width: 360px) { .tab-btn .ico { display: none; } .appbar .toolbar > .btn-label { display: none; } }
+    @media (max-width: 360px) { .tab-btn .ico { display: none; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
@@ -560,7 +560,6 @@
   <!-- Icone -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></symbol>
-    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
@@ -588,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.4.0" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.4.1" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -600,15 +599,13 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.4.0" alt="" />
+        <img src="icons/icon-192.png?v=2.4.1" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
         </div>
       </div>
       <div class="toolbar">
-        <label class="btn-label" for="csvInput" title="Consulta un file CSV senza collegarti ai Fogli Google"><svg class="ico"><use href="#i-upload"/></svg><span class="hide-sm">Importa CSV</span></label>
-        <input type="file" id="csvInput" accept=".csv,text/csv" hidden />
         <button id="btnExport" title="Scarica l'elenco soci con spunte e note"><svg class="ico"><use href="#i-download"/></svg><span class="hide-sm">Esporta CSV</span></button>
         <button type="button" id="btnNotif" class="icon-btn" title="Notifiche" aria-label="Notifiche"><svg class="ico"><use href="#i-bell"/></svg></button>
         <button type="button" id="btnTheme" class="icon-btn" title="Tema: automatico" aria-label="Cambia tema"><svg class="ico"><use href="#i-auto"/></svg></button>
@@ -944,7 +941,6 @@
       syncStatus: byId("syncStatus"),
       lastSyncTime: byId("lastSyncTime"),
       btnLoadSheet: byId("btnLoadSheet"),
-      csvInput: byId("csvInput"),
       btnExport: byId("btnExport"),
       searchInput: byId("searchInput"),
       typeFilter: byId("typeFilter"),
@@ -1047,9 +1043,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.0" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.1" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.0" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.1" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -1540,10 +1536,7 @@
       setBusy(els.btnLoadSheet, true);
       try {
         const data = await AppData.loadSoci();
-        if (!data || data.ok === false) throw new Error((data && data.error) || "Risposta non valida dal Foglio");
-        const list = Array.isArray(data.members) ? data.members
-          : (Array.isArray(data.rows) ? data.rows : (Array.isArray(data.data) ? data.data : []));
-        members = list;
+        members = data.members;
         saveLocal();
         renderTable();
         updateTimestamp(data.updatedAt);
@@ -1557,54 +1550,8 @@
     }
 
     // ===================================================================
-    //  Import / export CSV
+    //  Export CSV
     // ===================================================================
-    // Analizza tutto il testo, così funzionano anche le celle con "a capo" fra virgolette.
-    function parseCsv(text, sep) {
-      const rows = [];
-      let row = [], cur = "", inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        if (inQuotes) {
-          if (ch === '"') {
-            if (text[i + 1] === '"') { cur += '"'; i++; } else inQuotes = false;
-          } else cur += ch;
-        } else if (ch === '"') inQuotes = true;
-        else if (ch === sep) { row.push(cur); cur = ""; }
-        else if (ch === "\n" || ch === "\r") {
-          if (ch === "\r" && text[i + 1] === "\n") i++;
-          row.push(cur); rows.push(row); row = []; cur = "";
-        } else cur += ch;
-      }
-      if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
-      return rows;
-    }
-
-    els.csvInput.addEventListener("change", (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const rawText = String(reader.result || "");
-        const text = rawText.charCodeAt(0) === 0xFEFF ? rawText.slice(1) : rawText;
-        const firstLine = text.split(/\r?\n/, 1)[0] || "";
-        const sep = (firstLine.split(";").length) > (firstLine.split(",").length) ? ";" : ",";
-        const grid = parseCsv(text, sep).filter(r => r.some(c => String(c).trim() !== ""));
-        if (grid.length < 2) { toast("Il file CSV non contiene righe di dati", "err"); return; }
-        const headers = grid[0].map(h => h.trim());
-        members = grid.slice(1).map(vals => {
-          const obj = {};
-          headers.forEach((h, idx) => { obj[h] = String(vals[idx] ?? "").trim(); });
-          return obj;
-        });
-        saveLocal();
-        renderTable();
-        setStatusText(`Caricate ${members.length} righe da CSV (${file.name}).`);
-        toast(`Importate ${members.length} righe`);
-      };
-      reader.readAsText(file, "utf-8");
-      e.target.value = "";
-    });
 
     els.btnExport.addEventListener("click", () => {
       if (!members.length) { toast("Non ci sono dati da esportare", "err"); return; }
@@ -1812,7 +1759,7 @@
       if (inp) setMemberNote(inp.getAttribute("data-note-key"), inp.value);
     });
 
-    els.btnLoadSheet.addEventListener("click", loadFromSheet);
+    // Il pulsante "Aggiorna dati" lo collega js/app.js (controlla il login e ricarica tutto).
 
     const renderTableSoon = debounce(renderTable, 150);
     els.searchInput.addEventListener("input", renderTableSoon);
@@ -3328,6 +3275,6 @@
         .trim();
     }
 </script>
-<script src="js/app.js?v=2.4.0"></script>
+<script src="js/app.js?v=2.4.1"></script>
 </body>
 </html>

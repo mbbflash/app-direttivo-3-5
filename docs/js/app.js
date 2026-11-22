@@ -3,7 +3,6 @@
 (function () {
   const cfg = window.APP_CONFIG;
   const $ = (id) => document.getElementById(id);
-  const MIGRATED_KEY = "app35_migrated_v1";
   const ui = {
     overlay: $("loginOverlay"),
     overlayBtn: $("btnLoginOverlay"),
@@ -103,33 +102,9 @@
     saveExcLocalState();
   }
 
-  // La prima volta su questo dispositivo propone di caricare nel database le spunte
-  // e le note salvate dalla vecchia versione (solo locale) dell'app.
-  function migrateLocal(cloud) {
-    let done = false;
-    try { done = appStorage.getItem(MIGRATED_KEY) === "1"; } catch (e) {}
-    if (done) return;
-    const extra = {
-      paper: Object.keys(paperCards).filter(k => !(k in cloud.paper)),
-      note: Object.keys(localNotes).filter(k => !(k in cloud.note) && String(localNotes[k] || "").trim()),
-      exc: Object.keys(excLocalState).filter(k => !(k in cloud.exc))
-    };
-    const total = extra.paper.length + extra.note.length + extra.exc.length;
-    if (total && confirm(
-      `Su questo dispositivo ci sono dati salvati dalla versione precedente dell'app:\n` +
-      `• ${extra.paper.length} spunte tessere\n• ${extra.note.length} note soci\n• ${extra.exc.length} note/conferme escursioni\n\n` +
-      `Vuoi caricarli nel database condiviso, così li vede tutto il direttivo?`)) {
-      extra.paper.forEach(k => { cloud.paper[k] = paperCards[k]; CloudDB.paper(k, paperCards[k]); });
-      extra.note.forEach(k => { cloud.note[k] = localNotes[k]; CloudDB.note(k, localNotes[k]); });
-      extra.exc.forEach(k => { cloud.exc[k] = excLocalState[k]; CloudDB.exc(k, excLocalState[k]); });
-    }
-    try { appStorage.setItem(MIGRATED_KEY, "1"); } catch (e) {}
-  }
-
   async function loadCloud() {
     try {
       const data = await CloudDB.load();
-      migrateLocal(data);
       paperCards = data.paper;
       localNotes = data.note;
       excLocalState = data.exc;
@@ -146,7 +121,6 @@
   async function refreshAll() {
     await Promise.all([loadFromSheet(), loadCloud(), excList.length ? loadEscursioniFromServer() : null, statsData ? loadStats() : null, schedeData ? loadNextData() : null]);
   }
-  els.btnLoadSheet.removeEventListener("click", loadFromSheet);
   els.btnLoadSheet.addEventListener("click", () => {
     if (!GoogleApi.isSignedIn()) { require(); return; }
     refreshAll();
