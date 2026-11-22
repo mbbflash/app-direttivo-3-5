@@ -3,11 +3,11 @@
 // dell'account con cui si accede, e solo chi ha accesso a quei fogli vede i dati.
 window.APP_CONFIG = {
   appName: "APP Direttivo 3/5",
-  version: "2.0.0",
+  version: "2.0.1",
 
   // OAuth Client ID creato nella Google Cloud Console (vedi SETUP-GOOGLE.md).
   // Il Client ID è pubblico per natura: non dà accesso a niente senza login.
-  googleClientId: "INSERISCI_CLIENT_ID.apps.googleusercontent.com",
+  googleClientId: "697558119105-ne8rmvk3639k89pp3r263sgnrhm56165.apps.googleusercontent.com",
 
   // Account con cui è consentito entrare nell'app.
   allowedAccounts: ["trequintitrekking@gmail.com"],

@@ -131,7 +131,16 @@
     if (isDemo) return window.DemoBackend.handle(opts.method, url, opts.body ? JSON.parse(opts.body) : null);
     const headers = Object.assign({ Authorization: "Bearer " + token.access_token }, opts.headers || {});
     if (opts.body) headers["Content-Type"] = "application/json";
-    const res = await fetch(url, Object.assign({}, opts, { headers }));
+    // Tutto il direttivo usa lo stesso account, quindi condivide il limite di richieste al minuto:
+    // se Google risponde "troppe richieste" (429) o è momentaneamente non disponibile, riprovo da solo.
+    let res;
+    for (let attempt = 0; ; attempt++) {
+      res = await fetch(url, Object.assign({}, opts, { headers }));
+      const retryable = res.status === 429 || (opts.method === "GET" && [500, 502, 503, 504].includes(res.status));
+      if (!retryable || attempt >= 4) break;
+      const wait = Math.min(16000, 2000 * 2 ** attempt) + Math.random() * 1000;
+      await new Promise(r => setTimeout(r, wait));
+    }
     if (res.status === 401) {
       token = null;
       writeJson(localStorage, TOKEN_KEY, null);
