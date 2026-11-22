@@ -1,0 +1,78 @@
+schema: spec-driven
+
+context: |
+  Language: Italian (it)
+  All artifacts must be written in Italian.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  ## Il progetto
+  APP Direttivo 3/5: web app per il direttivo dell'associazione Tre Quinti Trekking APS.
+  Serve a consultare il Libro Soci e le iscrizioni alle escursioni (Google Form), a tenere
+  traccia di tessere cartacee, note, conferme e solleciti di rinnovo, e a vedere le
+  statistiche delle presenze. Utenti: pochi membri del direttivo, non tecnici, da PC,
+  Android, Chromebook e iPhone. Interfaccia e testi interamente in italiano.
+
+  ## Dove sta il codice
+  - Repository PUBBLICO su GitHub (mbbflash/app-direttivo-3-5): codice e specifiche OpenSpec
+    stanno insieme, quindi specifiche, proposte e attività non devono mai contenere ID dei
+    fogli, URL privati o dati personali dei soci.
+  - App attuale: `docs/` (PWA pubblicata su GitHub Pages:
+    https://mbbflash.github.io/app-direttivo-3-5/). Ogni push su `main` che tocca `docs/`
+    va online in pochi minuti per tutti.
+  - Versione vecchia in dismissione: `gestione-soci-associazione.html` + `server.py` +
+    `updater.py` + vecchia Web App Apps Script. Non va estesa.
+
+  ## Tecnologie
+  - HTML/CSS/JavaScript vanilla, nessun framework, nessun build step, nessuna dipendenza npm.
+    Gran parte della logica è nello script inline di `docs/index.html`; moduli in `docs/js/`:
+    config.js (impostazioni), google.js (login, Drive, Sheets), clouddb.js (database
+    condiviso e coda modifiche), app.js (collega pagina, login e database), storage.js,
+    demo.js (dati finti per ?demo=1). Service worker `docs/sw.js` (rete prima, cache poi).
+  - Nessun backend: il browser parla direttamente con le API Google (Google Identity
+    Services token client, Drive API v3, Sheets API v4). Scope: spreadsheets,
+    drive.metadata.readonly, email.
+  - Dati: Fogli Google dell'associazione, trovati per NOME tramite Drive API (nomi in
+    config.js). Il database condiviso è il foglio "NON TOCCARE - DATABASE APP DI GESTIONE"
+    con le schede Tessere, Note, Conferme_Escursioni, Solleciti, Log.
+
+  ## Vincoli e decisioni già prese
+  - MAI ID dei fogli, URL privati o dati dei soci nel repository pubblico: i fogli si
+    trovano per nome. Il Client ID OAuth in config.js è pubblico per natura ed è ammesso.
+  - Accesso consentito solo all'account condiviso trequintitrekking@gmail.com (scelta
+    "per ora"; con Google Workspace for Nonprofits si valuteranno account personali).
+  - Il foglio statistiche "Tre Quinti Wrapped - Foglio Calcolo" resta la fonte di verità
+    ed è compilato anche a mano: l'app può aggiungere righe solo dopo anteprima e conferma.
+  - Il foglio "3 - Modulo Iscrizione Tre Quinti Trekking APS (Risposte)" si legge solo
+    nelle colonne F:J (dati minimi per le notifiche).
+  - Notifiche solo dentro l'app (nessun server push). Telegram è il canale social
+    principale dell'associazione.
+  - Per un .apk usare una TWA (PWABuilder/Bubblewrap), non wrapper Electron/WebView:
+    Google blocca il login nelle WebView.
+  - Colore del marchio: bordeaux #730B2D. Tema chiaro/scuro/automatico.
+  - Ogni rilascio: aumentare `version` in docs/js/config.js, il `?v=` in index.html e
+    manifest.webmanifest, il nome della cache in sw.js, e aggiungere le note in
+    docs/version.json (pilota l'avviso di aggiornamento nell'app). Le modifiche si provano
+    con ?demo=1 prima del push.
+
+rules:
+  proposal:
+    - Indica sempre quali fogli Google vengono letti o scritti e se cambia lo schema del database condiviso
+    - Indica cosa resta fuori dalla modifica
+  design:
+    - Niente nuove dipendenze, framework o build step senza una motivazione esplicita
+    - Considera il limite di richieste Google condiviso da tutto il direttivo (stesso account)
+  tasks:
+    - Includi la prova in modalità demo (?demo=1) e, se servono dati veri, la prova con login
+    - Includi i passi di rilascio (versione, ?v=, cache del service worker, version.json)
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
