@@ -54,7 +54,8 @@
       pending: ["busy", `● ${s.pending} modifiche da salvare`],
       auth: ["warn", `⚠ ${s.pending ? s.pending + " modifiche non salvate: " : ""}accedi per salvare`],
       offline: ["warn", `⚠ Offline${s.pending ? ": " + s.pending + " modifiche in attesa" : ""}`],
-      error: ["err", "⚠ Errore di salvataggio: riprovo"]
+      error: ["err", "⚠ Errore di salvataggio: riprovo"],
+      loaderror: ["err", "⚠ Database non raggiungibile: clic per riprovare"]
     };
     const [cls, text] = map[s.state] || ["", ""];
     ui.badge.className = "sync-badge " + cls;
@@ -65,6 +66,7 @@
     const s = CloudDB.status();
     if (s.state === "auth") await doLogin();
     else if (s.state === "error" || s.state === "offline") CloudDB.flush();
+    else if (s.state === "loaderror") refreshAll();
   });
 
   // ---- Ridisegno senza disturbare chi sta scrivendo ----

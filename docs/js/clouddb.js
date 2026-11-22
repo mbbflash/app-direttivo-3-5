@@ -143,7 +143,7 @@
       if (pendingCount()) scheduleFlush(200);
       return data;
     } catch (e) {
-      setStatus(e instanceof GoogleApi.AuthError ? "auth" : "error", e.message);
+      setStatus(e instanceof GoogleApi.AuthError ? "auth" : "loaderror", e.message);
       throw e;
     }
   }
@@ -208,7 +208,8 @@
 
   async function flush() {
     if (flushing || !pendingCount()) {
-      if (!pendingCount()) setStatus("idle");
+      // Senza modifiche in coda non c'è niente da dire: non nascondo un errore di lettura.
+      if (!pendingCount() && ["pending", "saving", "auth", "offline", "error"].includes(lastStatus.state)) setStatus("idle");
       return;
     }
     if (!GoogleApi.isSignedIn()) { setStatus("auth", "Accedi per salvare le modifiche nel database."); return; }

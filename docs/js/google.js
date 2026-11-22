@@ -151,6 +151,11 @@
     try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { raw: text }; }
     if (!res.ok) {
       const msg = (data && data.error && (data.error.message || data.error.status)) || ("HTTP " + res.status);
+      const raw = JSON.stringify(data || {});
+      if (/SERVICE_DISABLED|accessNotConfigured|has not been used in project|is disabled/i.test(raw)) {
+        const api = /drive/i.test(raw) ? "Google Drive API" : /sheets/i.test(raw) ? "Google Sheets API" : "API Google";
+        throw new Error(`La ${api} non è abilitata nel progetto Google Cloud: abilitala (SETUP-GOOGLE.md, punto 2), attendi un paio di minuti e premi "Aggiorna dati".`);
+      }
       if (res.status === 403 || res.status === 404) {
         throw new Error(msg + " — controlla che l'account abbia accesso al foglio.");
       }
