@@ -22,6 +22,7 @@ Una web app locale, in sola lettura, collegata ai Fogli Google dell'associazione
 - [Avvio rapido](#-avvio-rapido)
 - [Configurazione](#%EF%B8%8F-configurazione)
 - [Dove finiscono i dati](#-dove-finiscono-i-dati)
+- [Aggiornamenti](#-aggiornamenti)
 - [Come funziona](#-come-funziona)
 - [Struttura del progetto](#-struttura-del-progetto)
 - [Risoluzione dei problemi](#-risoluzione-dei-problemi)
@@ -94,6 +95,13 @@ Per ogni escursione l'app segnala in automatico cosa controllare:
 ### 🔔 Notifiche
 
 - Notifiche del browser quando arrivano **nuove iscrizioni** a un'uscita (da attivare con *Attiva notifiche browser*).
+
+### 🔄 Aggiornamenti automatici
+
+- All'apertura l'app controlla se su GitHub c'è una **nuova versione** e la propone con le note delle novità;
+- **Aggiorna ora** scarica e installa la nuova versione e riavvia l'app da sola;
+- **Più tardi** o **Salta questa versione** per rimandare;
+- clic sul numero di versione (es. `v1.1.0`) accanto al titolo per controllare in qualsiasi momento.
 
 ### 💾 Import / Export
 
@@ -178,6 +186,45 @@ In alternativa a `config.json` puoi impostare la variabile d'ambiente `SOCI_WEB_
 
 ---
 
+## 🔄 Aggiornamenti
+
+### Per chi usa l'app
+
+Quando esce una nuova versione, all'apertura compare un avviso in cima alla pagina:
+
+1. leggi le novità e premi **Aggiorna ora**;
+2. l'app scarica l'ultima release da GitHub, salva i file attuali in `backup/` e si riavvia;
+3. la pagina si ricarica da sola con la nuova versione.
+
+Non vengono mai toccati `config.json`, `escursioni_config.json`, le spunte e le note salvate nel browser.
+
+> [!TIP]
+> Se qualcosa non va, i file della versione precedente sono in `backup/v<versione>_<data>/`: basta copiarli di nuovo nella cartella dell'app.
+
+> [!NOTE]
+> Se la cartella è un clone git (contiene `.git`), l'app avvisa della nuova versione ma non la installa: aggiorna con `git pull`.
+
+### Per chi sviluppa: pubblicare una nuova versione
+
+L'app propone un aggiornamento **solo quando viene pubblicata una Release** su GitHub, non a ogni commit.
+
+```bash
+# 1. Aumenta il numero di versione
+echo 1.2.0 > VERSION
+
+# 2. Commit e push
+git commit -am "Versione 1.2.0"
+git push
+
+# 3. Pubblica la release (il tag deve corrispondere a VERSION)
+gh release create v1.2.0 --title "v1.2.0" --notes "- Novità 1
+- Correzione 2"
+```
+
+Le note della release sono quelle che il direttivo vede nell'avviso di aggiornamento.
+
+---
+
 ## 🔧 Come funziona
 
 ```
@@ -188,6 +235,9 @@ In alternativa a `config.json` puoi impostare la variabile d'ambiente `SOCI_WEB_
 
 - `GET /api/soci` → elenco soci dalla Web App
 - `GET /api/escursioni` → iscrizioni alle escursioni dalla Web App; se non risponde, legge i fogli indicati in `escursioni_config.json`
+- `GET /api/version` → versione installata
+- `GET /api/update/check` → confronta la versione installata con l'ultima Release su GitHub
+- `POST /api/update/install` → scarica e installa l'ultima Release, poi riavvia il server
 
 ---
 
@@ -197,11 +247,14 @@ In alternativa a `config.json` puoi impostare la variabile d'ambiente `SOCI_WEB_
 app-direttivo-3-5/
 ├── gestione-soci-associazione.html   # Interfaccia web
 ├── server.py                         # Server locale e API
+├── updater.py                        # Aggiornamenti automatici da GitHub
+├── VERSION                           # Versione installata
 ├── avvia-soci.sh                     # Avvio rapido macOS / Linux
 ├── config.example.json               # Modello per config.json
 ├── escursioni_config.example.json    # Modello per escursioni_config.json
 ├── config.json                       # 🔒 locale, escluso da git
-└── escursioni_config.json            # 🔒 locale, escluso da git
+├── escursioni_config.json            # 🔒 locale, escluso da git
+└── backup/                           # 🔒 copie create dagli aggiornamenti, escluso da git
 ```
 
 ---
@@ -215,4 +268,6 @@ app-direttivo-3-5/
 | Errore porta 8000 già in uso | L'app è già avviata in un'altra finestra: chiudila o usa quella |
 | *Errore caricamento Foglio* | Controlla la connessione e che l'URL in `config.json` sia giusto |
 | Escursione *Impossibile leggere il foglio* | Il foglio dev'essere condiviso con chiunque abbia il link |
+| *Controllo aggiornamenti non riuscito* | Serve internet; l'app funziona comunque, riprova più tardi |
+| Dopo un aggiornamento l'app non riparte | Chiudi il terminale e avvia di nuovo `server.py`; i vecchi file sono in `backup/` |
 | `python` non trovato su Windows | Installa Python da [python.org](https://www.python.org/downloads/) spuntando *Add to PATH* |

@@ -408,15 +408,67 @@
       color: #ffffff;
       border-color: var(--primary);
     }
+
+    /* Aggiornamenti automatici */
+    .version-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #f1f3f6;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .update-banner {
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--info-bg);
+      border: 1px solid #c7d9ff;
+      color: var(--text);
+    }
+    .update-banner.show { display: block; }
+    .update-banner.is-error { background: var(--danger-bg); border-color: #f5c2c0; }
+    .update-banner.is-ok { background: var(--success-bg); border-color: #b7e2c4; }
+    .update-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .update-title { font-weight: 700; color: var(--info-fg); }
+    .update-banner.is-error .update-title { color: var(--danger-fg); }
+    .update-banner.is-ok .update-title { color: var(--success-fg); }
+    .update-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .update-notes {
+      margin: 10px 0 0;
+      max-height: 180px;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: inherit;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+    .update-msg { margin-top: 8px; font-size: 0.86rem; }
 </style>
 </head>
 <body>
   <div class="container">
+    <section id="updateBanner" class="update-banner" role="status" aria-live="polite">
+      <div class="update-head">
+        <span class="update-title" id="updateTitle"></span>
+        <div class="update-actions" id="updateActions">
+          <button type="button" class="primary" id="btnUpdateNow">Aggiorna ora</button>
+          <button type="button" id="btnUpdateLater">Più tardi</button>
+          <button type="button" id="btnUpdateSkip">Salta questa versione</button>
+        </div>
+      </div>
+      <pre class="update-notes" id="updateNotes"></pre>
+      <div class="update-msg" id="updateMsg"></div>
+    </section>
     <header>
       <div>
         <h1>
           APP Direttivo 3/5
           <span class="ro-pill">SOLA LETTURA</span>
+          <span class="version-pill" id="appVersion" title="Clicca per controllare gli aggiornamenti">v…</span>
         </h1>
         <p class="subtitle">Consultazione collegata al foglio "2 - Libro Soci e Volontari" tramite proxy locale</p>
       </div>
@@ -1959,6 +2011,103 @@ function formatNomeUscita(titoloRaw) {
     .trim();
 }
 
+</script>
+<script>
+  // Aggiornamenti automatici: all'apertura controlla se su GitHub c'è una nuova release.
+  (function () {
+    const SKIP_KEY = "app_direttivo_skip_version";
+    const banner = document.getElementById("updateBanner");
+    const titleEl = document.getElementById("updateTitle");
+    const notesEl = document.getElementById("updateNotes");
+    const msgEl = document.getElementById("updateMsg");
+    const actionsEl = document.getElementById("updateActions");
+    const btnNow = document.getElementById("btnUpdateNow");
+    const btnLater = document.getElementById("btnUpdateLater");
+    const btnSkip = document.getElementById("btnUpdateSkip");
+    const versionEl = document.getElementById("appVersion");
+    let info = null;
+
+    function readSkip() { try { return localStorage.getItem(SKIP_KEY) || ""; } catch (e) { return ""; } }
+    function writeSkip(v) { try { localStorage.setItem(SKIP_KEY, v); } catch (e) {} }
+
+    function show(state, title, notes, msg, withActions) {
+      banner.classList.remove("is-error", "is-ok");
+      if (state) banner.classList.add(state);
+      titleEl.textContent = title;
+      notesEl.textContent = notes || "";
+      notesEl.style.display = notes ? "" : "none";
+      msgEl.textContent = msg || "";
+      actionsEl.style.display = withActions ? "" : "none";
+      banner.classList.add("show");
+    }
+    function hide() { banner.classList.remove("show"); }
+
+    async function check(manual) {
+      try {
+        const res = await fetch("/api/update/check" + (manual ? "?force=1" : ""), { cache: "no-store" });
+        info = await res.json();
+      } catch (e) {
+        if (manual) show("is-error", "Impossibile controllare gli aggiornamenti", "", String(e), false);
+        return;
+      }
+      if (info.current) versionEl.textContent = "v" + info.current;
+      if (!info.ok) {
+        if (manual) show("is-error", "Controllo aggiornamenti non riuscito", "", info.error || "", false);
+        return;
+      }
+      if (!info.available) {
+        if (manual) {
+          show("is-ok", "Hai già l'ultima versione (v" + info.current + ")", "", "", false);
+          setTimeout(hide, 4000);
+        }
+        return;
+      }
+      if (!manual && readSkip() === info.latest) return;
+      const when = info.published ? " · pubblicata il " + new Date(info.published).toLocaleDateString("it-IT") : "";
+      show("", "Nuova versione disponibile: v" + info.latest + " (hai la v" + info.current + ")" + when,
+        info.notes ? "Novità:\n" + info.notes : "",
+        info.canInstall ? "" : "Questa cartella è un clone git: aggiorna con \"git pull\".",
+        true);
+      btnNow.style.display = info.canInstall ? "" : "none";
+    }
+
+    async function waitForVersion(target) {
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          const res = await fetch("/api/version", { cache: "no-store" });
+          const data = await res.json();
+          if (data.version === target) return true;
+        } catch (e) { /* il server si sta riavviando */ }
+      }
+      return false;
+    }
+
+    btnNow.addEventListener("click", async () => {
+      if (!info || !info.available) return;
+      if (!confirm("Installare la versione v" + info.latest + "?\n\nI file attuali vengono salvati nella cartella \"backup\" e l'app si riavvia da sola. Le tue configurazioni, spunte e note restano.")) return;
+      show("", "Aggiornamento a v" + info.latest + " in corso…", "", "Download e installazione, attendi qualche secondo.", false);
+      try {
+        const res = await fetch("/api/update/install", { method: "POST", headers: { "X-App-Update": "1" } });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "Errore sconosciuto");
+        show("", "Aggiornamento installato, riavvio dell'app…", "", "Backup della versione precedente in: " + data.backup, false);
+        const ok = await waitForVersion(data.to);
+        if (ok) {
+          location.reload();
+        } else {
+          show("is-error", "L'app non si è riavviata", "", "Chiudi la finestra del terminale e avvia di nuovo server.py.", false);
+        }
+      } catch (e) {
+        show("is-error", "Aggiornamento non riuscito", "", (e && e.message) || String(e), false);
+      }
+    });
+    btnLater.addEventListener("click", hide);
+    btnSkip.addEventListener("click", () => { if (info && info.latest) writeSkip(info.latest); hide(); });
+    versionEl.addEventListener("click", () => check(true));
+
+    check(false);
+  })();
 </script>
 </body>
 </html>

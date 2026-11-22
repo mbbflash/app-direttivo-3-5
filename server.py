@@ -4,9 +4,13 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
+import threading
 import urllib.request
 from urllib.parse import parse_qs, urlparse
+
+import updater
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
@@ -89,11 +93,52 @@ def fetch_sheet_csv_rows(url_or_id):
         records.append(item)
     return headers, records
 
+HIDDEN_PATHS = ("config.json", "escursioni_config.json", "backup", ".git")
+RESTART_REQUESTED = threading.Event()
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=BASE_DIR, **kwargs)
 
+    def send_json(self, status, obj):
+        body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_POST(self):
+        if self.path.startswith("/api/update/install"):
+            # L'header personalizzato impedisce ad altri siti di avviare l'aggiornamento.
+            if self.headers.get("X-App-Update") != "1":
+                self.send_json(403, {"ok": False, "error": "Richiesta non consentita"})
+                return
+            try:
+                result = updater.install()
+            except Exception as e:
+                self.send_json(500, {"ok": False, "error": str(e)})
+                return
+            self.send_json(200, result)
+            print(f"Aggiornamento installato: v{result['from']} -> v{result['to']}. Riavvio...", flush=True)
+            RESTART_REQUESTED.set()
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            return
+        self.send_error(404)
+
     def do_GET(self):
+        first = urlparse(self.path).path.lstrip("/").split("/", 1)[0]
+        if first in HIDDEN_PATHS:
+            self.send_error(404)
+            return
+        if self.path.startswith("/api/version"):
+            self.send_json(200, {"ok": True, "version": updater.current_version()})
+            return
+        if self.path.startswith("/api/update/check"):
+            force = "force=1" in self.path
+            self.send_json(200, updater.check(force=force))
+            return
         if self.path.startswith("/api/escursioni"):
             try:
                 sep = "&" if "?" in WEB_APP_URL else "?"
@@ -179,9 +224,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-print("APP Direttivo 3/5 attiva su http://localhost:8000/gestione-soci-associazione.html")
-print("Premi CTRL+C per fermarla.", flush=True)
-try:
-    http.server.ThreadingHTTPServer(("127.0.0.1", 8000), Handler).serve_forever()
-except KeyboardInterrupt:
-    print("\nAPP Direttivo 3/5 fermata.")
+def main():
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 8000), Handler)
+    print(f"APP Direttivo 3/5 (v{updater.current_version()}) attiva su "
+          "http://localhost:8000/gestione-soci-associazione.html")
+    print("Premi CTRL+C per fermarla.", flush=True)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nAPP Direttivo 3/5 fermata.")
+        return 0
+    finally:
+        httpd.server_close()
+    if RESTART_REQUESTED.is_set():
+        # Avvia la nuova versione nella stessa finestra e resta in attesa che finisca.
+        try:
+            return subprocess.call([sys.executable, os.path.join(BASE_DIR, "server.py")])
+        except KeyboardInterrupt:
+            return 0
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
