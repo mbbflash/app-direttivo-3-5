@@ -331,6 +331,22 @@
       return rowsToRecords(data.values).records;
     },
 
+    // Schede tecniche dei percorsi (sola lettura): il nome contiene gli anni e cambia,
+    // quindi si cerca per prefisso e si usa il più recente dell'account.
+    async loadSchede() {
+      const files = await listSpreadsheets("name contains " + driveQuoted(cfg.schedeNamePrefix));
+      const prefix = cfg.schedeNamePrefix.toLowerCase();
+      const list = files
+        .filter(f => f.name.toLowerCase().startsWith(prefix))
+        .sort((a, b) => Number(b.ownedByMe) - Number(a.ownedByMe) || String(b.modifiedTime).localeCompare(String(a.modifiedTime)));
+      if (!list.length) throw new Error(`Foglio "${cfg.schedeNamePrefix} …" non trovato nel Drive dell'account.`);
+      const f = list[0];
+      // Senza nome di scheda l'intervallo si riferisce al primo foglio.
+      const data = await Sheets.get(f.id, "A1:K");
+      const { headers, records } = rowsToRecords(data.values);
+      return { ok: true, title: f.name, headers, rows: records, updatedAt: new Date().toISOString() };
+    },
+
     // Foglio delle presenze effettive: una scheda per anno (DatiEscursioni2025, DatiEscursioni2026, ...).
     async loadStats() {
       return withRetryOnMissingFile(cfg.statsName, async (id) => {

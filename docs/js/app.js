@@ -144,7 +144,7 @@
   }
 
   async function refreshAll() {
-    await Promise.all([loadFromSheet(), loadCloud(), excList.length ? loadEscursioniFromServer() : null, statsData ? loadStats() : null]);
+    await Promise.all([loadFromSheet(), loadCloud(), excList.length ? loadEscursioniFromServer() : null, statsData ? loadStats() : null, schedeData ? loadNextData() : null]);
   }
   els.btnLoadSheet.removeEventListener("click", loadFromSheet);
   els.btnLoadSheet.addEventListener("click", () => {

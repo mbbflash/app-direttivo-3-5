@@ -1,6 +1,16 @@
 {
-  "version": "2.3.0",
+  "version": "2.4.0",
   "releases": [
+    {
+      "version": "2.4.0",
+      "date": "22/11/2026",
+      "notes": [
+        "Nuova scheda \"Prossima uscita\": l'assistente propone la prossima escursione dalle schede tecniche dei percorsi",
+        "Proposte ordinate per stagione e quota, tempo dall'ultima volta, partecipazione e varietà, con le motivazioni",
+        "Filtri per data, difficoltà, dislivello, durata e ritrovo; i percorsi già in programma vengono esclusi",
+        "Pulsante \"Copia annuncio\" con il testo pronto per Telegram, WhatsApp o email"
+      ]
+    },
     {
       "version": "2.3.0",
       "date": "22/11/2026",

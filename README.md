@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.3.0-blue)
+![Versione](https://img.shields.io/badge/versione-2.4.0-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -109,6 +109,18 @@ Legge il foglio **"Tre Quinti Wrapped - Foglio Calcolo"** (presenze effettive, u
 - **uscite dei form non ancora nel foglio**: l'app le segnala e, con *Aggiungi al foglio*, propone le righe da scrivere (presenti segnati *Confermato*, più eventuali presenti senza iscrizione, ore, km e dislivello). Scrive solo dopo conferma, nello stesso formato di sempre (`Socio | =UPPER(A) | Data | NomeEscursione | Ore | Km | Dislivello`), riusando la grafia dei nomi già presente nel foglio;
 - nella **scheda socio** il curriculum mostra le presenze vere con ore, km e dislivello totali.
 
+### 🧭 Prossima uscita (assistente)
+
+Aiuta il direttivo a scegliere la prossima escursione. Legge il foglio **"Tre Quinti Trekking - Schede Tecniche Escursioni …"** (cercato per inizio del nome, solo lettura) e lo incrocia con presenze e form:
+
+- filtri: **data prevista**, difficoltà, dislivello e durata massimi, **punto di ritrovo**, *escludi i percorsi fatti negli ultimi 12 mesi*;
+- classifica con un **punteggio da 0 a 100** e le **motivazioni**: quota adatta alla stagione (neve d'inverno, caldo d'estate), tempo dall'ultima volta, partecipazione media rispetto alle altre uscite, varietà di difficoltà rispetto alle ultime uscite;
+- i percorsi con un form già aperto per una data futura risultano **già in programma**;
+- per ogni proposta: dati tecnici, ritrovo, descrizione, uscite passate e **Copia annuncio** (testo pronto per Telegram, WhatsApp o email);
+- tabella **Tutti i percorsi** con l'esito di ognuno.
+
+Il punteggio è calcolato con regole fisse dentro l'app: nessun servizio esterno di intelligenza artificiale. I nomi brevi dei punti di ritrovo si possono cambiare in `config.js` (`ritrovoAlias`).
+
 ### 🚨 Avvisi uscita
 
 Per ogni escursione l'app segnala in automatico cosa controllare:
@@ -194,6 +206,7 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 | Note e conferme escursioni | Database → `Conferme_Escursioni` | ✅ Sì |
 | Solleciti di rinnovo | Database → `Solleciti` | ✅ Sì |
 | Presenze e statistiche | Foglio *Tre Quinti Wrapped - Foglio Calcolo* | ✅ Sì |
+| Schede tecniche dei percorsi | Foglio *Tre Quinti Trekking - Schede Tecniche Escursioni …* (solo lettura) | ✅ Sì |
 | Storico modifiche | Database → `Log` | ✅ Sì |
 | Cache e modifiche in coda | Browser del dispositivo | ❌ No, cancellate con **Esci** |
 

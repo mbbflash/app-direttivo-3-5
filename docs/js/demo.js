@@ -8,6 +8,7 @@
     return String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
   }
   function shift(days) { const d = new Date(); d.setDate(d.getDate() + days); return d; }
+  function futureStamp(days) { const d = shift(days); return d.getFullYear() + "." + String(d.getMonth() + 1).padStart(2, "0") + "." + String(d.getDate()).padStart(2, "0"); }
 
   function seed() {
     const people = [
@@ -46,6 +47,21 @@
             ["Giulia Bianchi", "=UPPER(A3)", "25/10/2026", "Monte Esempio", 4, "9.5", 650],
             ["Paolo Gialli", "=UPPER(A4)", "25/10/2026", "Monte Esempio", 4, "9.5", 650]]
         } },
+        "demo-schede": { name: cfg.schedeNamePrefix + " (demo)", sheets: { "Schede": [
+          ["Anno", "Escursione", "Difficoltà", "Lunghezza", "Durata", "Dislivello", "Quota Max", "Quota Min", "Partenza/Arrivo", "Ritrovo Principale", "Descrizione"],
+          ["2026", "Monte Esempio", "Medio", "9,5 km", "4 h senza pause", "650 m", "1180 m s.l.m.", "560 m s.l.m.", "Borgo Finto (LU)", "il parcheggio della stazione alle ore 8:30", "Anello panoramico di prova tra boschi e crinali inventati, con vista sul mare in lontananza..."],
+          ["2026", "Il Sentiero Finto", "Facile", "6 km", "3 h con pause", "250 m", "480 m s.l.m.", "220 m s.l.m.", "Villa Immaginaria (LU)", "il bar della piazza alle ore 9:00", "Passeggiata tranquilla lungo un vecchio acquedotto immaginario, adatta a tutti..."],
+          ["2026", "La Cresta Nevosa", "Difficile", "12 km", "7 h con pause", "1000 m", "1890 m s.l.m.", "950 m s.l.m.", "Rifugio Esempio", "il supermercato del paese alle ore 7:30", "Anello impegnativo in alta quota con tratti esposti, solo per escursionisti esperti..."],
+          ["2026", "Il Borgo Abbandonato", "Medio-Facile", "7 km", "3.30 h senza pause", "350 m", "760 m s.l.m.", "480 m s.l.m.", "Paese Vecchio (LU)", "il supermercato del paese alle ore 9:15", "Tra borghi abbandonati e castagneti secolari, con pranzo al sacco in un prato panoramico..."],
+          ["2025", "La Via del Bosco", "Medio", "12 km", "5 h con pause", "500 m", "980 m s.l.m.", "520 m s.l.m.", "Bosco Grande (LU)", "il parcheggio della stazione alle ore 8:30", "Lungo percorso nel bosco con faggete e ruscelli, ideale in autunno..."],
+          ["2025", "Lago Finto", "Medio-Difficile", "8,5 km", "6 h con pause", "700 m", "1620 m s.l.m.", "980 m s.l.m.", "Passo Inventato", "il supermercato del paese alle ore 8:00", "Salita a un lago di montagna immaginario e ritorno per il crinale..."],
+          ["2024", "Le Scogliere di Prova", "Facile", "8 km", "4 h con pause", "200 m", "190 m s.l.m.", "10 m s.l.m.", "Marina Finta (LI)", "il bar della piazza alle ore 8:30", "Sentiero a picco sul mare tra macchia mediterranea e calette, perfetto d'inverno..."],
+          ["2024", "Il Borgo Abbandonato", "Facile", "7 km", "3 h senza pause", "300 m", "760 m s.l.m.", "480 m s.l.m.", "Paese Vecchio (LU)", "il supermercato del paese alle ore 9:15", "Tra borghi abbandonati e castagneti secolari..."]
+        ] } },
+        // Uscita futura: l'assistente "Prossima uscita" la deve segnare come già in programma.
+        "demo-esc-3": { name: `${cfg.escursioniNamePrefix} ${futureStamp(20)} - "Il Borgo Abbandonato" (Risposte)`, sheets: { "Risposte del modulo 1": form([
+          [fmt(shift(-1)) + " 18.00", "Anna Neri", "anna.neri@esempio.it", "3330000003", "SI"]
+        ]) } },
         "demo-esc-1": { name: `${cfg.escursioniNamePrefix} 2026.10.25 - "Monte Esempio" (Risposte)`, sheets: { "Risposte del modulo 1": form([
           ["25/10/2026 9.00", "Mario Rossi", "mario.rossi@esempio.it", "3330000000", "SI"],
           ["25/10/2026 9.10", "Giulia Bianchi", "giulia.bianchi@esempio.it", "3330000001", "SI"],

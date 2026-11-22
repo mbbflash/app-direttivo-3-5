@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.3.0" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.3.0" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.3.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.0" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.0" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.3.0"></script>
-  <script src="js/config.js?v=2.3.0"></script>
-  <script src="js/google.js?v=2.3.0"></script>
-  <script src="js/clouddb.js?v=2.3.0"></script>
+  <script src="js/storage.js?v=2.4.0"></script>
+  <script src="js/config.js?v=2.4.0"></script>
+  <script src="js/google.js?v=2.4.0"></script>
+  <script src="js/clouddb.js?v=2.4.0"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -445,6 +445,43 @@
     .curriculum-totals { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 0.84rem; color: var(--muted); }
     .curriculum-totals strong { color: var(--text); }
 
+
+    /* ---------- Prossima uscita ---------- */
+    .next-intro { margin: 0 0 6px; font-size: 0.86rem; }
+    .next-filters { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+    .next-filters input, .next-filters select { width: 100%; }
+    .next-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+    .next-actions .flag-label { margin-right: auto; font-size: 0.86rem; }
+    .route-list { display: grid; gap: 12px; }
+    .route-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 14px 16px; box-shadow: var(--shadow-sm); }
+    .route-head { display: flex; gap: 12px; align-items: flex-start; }
+    .route-title { flex: 1 1 auto; min-width: 0; }
+    .route-title h3 { margin: 0; font-size: 1.02rem; line-height: 1.3; }
+    .route-score {
+      flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+      background: conic-gradient(var(--primary) calc(var(--p) * 1%), var(--surface-3) 0);
+    }
+    .route-score b { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--surface); font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+    .route-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 8px; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: var(--surface-3); color: var(--text); white-space: nowrap; }
+    .chip.diff-1, .chip.diff-2 { background: var(--success-bg); color: var(--success-fg); }
+    .chip.diff-3, .chip.diff-3-5 { background: var(--info-bg); color: var(--info-fg); }
+    .chip.diff-4 { background: var(--warn-bg); color: var(--warn-fg); }
+    .chip.diff-5 { background: var(--danger-bg); color: var(--danger-fg); }
+    .reasons { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 4px; font-size: 0.86rem; }
+    .reasons li { display: flex; gap: 7px; align-items: flex-start; }
+    .reasons li .ico { flex: 0 0 auto; margin-top: 2px; }
+    .reasons li.pro .ico { color: var(--success-fg); }
+    .reasons li.con .ico { color: var(--warn-fg); }
+    .route-meta { font-size: 0.82rem; color: var(--muted); }
+    .route-meta strong { color: var(--text); }
+    .route-more { margin-top: 8px; font-size: 0.86rem; }
+    .route-more summary { cursor: pointer; font-weight: 650; color: var(--primary); }
+    .route-more p { margin: 6px 0 0; }
+    .route-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .empty-box { padding: 26px 16px; text-align: center; color: var(--muted); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); font-size: 0.88rem; }
+    #btnNextMore { margin-top: 12px; }
+
     /* ---------- Novità e aggiornamenti ---------- */
     .update-card {
       position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 1500;
@@ -509,8 +546,9 @@
       .stat-box { padding: 12px; gap: 10px; }
       .stat-icon { width: 36px; height: 36px; border-radius: 10px; }
       .stat-value { font-size: 1.35rem; }
-      .view-tabs { display: flex; }
-      .tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 8px; }
+      .view-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+      .tab-btn { min-width: 0; padding: 8px 6px; justify-content: center; }
+      .route-card { padding: 12px; }
       .brand { flex: 1 1 auto; min-width: 0; }
       .brand-text { overflow: hidden; }
     }
@@ -543,13 +581,14 @@
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
     <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15v3M12 10v8M17 6v12"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
   </svg>
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.3.0" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.4.0" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -561,7 +600,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.3.0" alt="" />
+        <img src="icons/icon-192.png?v=2.4.0" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -596,6 +635,7 @@
       <button type="button" id="tabBtnSoci" class="tab-btn active" role="tab" aria-selected="true"><svg class="ico ico-sm"><use href="#i-users"/></svg>Libro Soci <span class="count" id="tabCountSoci"></span></button>
       <button type="button" id="tabBtnEscursioni" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-map"/></svg>Escursioni <span class="count" id="tabCountEsc"></span></button>
       <button type="button" id="tabBtnStats" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-chart"/></svg>Statistiche</button>
+      <button type="button" id="tabBtnNext" class="tab-btn" role="tab" aria-selected="false"><svg class="ico ico-sm"><use href="#i-compass"/></svg>Prossima uscita</button>
     </div>
 
     <div id="viewSoci" class="view-section">
@@ -808,6 +848,70 @@
         </div>
       </section>
     </div>
+
+    <div id="viewNext" class="view-section hidden">
+      <section class="card">
+        <h2 class="card-title"><svg class="ico"><use href="#i-compass"/></svg>Assistente scelta prossima escursione</h2>
+        <p class="muted next-intro">Incrocia le schede tecniche dei percorsi con presenze e iscrizioni e propone i più adatti alla data scelta. Il punteggio segue regole fisse: stagione e quota, tempo dall'ultima volta, partecipazione e varietà.</p>
+        <div class="form-grid next-filters">
+          <label>Data prevista<input type="date" id="nextDate" /></label>
+          <label>Difficoltà massima
+            <select id="nextDiff">
+              <option value="">Qualsiasi</option>
+              <option value="1">Facile</option>
+              <option value="2">Medio-Facile</option>
+              <option value="3.5">Medio</option>
+              <option value="4">Medio-Difficile</option>
+            </select>
+          </label>
+          <label>Dislivello massimo
+            <select id="nextDisl">
+              <option value="">Qualsiasi</option>
+              <option value="300">300 m</option>
+              <option value="500">500 m</option>
+              <option value="700">700 m</option>
+              <option value="900">900 m</option>
+            </select>
+          </label>
+          <label>Durata massima
+            <select id="nextOre">
+              <option value="">Qualsiasi</option>
+              <option value="3">3 ore</option>
+              <option value="4">4 ore</option>
+              <option value="5">5 ore</option>
+              <option value="6">6 ore</option>
+            </select>
+          </label>
+          <label>Ritrovo<select id="nextRitrovo"><option value="">Qualsiasi</option></select></label>
+        </div>
+        <div class="next-actions">
+          <label class="flag-label"><input type="checkbox" id="nextExclRecent" checked /> Escludi i percorsi fatti negli ultimi 12 mesi</label>
+          <button type="button" id="btnNextReset">Reimposta</button>
+          <button type="button" id="btnLoadNext" class="primary btn"><svg class="ico"><use href="#i-refresh"/></svg>Aggiorna</button>
+        </div>
+        <div id="nextStatusMsg" class="muted" style="font-size:0.82rem;margin-top:10px;">Dati dal foglio delle schede tecniche delle escursioni.</div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Proposte</h2>
+        <div class="route-list" id="nextList"><div class="empty-box">Nessun dato caricato.</div></div>
+        <button type="button" id="btnNextMore" hidden></button>
+      </section>
+
+      <section class="card">
+        <details class="collapsible" style="margin-top:0">
+          <summary>Tutti i percorsi (<span id="nextAllCount">0</span>)</summary>
+          <div class="collapsible-body">
+            <div class="table-wrap responsive">
+              <table>
+                <thead><tr><th>Percorso</th><th>Difficoltà</th><th>Km</th><th>Dislivello</th><th>Quota max</th><th>Ultima volta</th><th>Presenti (media)</th><th>Esito</th></tr></thead>
+                <tbody id="nextAllBody"><tr><td colspan="8" class="empty">Nessun dato caricato.</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
   </div>
 
   <div id="toastHost" class="toast-host" aria-live="polite"></div>
@@ -943,9 +1047,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.3.0" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.0" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.3.0" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.0" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2197,7 +2301,8 @@
     const MAIN_TABS = {
       soci: [byId("tabBtnSoci"), byId("viewSoci")],
       escursioni: [byId("tabBtnEscursioni"), byId("viewEscursioni")],
-      statistiche: [byId("tabBtnStats"), byId("viewStats")]
+      statistiche: [byId("tabBtnStats"), byId("viewStats")],
+      prossima: [byId("tabBtnNext"), byId("viewNext")]
     };
     function switchMainTab(which) {
       Object.entries(MAIN_TABS).forEach(([name, [btn, view]]) => {
@@ -2213,11 +2318,16 @@
         else renderStats();
         if (!excList.length) ensureEscursioni().then(renderStats).catch(() => {});
       }
+      if (which === "prossima") {
+        if (!schedeData) loadNextData();
+        else renderNext();
+      }
     }
 
     tabBtnSoci.addEventListener("click", () => switchMainTab("soci"));
     tabBtnEsc.addEventListener("click", () => switchMainTab("escursioni"));
     byId("tabBtnStats").addEventListener("click", () => switchMainTab("statistiche"));
+    byId("tabBtnNext").addEventListener("click", () => switchMainTab("prossima"));
     byId("btnLoadEscursioni").addEventListener("click", () => loadEscursioniFromServer());
     byId("btnExportExc").addEventListener("click", exportEscursioneCsv);
     byId("excSelect").addEventListener("change", renderEscursioni);
@@ -2586,6 +2696,365 @@
     byId("viewStats").addEventListener("change", (e) => { if (e.target.closest("[data-sa-person]")) updateStatsAddCount(); });
 
     // ===================================================================
+    //  Assistente "Prossima uscita": schede tecniche + presenze + form
+    // ===================================================================
+    let schedeData = null;         // { title, rows: [record del foglio] }
+    let schedeLoadPromise = null;
+    let nextShowAll = false;
+    let nextLastRanked = [];
+    const NEXT_FILTERS_KEY = "app35_next_filters_v1";
+    const ROUTE_STOP = new Set(["il", "lo", "la", "i", "gli", "le", "l", "di", "del", "della", "dello", "dei", "degli", "delle", "dell",
+      "e", "ed", "a", "al", "alla", "ai", "alle", "da", "dal", "in", "nel", "nella", "sul", "sulla", "su", "con", "per", "tra", "fra",
+      "monte", "m", "s", "lm", "lu", "pt", "ms", "pi", "li", "mo"]);
+    const DIFF_LABELS = { 1: "Facile", 2: "Medio-Facile", 3: "Medio", 3.5: "Medio+", 4: "Medio-Difficile", 5: "Difficile" };
+
+    function routeTokens(name) { return [...new Set(tokenizeName(name).filter(t => !ROUTE_STOP.has(t) && !/^\d+$/.test(t)))]; }
+    function routeMatches(tokA, nameB) {
+      const b = routeTokens(nameB);
+      if (!tokA.length || !b.length) return false;
+      const setB = new Set(b);
+      const common = tokA.filter(t => setB.has(t)).length;
+      if (!common) return false;
+      if (common / (tokA.length + b.length - common) >= 0.6) return true;
+      // Il nome più corto è tutto contenuto nell'altro ("Monte Fiocca" in "Il Monte Fiocca e il Passo Sella").
+      const short = Math.min(tokA.length, b.length), long = Math.max(tokA.length, b.length);
+      return common === short && (short >= 2 || long <= 2);
+    }
+
+    function firstNumber(s) {
+      const m = /(\d+(?:[.,]\d+)?)/.exec(String(s || ""));
+      return m ? parseFloat(m[1].replace(",", ".")) : null;
+    }
+    function parseMeters(s) {
+      const m = /(\d[\d.]*)\s*m\b/i.exec(String(s || "")) || /(\d[\d.]*)/.exec(String(s || ""));
+      return m ? parseInt(m[1].replace(/\./g, ""), 10) : null;
+    }
+    // "5.30 h" = 5 ore e 30 minuti; "4,5 h" = 4 ore e mezza; "7 h con pause" = 7.
+    function parseHours(s) {
+      const t = String(s || "");
+      const m = /(\d+)(?:\s*[.,:]\s*(\d{1,2}))?\s*(?:h|ore)/i.exec(t);
+      if (!m) return firstNumber(t);
+      const h = Number(m[1]);
+      if (!m[2]) return h;
+      return m[2].length === 2 ? h + Number(m[2]) / 60 : h + Number(m[2]) / 10;
+    }
+    function difficultyLevel(s) {
+      const t = String(s || "").toLowerCase().split("(")[0];
+      if (/medio\s*[-/]\s*difficile/.test(t)) return 4;
+      if (/medio\s*[-/]\s*facile/.test(t)) return 2;
+      if (/medio\s*\+/.test(t)) return 3.5;
+      if (/difficile/.test(t)) return 5;
+      if (/facile/.test(t)) return 1;
+      if (/medio/.test(t)) return 3;
+      return null;
+    }
+    function ritrovoLabel(s) {
+      const raw = String(s || "").trim();
+      if (!raw) return "";
+      const low = raw.toLowerCase();
+      const alias = (APP_CONFIG.ritrovoAlias || []).find(a => a.match.every(w => low.includes(w)));
+      if (alias) return alias.label;
+      return raw.replace(/^(il|la|lo|l'|i|gli|le|direttamente(\s+(a|in|nel))?)\s+/i, "")
+        .split(/\s+(?:alle?|per le)\s+ore\b|\s+ore\s+\d|[.(]/i)[0].trim().slice(0, 48);
+    }
+
+    function pickField(row, re) {
+      const k = Object.keys(row).find(h => re.test(h));
+      return k ? String(row[k] || "").trim() : "";
+    }
+
+    // Righe del foglio → percorsi unici (stesso nome in più anni = un percorso, dati dell'anno più recente).
+    function buildRoutes() {
+      const map = new Map();
+      (schedeData ? schedeData.rows : []).forEach(row => {
+        const nome = pickField(row, /^escursione|^nome|percorso/i);
+        if (!nome) return;
+        const anno = Number(pickField(row, /^anno/i)) || null;
+        const rec = {
+          nome, anno,
+          difficolta: pickField(row, /difficolt/i),
+          lunghezza: pickField(row, /lunghezza|km/i),
+          durata: pickField(row, /durata/i),
+          dislivello: pickField(row, /dislivello/i),
+          quotaMaxTxt: pickField(row, /quota\s*max/i),
+          quotaMinTxt: pickField(row, /quota\s*min/i),
+          partenza: pickField(row, /partenza/i),
+          ritrovo: pickField(row, /ritrovo/i),
+          descrizione: pickField(row, /descrizione/i)
+        };
+        const key = routeTokens(nome).sort().join(" ") || nome.toLowerCase();
+        const prev = map.get(key);
+        if (!prev) { map.set(key, Object.assign(rec, { key, years: anno ? [anno] : [] })); return; }
+        if (anno && !prev.years.includes(anno)) prev.years.push(anno);
+        if ((anno || 0) > (prev.anno || 0)) Object.assign(prev, rec, { key, years: prev.years });
+      });
+      return [...map.values()].map(r => Object.assign(r, {
+        tokens: routeTokens(r.nome),
+        level: difficultyLevel(r.difficolta),
+        km: firstNumber(r.lunghezza),
+        ore: parseHours(r.durata),
+        disl: parseMeters(r.dislivello),
+        quotaMax: parseMeters(r.quotaMaxTxt),
+        ritrovoLabel: ritrovoLabel(r.ritrovo),
+        years: r.years.sort((a, b) => a - b)
+      }));
+    }
+
+    // Uscite già fatte o in programma: presenze (foglio statistiche) + date dei form.
+    function buildEvents() {
+      const events = [];
+      if (statsData) {
+        aggregateStats("").excursions.forEach(e => {
+          const d = parseItDate(e.data);
+          if (d) events.push({ date: d, nome: e.nome, presenti: e.people.length, source: "stats" });
+        });
+      }
+      excList.forEach(esc => {
+        const d = parseItDate(formDateFromTitle(esc.titolo));
+        if (!d) return;
+        if (events.some(e => e.source === "stats" && e.date.getTime() === d.getTime())) return;
+        events.push({ date: d, nome: formatNomeUscita(esc.titolo), presenti: null, source: "form" });
+      });
+      return events.sort((a, b) => a.date - b.date);
+    }
+
+    function monthsBetween(a, b) {
+      return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()) - (b.getDate() < a.getDate() ? 1 : 0);
+    }
+    function fmtDateIt(d) { return d ? d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }) : ""; }
+
+    function readNextFilters() {
+      return {
+        date: byId("nextDate").value,
+        diff: byId("nextDiff").value,
+        disl: byId("nextDisl").value,
+        ore: byId("nextOre").value,
+        ritrovo: byId("nextRitrovo").value,
+        exclRecent: byId("nextExclRecent").checked
+      };
+    }
+    function defaultNextDate() {
+      const d = new Date(); d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + 14);
+      d.setDate(d.getDate() + ((7 - d.getDay()) % 7));   // la domenica successiva
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function applySavedNextFilters() {
+      const f = readJsonKey(NEXT_FILTERS_KEY, {});
+      byId("nextDate").value = defaultNextDate();
+      ["diff", "disl", "ore"].forEach(k => { if (f[k] !== undefined) byId("next" + k[0].toUpperCase() + k.slice(1)).value = f[k]; });
+      byId("nextExclRecent").checked = f.exclRecent !== false;
+    }
+
+    function rankRoutes() {
+      const f = readNextFilters();
+      const target = new Date((f.date || defaultNextDate()) + "T00:00:00");
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const month = target.getMonth();
+      const winter = [11, 0, 1, 2].includes(month), summer = [5, 6, 7].includes(month);
+      const routes = buildRoutes();
+      const events = buildEvents();
+      const past = events.filter(e => e.date < today);
+      const withPres = past.filter(e => e.presenti);
+      const globalAvg = withPres.length ? withPres.reduce((s, e) => s + e.presenti, 0) / withPres.length : null;
+
+      // Difficoltà delle ultime uscite fatte, per proporre un po' di varietà.
+      const lastLevels = [];
+      for (let i = past.length - 1; i >= 0 && lastLevels.length < 2; i--) {
+        const r = routes.find(x => routeMatches(x.tokens, past[i].nome));
+        if (r && r.level) lastLevels.push(r.level);
+      }
+
+      const ranked = routes.map(r => {
+        const mine = events.filter(e => routeMatches(r.tokens, e.nome));
+        const done = mine.filter(e => e.date < today);
+        const planned = mine.find(e => e.date >= today);
+        const lastDate = done.length ? done[done.length - 1].date : null;
+        const pres = done.filter(e => e.presenti);
+        const avgPres = pres.length ? pres.reduce((s, e) => s + e.presenti, 0) / pres.length : null;
+        const lastYear = r.years.length ? r.years[r.years.length - 1] : null;
+        // Senza una data registrata si stima a metà dell'anno della scheda.
+        const months = lastDate ? monthsBetween(lastDate, target) : (lastYear ? (target.getFullYear() - lastYear) * 12 + (target.getMonth() - 6) : null);
+
+        let score = 50;
+        const pros = [], cons = [], excluded = [];
+        if (r.quotaMax) {
+          if (winter && r.quotaMax > 1500) { score -= 30; cons.push(`quota alta d'inverno (${r.quotaMax} m): possibile neve`); }
+          else if (winter && r.quotaMax > 1200) { score -= 10; cons.push(`${r.quotaMax} m d'inverno: controllare neve e ghiaccio`); }
+          else if (winter && r.quotaMax < 1000) { score += 5; pros.push(`bassa quota (${r.quotaMax} m), adatta all'inverno`); }
+          if (summer && r.quotaMax < 700) { score -= 20; cons.push(`bassa quota d'estate (${r.quotaMax} m): caldo`); }
+          else if (summer && r.quotaMax > 1300) { score += 10; pros.push(`in quota d'estate (${r.quotaMax} m): più fresco`); }
+        }
+        if (lastDate) {
+          if (months < 12) { score -= 25; cons.push(months < 1 ? "fatta meno di un mese prima" : `fatta solo ${months} mesi prima`); }
+          else if (months >= 24) { score += 15; pros.push(`non si fa da ${Math.floor(months / 12)} anni`); }
+          else { score += 5; pros.push(`ultima volta ${months} mesi prima`); }
+        } else if (lastYear) {
+          if (months < 12) { score -= 15; cons.push(`già proposta nel ${lastYear}`); }
+          else if (months >= 24) { score += 10; pros.push(`proposta l'ultima volta nel ${lastYear}`); }
+          else { score += 3; pros.push(`proposta nel ${lastYear}`); }
+        } else { score += 10; pros.push("mai registrata: una novità"); }
+        if (avgPres !== null && globalAvg) {
+          const delta = Math.round(Math.max(-10, Math.min(15, (avgPres / globalAvg - 1) * 30)));
+          score += delta;
+          if (delta >= 3) pros.push(`molto partecipata: in media ${fmtNum(avgPres)} presenti (media generale ${fmtNum(globalAvg)})`);
+          else if (delta <= -3) cons.push(`poco partecipata: in media ${fmtNum(avgPres)} presenti (media generale ${fmtNum(globalAvg)})`);
+        }
+        if (r.level && lastLevels.length) {
+          if (lastLevels.length >= 2 && lastLevels.every(l => l === r.level)) { score -= 5; cons.push("stessa difficoltà delle ultime due uscite"); }
+          else if (lastLevels[0] !== r.level) { score += 5; pros.push(`difficoltà diversa dall'ultima uscita (${DIFF_LABELS[lastLevels[0]] || ""})`); }
+        }
+        score = Math.max(0, Math.min(100, Math.round(score)));
+
+        if (planned) excluded.push(`già in programma il ${fmtDateIt(planned.date)}`);
+        if (f.diff && r.level && r.level > Number(f.diff)) excluded.push("più difficile del filtro");
+        if (f.disl && r.disl !== null && r.disl > Number(f.disl)) excluded.push(`dislivello ${r.disl} m`);
+        if (f.ore && r.ore !== null && r.ore > Number(f.ore)) excluded.push(`durata ${fmtNum(r.ore)} h`);
+        if (f.ritrovo && r.ritrovoLabel !== f.ritrovo) excluded.push("altro ritrovo");
+        if (f.exclRecent && months !== null && months < 12) excluded.push(lastDate ? "fatta negli ultimi 12 mesi" : `già proposta nel ${lastYear}`);
+        return Object.assign({}, r, { score, pros, cons, excluded, lastDate, lastYear, avgPres, planned, history: done });
+      }).sort((a, b) => b.score - a.score || a.nome.localeCompare(b.nome, "it"));
+      return { ranked, target, hasStats: Boolean(statsData), hasForms: excList.length > 0 };
+    }
+
+    function chipsHtml(r) {
+      const lv = r.level ? String(r.level).replace(".", "-") : "x";
+      return `<div class="route-chips">
+        ${r.difficolta ? `<span class="chip diff-${lv}">${escapeHtml(r.difficolta)}</span>` : ""}
+        ${r.lunghezza ? `<span class="chip">${escapeHtml(r.lunghezza)}</span>` : ""}
+        ${r.dislivello ? `<span class="chip">↑ ${escapeHtml(r.dislivello)}</span>` : ""}
+        ${r.durata ? `<span class="chip">${icon("clock", "ico-sm")}${escapeHtml(r.durata)}</span>` : ""}
+        ${r.quotaMaxTxt ? `<span class="chip">max ${escapeHtml(r.quotaMaxTxt)}</span>` : ""}
+      </div>`;
+    }
+
+    function lastDoneText(r) {
+      if (r.lastDate) return `Ultima volta: <strong>${fmtDateIt(r.lastDate)}</strong>` + (r.avgPres !== null ? ` · in media <strong>${fmtNum(r.avgPres)}</strong> presenti` : "");
+      if (r.years.length) return `Proposta nel ${r.years.join(", ")} <span class="muted">(nessuna presenza registrata)</span>`;
+      return "Mai registrata";
+    }
+
+    function renderNext() {
+      if (!schedeData) return;
+      const sel = byId("nextRitrovo");
+      const want = sel.options.length > 1 ? sel.value : (readJsonKey(NEXT_FILTERS_KEY, {}).ritrovo || "");
+      const labels = [...new Set(buildRoutes().map(r => r.ritrovoLabel).filter(Boolean))].sort((a, b) => a.localeCompare(b, "it"));
+      sel.innerHTML = `<option value="">Qualsiasi</option>` + labels.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join("");
+      sel.value = labels.includes(want) ? want : "";
+      writeJsonKey(NEXT_FILTERS_KEY, readNextFilters());
+
+      const res = rankRoutes();
+      const ok = res.ranked.filter(r => !r.excluded.length);
+      nextLastRanked = res.ranked;
+      const shown = ok.slice(0, nextShowAll ? 20 : 5);
+      const season = ["inverno", "inverno", "primavera", "primavera", "primavera", "estate", "estate", "estate", "autunno", "autunno", "autunno", "inverno"][res.target.getMonth()];
+      byId("nextStatusMsg").innerHTML =
+        `${escapeHtml(schedeData.title)} · ${res.ranked.length} percorsi, ${ok.length} compatibili con i filtri · ` +
+        `uscita prevista ${escapeHtml(res.target.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" }))} (${season})` +
+        (res.hasStats ? "" : " · presenze non ancora caricate") +
+        (res.hasForms ? "" : " · form non ancora caricati");
+
+      byId("nextList").innerHTML = shown.length ? shown.map((r, i) => `
+        <article class="route-card">
+          <div class="route-head">
+            <span class="rank ${i < 3 ? "r" + (i + 1) : ""}">${i + 1}</span>
+            <div class="route-title"><h3>${escapeHtml(r.nome)}</h3><span class="sub">${escapeHtml(r.partenza)}${r.ritrovoLabel ? " · ritrovo " + escapeHtml(r.ritrovoLabel) : ""}</span></div>
+            <div class="route-score" style="--p:${r.score}" title="Punteggio su 100"><b>${r.score}</b></div>
+          </div>
+          ${chipsHtml(r)}
+          <ul class="reasons">
+            ${r.pros.map(t => `<li class="pro">${icon("check", "ico-sm")}<span>${escapeHtml(t)}</span></li>`).join("")}
+            ${r.cons.map(t => `<li class="con">${icon("alert", "ico-sm")}<span>${escapeHtml(t)}</span></li>`).join("")}
+          </ul>
+          <div class="route-meta">${lastDoneText(r)}</div>
+          ${r.descrizione || r.ritrovo ? `<details class="route-more"><summary>Descrizione e ritrovo</summary>
+            ${r.descrizione ? `<p>${escapeHtml(r.descrizione)}</p>` : ""}
+            ${r.ritrovo ? `<p><strong>Ritrovo:</strong> ${escapeHtml(r.ritrovo)}</p>` : ""}
+            ${r.history.length ? `<p><strong>Uscite registrate:</strong> ${r.history.map(e => fmtDateIt(e.date) + (e.presenti ? ` (${e.presenti} presenti)` : "")).join(", ")}</p>` : ""}
+          </details>` : ""}
+          <div class="route-actions"><button type="button" class="btn" data-next-copy="${res.ranked.indexOf(r)}">${icon("copy", "ico-sm")}Copia annuncio</button></div>
+        </article>`).join("") : `<div class="empty-box">Nessun percorso rispetta i filtri. Prova ad allargarli o togli "Escludi i percorsi fatti negli ultimi 12 mesi".</div>`;
+      const more = byId("btnNextMore");
+      more.hidden = ok.length <= 5;
+      more.textContent = nextShowAll ? "Mostra solo le prime 5" : `Mostra altre ${Math.min(ok.length, 20) - 5}`;
+
+      byId("nextAllCount").textContent = res.ranked.length;
+      byId("nextAllBody").innerHTML = res.ranked.map(r => `
+        <tr>
+          <td class="cell-main"><strong>${escapeHtml(r.nome)}</strong><span class="sub">${escapeHtml(r.partenza)}</span></td>
+          <td data-label="Difficoltà">${escapeHtml(r.difficolta)}</td>
+          <td class="num" data-label="Km">${r.km !== null ? fmtNum(r.km) : ""}</td>
+          <td class="num" data-label="Dislivello">${r.disl !== null ? r.disl + " m" : ""}</td>
+          <td class="num" data-label="Quota max">${r.quotaMax ? r.quotaMax + " m" : ""}</td>
+          <td data-label="Ultima volta">${r.lastDate ? fmtDateIt(r.lastDate) : (r.lastYear ? "nel " + r.lastYear : "—")}</td>
+          <td class="num" data-label="Presenti (media)">${r.avgPres !== null ? fmtNum(r.avgPres) : ""}</td>
+          <td data-label="Esito">${r.excluded.length ? `<span class="badge warn">${escapeHtml(r.excluded[0])}</span>` : `<span class="badge ok">${r.score}/100</span>`}</td>
+        </tr>`).join("") || `<tr><td colspan="8" class="empty">Nessun percorso nel foglio.</td></tr>`;
+    }
+
+    function routeAnnouncement(r) {
+      const f = readNextFilters();
+      const lines = [`🥾 ${r.nome.toUpperCase()}`];
+      if (f.date) lines.push(`📅 ${new Date(f.date + "T00:00:00").toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}`);
+      lines.push("");
+      if (r.difficolta) lines.push(`📊 Difficoltà: ${r.difficolta}`);
+      const tech = [r.lunghezza && `📏 ${r.lunghezza}`, r.dislivello && `⛰️ dislivello ${r.dislivello}`, r.durata && `⏱️ ${r.durata}`].filter(Boolean);
+      if (tech.length) lines.push(tech.join(" · "));
+      if (r.quotaMaxTxt) lines.push(`🏔️ Quota massima: ${r.quotaMaxTxt}`);
+      if (r.partenza) lines.push(`📍 Partenza: ${r.partenza}`);
+      if (r.ritrovo) lines.push(`🚗 Ritrovo: ${r.ritrovo}`);
+      if (r.descrizione) lines.push("", r.descrizione);
+      return lines.join("\n");
+    }
+
+    function loadNextData() {
+      if (schedeLoadPromise) return schedeLoadPromise;
+      const btn = byId("btnLoadNext");
+      const msg = byId("nextStatusMsg");
+      setBusy(btn, true);
+      msg.textContent = "Lettura delle schede tecniche…";
+      schedeLoadPromise = (async () => {
+        try {
+          schedeData = await AppData.loadSchede();
+          renderNext();
+          // Presenze e form arricchiscono le proposte, ma non sono indispensabili.
+          const extra = [];
+          if (!statsData) extra.push(ensureStats().catch(() => {}));
+          if (!excList.length) extra.push(ensureEscursioni().catch(() => {}));
+          if (extra.length) Promise.all(extra).then(renderNext);
+        } catch (err) {
+          if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+          msg.textContent = "Errore: " + ((err && err.message) || err);
+          byId("nextList").innerHTML = `<div class="empty-box">Schede tecniche non disponibili.</div>`;
+        } finally {
+          setBusy(btn, false);
+          schedeLoadPromise = null;
+        }
+      })();
+      return schedeLoadPromise;
+    }
+
+    applySavedNextFilters();
+    byId("btnLoadNext").addEventListener("click", () => loadNextData());
+    byId("viewNext").addEventListener("change", (e) => {
+      if (e.target.closest(".next-filters, #nextExclRecent")) { nextShowAll = false; renderNext(); }
+    });
+    byId("btnNextReset").addEventListener("click", () => {
+      byId("nextDate").value = defaultNextDate();
+      ["nextDiff", "nextDisl", "nextOre", "nextRitrovo"].forEach(id => { byId(id).value = ""; });
+      byId("nextExclRecent").checked = true;
+      nextShowAll = false;
+      renderNext();
+    });
+    byId("btnNextMore").addEventListener("click", () => { nextShowAll = !nextShowAll; renderNext(); });
+    byId("viewNext").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-next-copy]");
+      if (!b) return;
+      const r = nextLastRanked[Number(b.getAttribute("data-next-copy"))];
+      if (r) copyText(routeAnnouncement(r), "Annuncio copiato: incollalo su Telegram, WhatsApp o nell'email");
+    });
+
+    // ===================================================================
     //  Aggiornamenti dell'app: notifica e "Novità"
     // ===================================================================
     const SEEN_VERSION_KEY = "app35_seen_version_v1";
@@ -2859,6 +3328,6 @@
         .trim();
     }
 </script>
-<script src="js/app.js?v=2.3.0"></script>
+<script src="js/app.js?v=2.4.0"></script>
 </body>
 </html>
