@@ -31,7 +31,6 @@ Una web app installabile su PC, Android e Chromebook, collegata direttamente ai 
 - [Prima configurazione](#%EF%B8%8F-prima-configurazione)
 - [Struttura del progetto](#-struttura-del-progetto)
 - [Risoluzione dei problemi](#-risoluzione-dei-problemi)
-- [Vecchia versione con server.py](#-vecchia-versione-con-serverpy)
 
 ---
 
@@ -270,12 +269,7 @@ app-direttivo-3-5/
 │       ├── clouddb.js                 # Database condiviso e coda delle modifiche
 │       ├── app.js                     # Collegamento tra pagina, login e database
 │       └── demo.js                    # Dati finti per la modalità ?demo=1
-├── SETUP-GOOGLE.md                    # Guida per creare il Client ID
-│
-│   # Vecchia versione locale (in dismissione)
-├── gestione-soci-associazione.html
-├── server.py · updater.py · VERSION · avvia-soci.sh
-└── config.example.json · escursioni_config.example.json
+└── SETUP-GOOGLE.md                    # Guida per creare il Client ID
 ```
 
 ---
@@ -292,16 +286,3 @@ app-direttivo-3-5/
 | *⚠ accedi per salvare* | La sessione è scaduta: clicca l'avviso e accedi, le modifiche in coda vengono salvate |
 | *⚠ Offline* | Le modifiche restano in coda e partono appena torna la connessione |
 | Non vedo le modifiche di un altro | Premi **Aggiorna dati** |
-
----
-
-## 🗃️ Vecchia versione con server.py
-
-La versione precedente (pagina locale + `server.py` + vecchia Web App pubblica) resta nel repository finché il direttivo non è passato alla nuova app. Per usarla:
-
-```bash
-cp config.example.json config.json   # inserisci l'URL della vecchia Web App
-python server.py                     # poi apri http://localhost:8000/gestione-soci-associazione.html
-```
-
-**Per portare nella nuova app le spunte e le note salvate con la vecchia versione:** con `server.py` avviato apri **http://localhost:8000/docs/** sullo stesso browser in cui le avevi messe e accedi: l'app propone di caricarle nel database condiviso.

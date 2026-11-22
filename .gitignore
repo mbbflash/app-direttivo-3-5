@@ -1,10 +1,3 @@
-# Configurazione con URL privati (non versionare)
-config.json
-escursioni_config.json
-
-# Backup creati dagli aggiornamenti automatici
-backup/
-
 # Python
 __pycache__/
 *.pyc

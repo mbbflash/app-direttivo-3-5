@@ -80,5 +80,3 @@ Oggi **Libro Soci**, **database** e **fogli delle escursioni** sono condivisi co
 Per ciascun foglio: **Condividi** → *Accesso generale* → **Con limitazioni** → **Fine**.
 
 Poi disattiva la vecchia Web App di Apps Script (**Esegui il deployment** → **Gestisci deployment** → **Archivia**), che oggi restituisce i dati dei soci a chiunque ne conosca l'indirizzo.
-
-> ⚠️ Fallo solo quando il direttivo usa già la nuova app: la vecchia versione con `server.py` smetterà di funzionare.
