@@ -4,12 +4,15 @@
 
 **Gestione soci, tessere ed escursioni per il direttivo dell'associazione**
 
-Una web app locale, in sola lettura, collegata ai Fogli Google dell'associazione.
+Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
-![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)
-![Dipendenze](https://img.shields.io/badge/dipendenze-nessuna-brightgreen)
-![Modalità](https://img.shields.io/badge/modalit%C3%A0-sola%20lettura-blue)
-![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20macOS%20%7C%20Linux-supportati-lightgrey)
+[![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
+![Versione](https://img.shields.io/badge/versione-2.0.0-blue)
+![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
+![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
+
+**👉 https://mbbflash.github.io/app-direttivo-3-5/**
 
 </div>
 
@@ -19,23 +22,28 @@ Una web app locale, in sola lettura, collegata ai Fogli Google dell'associazione
 
 - [Cos'è](#-cosè)
 - [Funzionalità](#-funzionalità)
-- [Avvio rapido](#-avvio-rapido)
-- [Configurazione](#%EF%B8%8F-configurazione)
-- [Dove finiscono i dati](#-dove-finiscono-i-dati)
+- [Come si usa](#-come-si-usa)
+- [Installarla come app](#-installarla-come-app)
+- [Dove finiscono i dati](#%EF%B8%8F-dove-finiscono-i-dati)
+- [Sicurezza](#-sicurezza)
 - [Aggiornamenti](#-aggiornamenti)
 - [Come funziona](#-come-funziona)
+- [Prima configurazione](#%EF%B8%8F-prima-configurazione)
 - [Struttura del progetto](#-struttura-del-progetto)
 - [Risoluzione dei problemi](#-risoluzione-dei-problemi)
+- [Vecchia versione con server.py](#-vecchia-versione-con-serverpy)
 
 ---
 
 ## 💡 Cos'è
 
-**APP Direttivo 3/5** permette ai membri del direttivo di consultare in un'unica pagina il **Libro Soci e Volontari** e le **iscrizioni alle escursioni** raccolte con i Google Form.
+**APP Direttivo 3/5** permette ai membri del direttivo di consultare in un'unica pagina il **Libro Soci e Volontari** e le **iscrizioni alle escursioni** raccolte con i Google Form, e di tenere traccia insieme di **tessere cartacee, note e conferme**.
 
-- 🔒 **Sola lettura**: non modifica mai i Fogli Google.
-- 💻 **Tutto in locale**: gira sul tuo computer, raggiungibile solo da te (`127.0.0.1`).
-- 📦 **Zero installazioni**: serve solo Python 3, senza librerie aggiuntive.
+- 🔐 **Accesso con Google**: si entra con l'account dell'associazione, niente link pubblici.
+- 🤝 **Dati condivisi**: spunte e note finiscono in un foglio Google comune, visibili a tutto il direttivo.
+- 📱 **Ovunque**: funziona da browser e si installa come app su PC, Android, Chromebook e iPhone.
+- 🔄 **Sempre aggiornata**: ogni nuova versione arriva da sola, senza scaricare niente.
+- 📦 **Niente da installare**: niente Python, niente server, niente file di configurazione.
 
 ---
 
@@ -45,14 +53,14 @@ Una web app locale, in sola lettura, collegata ai Fogli Google dell'associazione
 
 | Funzione | Cosa fa |
 |---|---|
-| **Caricamento dal Foglio** | Con *Carica da Foglio* legge l'elenco aggiornato di soci e volontari dalla Web App Google |
+| **Caricamento automatico** | Dopo l'accesso legge il Libro Soci direttamente dal Foglio Google; *Aggiorna dati* lo rilegge |
 | **Cruscotto** | Contatori di record totali, tessere **attive**, **in scadenza** (≤ 30 giorni) e **scadute / da rinnovare** |
 | **Ricerca libera** | Cerca per nome, cognome, n° tessera, email, telefono, codice fiscale o città |
 | **Filtro per tipologia** | Filtra per tipo di tessera (l'elenco si crea in automatico dai dati) |
 | **Filtro per stato** | Non scadute · Solo attive · In scadenza · Scadute · Tutti |
 | **Filtro tessere cartacee** | *Da preparare* · *Preparata, da consegnare* · *Consegnata* |
 | **Tabella ordinabile** | Clic sull'intestazione per ordinare per tessera, nome, data tesseramento, scadenza, giorni rimanenti, stato o tipo |
-| **Colonne** | Tessera, socio, tessera cartacea, tesseramento, scadenza, giorni (GG), stato, solleciti, note, nota locale, tipo tessera |
+| **Colonne** | Tessera, socio, tessera cartacea, tesseramento, scadenza, giorni (GG), stato, solleciti, note, nota, tipo tessera |
 | **Calcolo scadenze** | Calcola i giorni alla scadenza e assegna lo stato con badge colorati |
 | **Reset filtri** | Riporta ricerca e filtri alla situazione iniziale |
 
@@ -63,19 +71,19 @@ Cliccando su un nominativo si apre la scheda personale con:
 - 📋 tutti i dati del socio presenti nel Libro Soci;
 - 📞 pulsante **Chiama** (link `tel:`) e ✉️ **Invia email** (link `mailto:`);
 - 🥾 **curriculum escursioni**: a quali uscite ha partecipato e quante sono;
-- ✅ spunte **Preparata** / **Consegnata** per la tessera cartacea;
-- 📝 una **nota locale** personale, salvata nel browser e inclusa nell'export CSV.
+- ✅ spunte **Preparata** / **Consegnata** per la tessera cartacea, **condivise con il direttivo**;
+- 📝 una **nota** sul socio, **condivisa con il direttivo** e inclusa nell'export CSV.
 
 ### 🗺️ Escursioni (Form)
 
 | Funzione | Cosa fa |
 |---|---|
-| **Elenco uscite** | Carica tutte le escursioni dai fogli risposte dei Google Form e le mostra in un menu |
+| **Elenco uscite automatico** | Trova da solo nel Drive tutti i fogli risposte *"Form Iscrizione …"*, anche quelli nuovi |
 | **Adesioni** | Tabella dei partecipanti all'uscita scelta, con contatti, stato socio e n° di escursioni fatte |
 | **Ricerca partecipanti** | Cerca per nome, email o telefono |
 | **Statistiche uscita** | Adesioni nel foglio, quanti sono **già soci**, partecipanti unici |
 | **Abbinamento al Libro Soci** | Riconosce i soci da email, telefono o nome e cognome (anche in ordine invertito) |
-| **Conferma e note** | Spunta di conferma e nota locale per ogni partecipante |
+| **Note per partecipante** | Nota su ogni iscritto all'uscita, **condivisa con il direttivo** |
 | **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli |
 
 ### 🚨 Avvisi uscita
@@ -92,83 +100,49 @@ Per ogni escursione l'app segnala in automatico cosa controllare:
 - ✉️ **Apri in posta (CCN)**: apre il programma di posta con destinatari, oggetto e testo già pronti;
 - 📝 **Modelli di testo**: *annullamento escursione* o *informazioni utili*, da copiare con un clic.
 
+### 🤝 Lavoro di squadra
+
+- 💾 spunte, note e conferme salvate nel **database condiviso** su Google Fogli;
+- 🕓 per ogni modifica: **chi** l'ha fatta (il nome che scrivi nel campo *Il tuo nome*) e **quando**, più uno storico completo nella scheda `Log`;
+- 🔁 tornando sull'app dopo qualche minuto vedi le modifiche fatte dagli altri;
+- 📶 **offline o sessione scaduta**: le modifiche restano in coda sul dispositivo e vengono salvate appena possibile (indicatore *● modifiche da salvare*).
+
 ### 🔔 Notifiche
 
 - Notifiche del browser quando arrivano **nuove iscrizioni** a un'uscita (da attivare con *Attiva notifiche browser*).
 
-### 🔄 Aggiornamenti automatici
-
-- All'apertura l'app controlla se su GitHub c'è una **nuova versione** e la propone con le note delle novità;
-- **Aggiorna ora** scarica e installa la nuova versione e riavvia l'app da sola;
-- **Più tardi** o **Salta questa versione** per rimandare;
-- clic sul numero di versione (es. `v1.1.0`) accanto al titolo per controllare in qualsiasi momento.
-
 ### 💾 Import / Export
 
-- **Esporta CSV** dell'elenco soci, comprese le note locali;
+- **Esporta CSV** dell'elenco soci, comprese le note;
 - **Importa CSV locale** per consultare un file senza collegarsi ai Fogli Google.
 
 ---
 
-## 🚀 Avvio rapido
+## 🚀 Come si usa
 
-> **Serve:** Python 3 e una connessione a internet.
+1. Apri **https://mbbflash.github.io/app-direttivo-3-5/**
+2. Premi **Accedi con Google** e scegli **trequintitrekking@gmail.com**
+3. Scrivi il tuo nome nel campo **Il tuo nome**: comparirà nello storico delle modifiche
+4. Fatto: soci e database si caricano da soli. Le escursioni si caricano aprendo la scheda **Escursioni**.
 
-```bash
-# 1. Scarica il progetto
-git clone https://github.com/mbbflash/app-direttivo-3-5.git
-cd app-direttivo-3-5
+L'accesso dura circa un'ora; quando scade l'app chiede di accedere di nuovo con un clic.
+**Esci** chiude la sessione e cancella dal dispositivo tutti i dati in cache.
 
-# 2. Crea i file di configurazione (vedi sotto) e inserisci gli URL
-cp config.example.json config.json
-cp escursioni_config.example.json escursioni_config.json
-
-# 3. Avvia
-python server.py          # Windows
-./avvia-soci.sh           # macOS / Linux
-```
-
-Poi apri nel browser 👉 **http://localhost:8000/gestione-soci-associazione.html**
-
-Per fermare l'app premi `CTRL + C` nel terminale.
-
-> [!WARNING]
-> Non aprire il file HTML con un doppio clic (`file:///…`): senza il server i dati non si caricano.
+> [!TIP]
+> Vuoi solo dare un'occhiata? Apri **https://mbbflash.github.io/app-direttivo-3-5/?demo=1**: modalità demo con dati inventati, nessun accesso a Google.
 
 ---
 
-## ⚙️ Configurazione
+## 📲 Installarla come app
 
-Gli indirizzi dei Fogli Google **non sono nel repository** per proteggere i dati dei soci. Vanno messi in due file locali, già esclusi da git:
+| Dispositivo | Come |
+|---|---|
+| **Android** | Apri il link in Chrome → menu ⋮ → **Installa app** (o *Aggiungi a schermata Home*) |
+| **Chromebook** | Apri il link in Chrome → icona **Installa** nella barra degli indirizzi |
+| **Windows / macOS** | Chrome o Edge → icona **Installa** nella barra degli indirizzi: compare nel menu Start / Launchpad |
+| **iPhone / iPad** | Safari → **Condividi** → **Aggiungi alla schermata Home** |
 
-| File | Contenuto | Obbligatorio |
-|---|---|---|
-| `config.json` | URL della Web App Google Apps Script (`web_app_url`) | ✅ Sì |
-| `escursioni_config.json` | Elenco dei fogli escursioni, usato come riserva | ➖ Facoltativo |
-
-**`config.json`**
-```json
-{
-  "web_app_url": "https://script.google.com/macros/s/ID_DEPLOYMENT/exec"
-}
-```
-
-In alternativa a `config.json` puoi impostare la variabile d'ambiente `SOCI_WEB_APP_URL`.
-
-**`escursioni_config.json`**
-```json
-[
-  {
-    "id": "esc-1",
-    "titolo": "Escursione 1",
-    "data": "",
-    "url": "https://docs.google.com/spreadsheets/d/ID_FOGLIO/edit?gid=0#gid=0"
-  }
-]
-```
-
-> [!IMPORTANT]
-> Chiedi gli URL al presidente o a chi gestisce i Fogli e **non pubblicarli mai**: chiunque li abbia può leggere i dati dei soci.
+L'app installata si apre a schermo intero, con la sua icona, come un programma normale.
 
 ---
 
@@ -176,68 +150,68 @@ In alternativa a `config.json` puoi impostare la variabile d'ambiente `SOCI_WEB_
 
 | Dato | Dove sta | Condiviso con il direttivo? |
 |---|---|---|
-| Soci ed escursioni | Fogli Google, letti ogni volta dal server | ✅ Sì, è la fonte comune |
-| Spunte tessere cartacee | `localStorage` del tuo browser | ❌ No, solo sul tuo PC |
-| Note locali e conferme | `localStorage` del tuo browser | ❌ No, solo sul tuo PC |
-| URL privati | `config.json`, `escursioni_config.json` | ❌ No, da passare a mano |
+| Soci | Foglio *2 - Libro Soci e Volontari* (solo lettura) | ✅ Sì, è la fonte comune |
+| Iscrizioni escursioni | Fogli *Form Iscrizione …* (solo lettura) | ✅ Sì |
+| Spunte tessere cartacee | Foglio *NON TOCCARE - DATABASE APP DI GESTIONE* → `Tessere` | ✅ Sì |
+| Note sui soci | Database → `Note` | ✅ Sì |
+| Note e conferme escursioni | Database → `Conferme_Escursioni` | ✅ Sì |
+| Storico modifiche | Database → `Log` | ✅ Sì |
+| Cache e modifiche in coda | Browser del dispositivo | ❌ No, cancellate con **Esci** |
 
-> [!NOTE]
-> Ogni membro del direttivo vede solo le proprie spunte e note. Cambiando browser o computer si ripartono da zero: usa **Esporta CSV** per conservarle.
+> [!IMPORTANT]
+> Non modificare a mano il foglio *NON TOCCARE - DATABASE APP DI GESTIONE*: lo gestisce l'app.
+
+---
+
+## 🔒 Sicurezza
+
+- I dati si leggono **solo dopo il login** con l'account abilitato (`trequintitrekking@gmail.com`): un altro account viene rifiutato.
+- L'app usa i permessi di quell'account: **chi non ha accesso ai fogli non vede niente**, anche conoscendo l'indirizzo dell'app.
+- Il codice è pubblico ma **non contiene dati né indirizzi dei fogli**: l'app li cerca per nome nel Drive dell'account.
+- Il token di accesso dura al massimo un'ora e resta solo sul dispositivo; **Esci** lo revoca.
+
+> [!WARNING]
+> Completa la sicurezza togliendo la condivisione *"Chiunque abbia il link"* dai fogli e disattivando la vecchia Web App: vedi la fine di [SETUP-GOOGLE.md](SETUP-GOOGLE.md).
 
 ---
 
 ## 🔄 Aggiornamenti
 
-### Per chi usa l'app
+**Non serve fare niente.** Con internet l'app carica sempre l'ultima versione pubblicata; senza internet apre l'ultima copia salvata.
 
-Quando esce una nuova versione, all'apertura compare un avviso in cima alla pagina:
+### Per chi sviluppa
 
-1. leggi le novità e premi **Aggiorna ora**;
-2. l'app scarica l'ultima release da GitHub, salva i file attuali in `backup/` e si riavvia;
-3. la pagina si ricarica da sola con la nuova versione.
-
-Non vengono mai toccati `config.json`, `escursioni_config.json`, le spunte e le note salvate nel browser.
-
-> [!TIP]
-> Se qualcosa non va, i file della versione precedente sono in `backup/v<versione>_<data>/`: basta copiarli di nuovo nella cartella dell'app.
-
-> [!NOTE]
-> Se la cartella è un clone git (contiene `.git`), l'app avvisa della nuova versione ma non la installa: aggiorna con `git pull`.
-
-### Per chi sviluppa: pubblicare una nuova versione
-
-L'app propone un aggiornamento **solo quando viene pubblicata una Release** su GitHub, non a ogni commit.
-
-```bash
-# 1. Aumenta il numero di versione
-echo 1.2.0 > VERSION
-
-# 2. Commit e push
-git commit -am "Versione 1.2.0"
-git push
-
-# 3. Pubblica la release (il tag deve corrispondere a VERSION)
-gh release create v1.2.0 --title "v1.2.0" --notes "- Novità 1
-- Correzione 2"
-```
-
-Le note della release sono quelle che il direttivo vede nell'avviso di aggiornamento.
+Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js`.
 
 ---
 
 ## 🔧 Come funziona
 
 ```
- Browser  ──►  server.py (localhost:8000)  ──►  Web App Google Apps Script  ──►  Fogli Google
-                    │
-                    └──►  esportazione CSV dei fogli escursioni (riserva)
+ App (browser / app installata)
+        │  1. Accedi con Google  →  token dell'account dell'associazione
+        ├──►  Google Drive API   →  trova i fogli per nome
+        ├──►  Google Sheets API  →  legge Libro Soci ed escursioni
+        └──►  Google Sheets API  →  legge e scrive il database condiviso
 ```
 
-- `GET /api/soci` → elenco soci dalla Web App
-- `GET /api/escursioni` → iscrizioni alle escursioni dalla Web App; se non risponde, legge i fogli indicati in `escursioni_config.json`
-- `GET /api/version` → versione installata
-- `GET /api/update/check` → confronta la versione installata con l'ultima Release su GitHub
-- `POST /api/update/install` → scarica e installa l'ultima Release, poi riavvia il server
+Nessun server intermedio: il browser parla direttamente con Google.
+
+Permessi richiesti all'account:
+
+| Permesso | Perché |
+|---|---|
+| `spreadsheets` | Leggere Libro Soci ed escursioni, scrivere nel database |
+| `drive.metadata.readonly` | Trovare i fogli per nome (solo nomi, non il contenuto di altri file) |
+| `email` | Controllare che l'account sia quello abilitato |
+
+---
+
+## ⚙️ Prima configurazione
+
+Va fatta **una volta sola**: creare il *Client ID* Google per il login. Istruzioni passo passo in **[SETUP-GOOGLE.md](SETUP-GOOGLE.md)**.
+
+Le impostazioni dell'app sono in [`docs/js/config.js`](docs/js/config.js): Client ID, account abilitati e nomi dei fogli da cercare.
 
 ---
 
@@ -245,16 +219,23 @@ Le note della release sono quelle che il direttivo vede nell'avviso di aggiornam
 
 ```
 app-direttivo-3-5/
-├── gestione-soci-associazione.html   # Interfaccia web
-├── server.py                         # Server locale e API
-├── updater.py                        # Aggiornamenti automatici da GitHub
-├── VERSION                           # Versione installata
-├── avvia-soci.sh                     # Avvio rapido macOS / Linux
-├── config.example.json               # Modello per config.json
-├── escursioni_config.example.json    # Modello per escursioni_config.json
-├── config.json                       # 🔒 locale, escluso da git
-├── escursioni_config.json            # 🔒 locale, escluso da git
-└── backup/                           # 🔒 copie create dagli aggiornamenti, escluso da git
+├── docs/                              # 🌐 App web (pubblicata su GitHub Pages)
+│   ├── index.html                     # Interfaccia
+│   ├── manifest.webmanifest           # Dati per installarla come app
+│   ├── sw.js                          # Funzionamento offline e aggiornamenti
+│   ├── icons/                         # Icone dell'app
+│   └── js/
+│       ├── config.js                  # Impostazioni (Client ID, nomi dei fogli)
+│       ├── google.js                  # Accesso Google, Drive e Sheets
+│       ├── clouddb.js                 # Database condiviso e coda delle modifiche
+│       ├── app.js                     # Collegamento tra pagina, login e database
+│       └── demo.js                    # Dati finti per la modalità ?demo=1
+├── SETUP-GOOGLE.md                    # Guida per creare il Client ID
+│
+│   # Vecchia versione locale (in dismissione)
+├── gestione-soci-associazione.html
+├── server.py · updater.py · VERSION · avvia-soci.sh
+└── config.example.json · escursioni_config.example.json
 ```
 
 ---
@@ -263,11 +244,24 @@ app-direttivo-3-5/
 
 | Problema | Soluzione |
 |---|---|
-| `URL della Web App mancante` all'avvio | Crea `config.json` partendo da `config.example.json` |
-| La pagina non si apre | Controlla che il terminale con `server.py` sia ancora aperto |
-| Errore porta 8000 già in uso | L'app è già avviata in un'altra finestra: chiudila o usa quella |
-| *Errore caricamento Foglio* | Controlla la connessione e che l'URL in `config.json` sia giusto |
-| Escursione *Impossibile leggere il foglio* | Il foglio dev'essere condiviso con chiunque abbia il link |
-| *Controllo aggiornamenti non riuscito* | Serve internet; l'app funziona comunque, riprova più tardi |
-| Dopo un aggiornamento l'app non riparte | Chiudi il terminale e avvia di nuovo `server.py`; i vecchi file sono in `backup/` |
-| `python` non trovato su Windows | Installa Python da [python.org](https://www.python.org/downloads/) spuntando *Add to PATH* |
+| *Manca il Client ID Google* | Segui [SETUP-GOOGLE.md](SETUP-GOOGLE.md) |
+| *Google non ha verificato questa app* | Normale: **Avanzate** → **Vai a APP Direttivo 3/5** |
+| *Il browser ha bloccato la finestra di accesso* | Consenti i popup per il sito e riprova |
+| *Questo account non è abilitato* | Esci da Google e accedi con `trequintitrekking@gmail.com` |
+| *Foglio … non trovato nel Drive* | Il foglio è stato rinominato o spostato: il nome deve corrispondere a quello in `config.js` |
+| *⚠ accedi per salvare* | La sessione è scaduta: clicca l'avviso e accedi, le modifiche in coda vengono salvate |
+| *⚠ Offline* | Le modifiche restano in coda e partono appena torna la connessione |
+| Non vedo le modifiche di un altro | Premi **Aggiorna dati** |
+
+---
+
+## 🗃️ Vecchia versione con server.py
+
+La versione precedente (pagina locale + `server.py` + vecchia Web App pubblica) resta nel repository finché il direttivo non è passato alla nuova app. Per usarla:
+
+```bash
+cp config.example.json config.json   # inserisci l'URL della vecchia Web App
+python server.py                     # poi apri http://localhost:8000/gestione-soci-associazione.html
+```
+
+**Per portare nella nuova app le spunte e le note salvate con la vecchia versione:** con `server.py` avviato apri **http://localhost:8000/docs/** sullo stesso browser in cui le avevi messe e accedi: l'app propone di caricarle nel database condiviso.
