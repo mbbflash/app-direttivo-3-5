@@ -92,8 +92,8 @@
 
   function cacheMaps() {
     try {
-      localStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
-      localStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
+      appStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
+      appStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
     } catch (e) {}
     saveExcLocalState();
   }
@@ -102,7 +102,7 @@
   // e le note salvate dalla vecchia versione (solo locale) dell'app.
   function migrateLocal(cloud) {
     let done = false;
-    try { done = localStorage.getItem(MIGRATED_KEY) === "1"; } catch (e) {}
+    try { done = appStorage.getItem(MIGRATED_KEY) === "1"; } catch (e) {}
     if (done) return;
     const extra = {
       paper: Object.keys(paperCards).filter(k => !(k in cloud.paper)),
@@ -118,7 +118,7 @@
       extra.note.forEach(k => { cloud.note[k] = localNotes[k]; CloudDB.note(k, localNotes[k]); });
       extra.exc.forEach(k => { cloud.exc[k] = excLocalState[k]; CloudDB.exc(k, excLocalState[k]); });
     }
-    try { localStorage.setItem(MIGRATED_KEY, "1"); } catch (e) {}
+    try { appStorage.setItem(MIGRATED_KEY, "1"); } catch (e) {}
   }
 
   async function loadCloud() {
@@ -186,7 +186,7 @@
     await GoogleApi.signOut();
     // Sul dispositivo non deve restare nessun dato dei soci.
     [STORAGE_KEY, PAPER_CARDS_KEY, LOCAL_NOTES_KEY, EXC_LOCAL_KEY, "app35_pending_v1"].forEach(k => {
-      try { localStorage.removeItem(k); } catch (e) {}
+      try { appStorage.removeItem(k); } catch (e) {}
     });
     location.reload();
   }

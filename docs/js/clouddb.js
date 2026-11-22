@@ -25,12 +25,12 @@
 
   function readPending() {
     try {
-      const p = JSON.parse(localStorage.getItem(PENDING_KEY) || "{}");
+      const p = JSON.parse(appStorage.getItem(PENDING_KEY) || "{}");
       return p && typeof p === "object" ? p : {};
     } catch (e) { return {}; }
   }
   function savePending() {
-    try { localStorage.setItem(PENDING_KEY, JSON.stringify(pending)); } catch (e) {}
+    try { appStorage.setItem(PENDING_KEY, JSON.stringify(pending)); } catch (e) {}
   }
   function pendingCount() { return Object.keys(pending).length; }
 
@@ -55,10 +55,10 @@
   function nowIt() { return new Date().toLocaleString("it-IT"); }
 
   function operator() {
-    try { return localStorage.getItem(OPERATOR_KEY) || ""; } catch (e) { return ""; }
+    try { return appStorage.getItem(OPERATOR_KEY) || ""; } catch (e) { return ""; }
   }
   function setOperator(name) {
-    try { localStorage.setItem(OPERATOR_KEY, String(name || "").trim()); } catch (e) {}
+    try { appStorage.setItem(OPERATOR_KEY, String(name || "").trim()); } catch (e) {}
   }
   function who() {
     const email = window.GoogleApi.email();

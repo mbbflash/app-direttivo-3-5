@@ -62,7 +62,7 @@
     if (isDemo) {
       await loadScript("js/demo.js");
     }
-    const saved = readJson(localStorage, TOKEN_KEY);
+    const saved = readJson(appStorage, TOKEN_KEY);
     if (saved && saved.expires_at > Date.now() + 60000) token = saved;
     if (!isDemo && isConfigured()) loadGis().catch(() => {});
     return { signedIn: tokenValid(), email: token ? token.email : "" };
@@ -108,14 +108,14 @@
       throw new Error("Questo account (" + (email || "sconosciuto") + ") non è abilitato. Accedi con " + allowed.join(" oppure ") + ".");
     }
     token.email = email;
-    writeJson(localStorage, TOKEN_KEY, token);
+    writeJson(appStorage, TOKEN_KEY, token);
     return { email };
   }
 
   async function signOut() {
     const t = token;
     token = null;
-    writeJson(localStorage, TOKEN_KEY, null);
+    writeJson(appStorage, TOKEN_KEY, null);
     if (t && !isDemo && window.google && google.accounts && google.accounts.oauth2) {
       try { google.accounts.oauth2.revoke(t.access_token, () => {}); } catch (e) {}
     }
@@ -124,7 +124,7 @@
   async function apiJson(url, options = {}) {
     if (!tokenValid()) {
       token = null;
-      writeJson(localStorage, TOKEN_KEY, null);
+      writeJson(appStorage, TOKEN_KEY, null);
       throw new AuthError("Sessione Google scaduta: accedi di nuovo.");
     }
     const opts = Object.assign({ method: "GET" }, options);
@@ -143,7 +143,7 @@
     }
     if (res.status === 401) {
       token = null;
-      writeJson(localStorage, TOKEN_KEY, null);
+      writeJson(appStorage, TOKEN_KEY, null);
       throw new AuthError("Sessione Google scaduta: accedi di nuovo.");
     }
     const text = await res.text();
@@ -184,20 +184,20 @@
   }
 
   async function findSpreadsheetId(name) {
-    const cache = readJson(localStorage, FILE_CACHE_KEY) || {};
+    const cache = readJson(appStorage, FILE_CACHE_KEY) || {};
     if (cache[name]) return cache[name];
     const files = await listSpreadsheets("name = " + driveQuoted(name));
     if (!files.length) throw new Error(`Foglio "${name}" non trovato nel Drive dell'account.`);
     files.sort((a, b) => Number(b.ownedByMe) - Number(a.ownedByMe));
     cache[name] = files[0].id;
-    writeJson(localStorage, FILE_CACHE_KEY, cache);
+    writeJson(appStorage, FILE_CACHE_KEY, cache);
     return files[0].id;
   }
 
   function forgetSpreadsheetId(name) {
-    const cache = readJson(localStorage, FILE_CACHE_KEY) || {};
+    const cache = readJson(appStorage, FILE_CACHE_KEY) || {};
     delete cache[name];
-    writeJson(localStorage, FILE_CACHE_KEY, cache);
+    writeJson(appStorage, FILE_CACHE_KEY, cache);
   }
 
   function sheetUrl(id, path) { return SHEETS + "/" + encodeURIComponent(id) + (path || ""); }

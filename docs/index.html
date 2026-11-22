@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <script src="js/storage.js"></script>
   <script src="js/config.js"></script>
   <script src="js/google.js"></script>
   <script src="js/clouddb.js"></script>
@@ -716,13 +717,13 @@
 
     function saveLocal() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
+        appStorage.setItem(STORAGE_KEY, JSON.stringify(members));
       } catch (e) {}
     }
 
     function loadLocal() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = appStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) members = parsed;
@@ -730,7 +731,7 @@
       } catch (e) {}
 
       try {
-        const rawNotes = localStorage.getItem(LOCAL_NOTES_KEY);
+        const rawNotes = appStorage.getItem(LOCAL_NOTES_KEY);
         if (rawNotes) {
           const parsedNotes = JSON.parse(rawNotes);
           if (parsedNotes && typeof parsedNotes === "object") localNotes = parsedNotes;
@@ -738,7 +739,7 @@
       } catch (e) {}
 
       try {
-        const rawPaper = localStorage.getItem(PAPER_CARDS_KEY);
+        const rawPaper = appStorage.getItem(PAPER_CARDS_KEY);
         if (rawPaper) {
           const parsedPaper = JSON.parse(rawPaper);
           if (parsedPaper && typeof parsedPaper === "object") paperCards = parsedPaper;
@@ -798,14 +799,14 @@
       }
 
       try {
-        localStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
+        appStorage.setItem(PAPER_CARDS_KEY, JSON.stringify(paperCards));
       } catch (e) {}
       CloudDB.paper(key, paperCards[key] || null);
     }
 
     function saveLocalNotes() {
       try {
-        localStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
+        appStorage.setItem(LOCAL_NOTES_KEY, JSON.stringify(localNotes));
       } catch (e) {}
     }
 
@@ -1321,7 +1322,7 @@
     let excLocalState = {};
 
     try {
-      const rawExcLocal = localStorage.getItem(EXC_LOCAL_KEY);
+      const rawExcLocal = appStorage.getItem(EXC_LOCAL_KEY);
       if (rawExcLocal) {
         const parsed = JSON.parse(rawExcLocal);
         if (parsed && typeof parsed === "object") excLocalState = parsed;
@@ -1329,7 +1330,7 @@
     } catch (e) {}
 
     function saveExcLocalState() {
-      try { localStorage.setItem(EXC_LOCAL_KEY, JSON.stringify(excLocalState)); } catch (e) {}
+      try { appStorage.setItem(EXC_LOCAL_KEY, JSON.stringify(excLocalState)); } catch (e) {}
     }
 
     function normalizePersonKey(name, email, phone) {

@@ -1,11 +1,12 @@
 // Service worker di APP Direttivo 3/5.
 // Strategia "prima la rete": con internet si carica sempre l'ultima versione pubblicata,
 // senza internet si apre l'ultima copia salvata. I dati Google non vengono mai messi in cache qui.
-const CACHE = "app35-shell-v1";
+const CACHE = "app35-shell-v2";
 const SHELL = [
   "./",
   "index.html",
   "manifest.webmanifest",
+  "js/storage.js",
   "js/config.js",
   "js/google.js",
   "js/clouddb.js",
