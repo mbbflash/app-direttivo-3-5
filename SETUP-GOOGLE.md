@@ -24,12 +24,17 @@ Per far accedere l'app ai Fogli con l'account **trequintitrekking@gmail.com** se
 2. **Informazioni app**: nome `APP Direttivo 3/5`, email di assistenza `trequintitrekking@gmail.com`
 3. **Pubblico / Audience**: scegli **Esterno**
 4. **Dati di contatto**: `trequintitrekking@gmail.com` → accetta le condizioni → **Crea**
-5. Vai in **Accesso ai dati / Data access** → **Aggiungi o rimuovi ambiti** e aggiungi:
-   - `.../auth/spreadsheets`
-   - `.../auth/drive.metadata.readonly`
-   - `openid` e `.../auth/userinfo.email`
-   
-   → **Aggiorna** → **Salva**
+5. *(Facoltativo: in stato Test l'app funziona anche se salti questo punto.)*
+   Vai in **Accesso ai dati / Data access** → **Aggiungi o rimuovi ambiti**.
+   Nell'elenco compaiono solo gli ambiti delle API già abilitate al punto 2: se non li trovi, controlla di aver abilitato Sheets e Drive.
+   Il modo più semplice è scorrere in fondo al pannello fino a **Aggiungi ambiti manualmente** e incollare, uno per riga:
+   ```
+   https://www.googleapis.com/auth/spreadsheets
+   https://www.googleapis.com/auth/drive.metadata.readonly
+   openid
+   https://www.googleapis.com/auth/userinfo.email
+   ```
+   → **Aggiungi alla tabella** → **Aggiorna** → **Salva**
 6. Vai in **Pubblico / Audience** → **Utenti di test** → **Add users** → `trequintitrekking@gmail.com` → **Salva**
 
 Lascia l'app in stato **Test**: va benissimo, perché la usa un solo account.
