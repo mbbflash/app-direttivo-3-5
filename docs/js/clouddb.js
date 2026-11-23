@@ -10,7 +10,9 @@
     note: { name: "Note", headers: ["chiave", "tessera", "socio", "nota", "aggiornato_il", "aggiornato_da"] },
     exc: { name: "Conferme_Escursioni", headers: ["chiave", "escursione", "partecipante", "confermato", "nota", "aggiornato_il", "aggiornato_da"] },
     remind: { name: "Solleciti", headers: ["chiave", "tessera", "socio", "canale", "data_sollecito", "aggiornato_il", "aggiornato_da"] },
-    log: { name: "Log", headers: ["quando", "chi", "tipo", "chiave", "valore"] }
+    log: { name: "Log", headers: ["quando", "chi", "tipo", "chiave", "valore"] },
+    // Richieste per lo script Apps Script (SETUP-APPS-SCRIPT.md): righe aggiunte, mai riscritte dall'app.
+    req: { name: "Richieste", headers: ["id", "tipo", "parametri", "stato", "risultato", "errore", "creato_il", "creato_da", "completato_il"] }
   };
 
   let dbId = "";
@@ -252,6 +254,33 @@
 
   window.addEventListener("online", () => scheduleFlush(500));
 
+  // ---- Richieste allo script di automazione ----
+  // Partono subito: se non si può (offline o senza accesso) l'errore arriva al chiamante,
+  // perché eseguirle più tardi senza che l'utente lo veda potrebbe sorprendere.
+  async function addRequest(tipo, parametri) {
+    if (!navigator.onLine) throw new Error("Sei offline: riprova quando torna la connessione.");
+    if (!GoogleApi.isSignedIn()) throw new GoogleApi.AuthError("Accedi con Google per inviare la richiesta.");
+    await openDb();
+    const id = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+    await GoogleApi.Sheets.append(dbId, tabRange("req"),
+      [[id, tipo, JSON.stringify(parametri || {}), "in_attesa", "", "", nowIt(), who(), ""]]);
+    return id;
+  }
+
+  async function getRequest(id) {
+    await openDb();
+    const res = await GoogleApi.Sheets.get(dbId, tabRange("req"));
+    const rows = res.values || [];
+    for (let i = rows.length - 1; i >= 1; i--) {
+      const r = rows[i] || [];
+      if (String(r[0] || "").trim() !== id) continue;
+      let risultato = null;
+      try { risultato = r[4] ? JSON.parse(r[4]) : null; } catch (e) { risultato = null; }
+      return { id, stato: String(r[3] || "").trim(), risultato, errore: String(r[5] || "").trim() };
+    }
+    return null;
+  }
+
   window.CloudDB = {
     TABS,
     load,
@@ -260,6 +289,8 @@
     note: (key, text) => queue("note", key, String(text || "").trim() ? text : null, 1000),
     exc: (key, value) => queue("exc", key, value, 1000),
     remind: (key, value) => queue("remind", key, value, 300),
+    addRequest,
+    getRequest,
     pendingCount,
     status: () => lastStatus,
     onStatus: (cb) => { statusCb = cb || (() => {}); },

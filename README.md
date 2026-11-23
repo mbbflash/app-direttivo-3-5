@@ -98,6 +98,7 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 | **Note e conferme per partecipante** | Nota e spunta *Confermato* su ogni iscritto, **condivise con il direttivo** |
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli |
+| **Nuova escursione programmata** | Pulsante che crea il form di iscrizione (copia del template, con titolo e giorno della settimana) e il foglio *Iscrizioni AAAA.MM.GG - Nome (Risposte)* collegato, poi dà il link da condividere. Lo fa lo script di automazione: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |
 
 ### 📊 Statistiche
 
@@ -206,6 +207,8 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 | Solleciti di rinnovo | Database → `Solleciti` | ✅ Sì |
 | Presenze e statistiche | Foglio *Tre Quinti Wrapped - Foglio Calcolo* | ✅ Sì |
 | Schede tecniche dei percorsi | Foglio *Tre Quinti Trekking - Schede Tecniche Escursioni …* (solo lettura) | ✅ Sì |
+| Richieste allo script (nuove uscite) | Database → `Richieste` | ✅ Sì |
+| Form e fogli delle nuove uscite | Creati dallo script nella cartella del form template | ✅ Sì |
 | Storico modifiche | Database → `Log` | ✅ Sì |
 | Cache e modifiche in coda | Browser del dispositivo | ❌ No, cancellate con **Esci** |
 

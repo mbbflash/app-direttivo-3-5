@@ -1,6 +1,24 @@
 {
-  "version": "2.4.2",
+  "version": "2.5.1",
   "releases": [
+    {
+      "version": "2.5.1",
+      "date": "23/11/2026",
+      "notes": [
+        "Scheda Escursioni molto più veloce: l'elenco delle uscite compare subito e l'uscita aperta si legge per prima",
+        "Le altre uscite si caricano in sottofondo, con il conteggio di avanzamento",
+        "Le uscite non modificate restano salvate sul dispositivo e non vengono rilette: dalla seconda apertura è quasi istantanea"
+      ]
+    },
+    {
+      "version": "2.5.0",
+      "date": "23/11/2026",
+      "notes": [
+        "Nuovo pulsante \"Nuova escursione programmata\" nella scheda Escursioni: crea il form dal template e il foglio delle risposte collegato",
+        "Il titolo del form ha già nome, giorno della settimana e data; il link da condividere è pronto da copiare",
+        "Funziona dopo aver installato lo script di automazione sull'account dell'associazione (guida SETUP-APPS-SCRIPT.md)"
+      ]
+    },
     {
       "version": "2.4.2",
       "date": "23/11/2026",

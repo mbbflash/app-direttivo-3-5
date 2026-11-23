@@ -10,6 +10,7 @@
   ].join(" ");
   const TOKEN_KEY = "app35_token_v1";
   const FILE_CACHE_KEY = "app35_file_ids_v1";
+  const EXC_CACHE_KEY = "app35_exc_cache_v1";
   const SHEETS = "https://sheets.googleapis.com/v4/spreadsheets";
   const DRIVE = "https://www.googleapis.com/drive/v3/files";
   const SPREADSHEET_MIME = "application/vnd.google-apps.spreadsheet";
@@ -286,18 +287,6 @@
     }
   }
 
-  async function mapLimit(items, limit, fn) {
-    const out = new Array(items.length);
-    let next = 0;
-    const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (next < items.length) {
-        const i = next++;
-        out[i] = await fn(items[i], i);
-      }
-    });
-    await Promise.all(workers);
-    return out;
-  }
 
   // "5,2", "8.5", "1.300" o 5.2 → numero.
   function looseNumber(v) {
@@ -321,20 +310,59 @@
       });
     },
 
-    async loadEscursioni() {
+    // Elenco subito (una sola chiamata a Drive), poi i fogli uno alla volta.
+    // I fogli non modificati dall'ultima lettura arrivano dalla cache del dispositivo.
+    // opts.onList(escursioni): elenco con le uscite ancora da leggere marcate "loading".
+    // opts.onItem(esc): un'uscita appena letta. opts.wanted(): id da leggere per primo (quella aperta).
+    async loadEscursioni(opts) {
+      opts = opts || {};
       const list = excursionFiles(await listSpreadsheets(excursionDriveQuery()));
-      const escursioni = await mapLimit(list, 4, async (f) => {
-        try {
-          // Senza nome di scheda l'intervallo si riferisce al primo foglio (le risposte del modulo).
-          const data = await Sheets.get(f.id, "A1:AZ");
-          const { headers, records } = rowsToRecords(data.values);
-          return { id: f.id, titolo: f.name, data: "", ok: true, headers, rows: records };
-        } catch (e) {
-          if (e instanceof AuthError) throw e;
-          return { id: f.id, titolo: f.name, data: "", ok: false, error: e.message, headers: [], rows: [] };
-        }
+      const cache = readJson(appStorage, EXC_CACHE_KEY) || {};
+      const toItem = (f, values) => {
+        const { headers, records } = rowsToRecords(values);
+        return { id: f.id, titolo: f.name, data: "", ok: true, headers, rows: records };
+      };
+      const items = list.map(f => {
+        const c = cache[f.id];
+        if (c && c.mt === f.modifiedTime && Array.isArray(c.values)) return toItem(f, c.values);
+        return { id: f.id, titolo: f.name, data: "", ok: true, loading: true, headers: [], rows: [] };
       });
-      return { ok: true, escursioni, updatedAt: new Date().toISOString() };
+      if (opts.onList) opts.onList(items.slice());
+
+      // Le più recenti per prime: sono quelle che servono di solito.
+      const pending = items.map((it, i) => i).filter(i => items[i].loading).reverse();
+      const fresh = {};
+      const worker = async () => {
+        while (pending.length) {
+          const want = opts.wanted ? opts.wanted() : "";
+          let k = want ? pending.findIndex(i => items[i].id === want) : -1;
+          if (k < 0) k = 0;
+          const i = pending.splice(k, 1)[0];
+          const f = list[i];
+          try {
+            // Senza nome di scheda l'intervallo si riferisce al primo foglio (le risposte del modulo).
+            const data = await Sheets.get(f.id, "A1:AZ");
+            items[i] = toItem(f, data.values);
+            fresh[f.id] = { mt: f.modifiedTime, values: data.values || [] };
+          } catch (e) {
+            if (e instanceof AuthError) throw e;
+            items[i] = { id: f.id, titolo: f.name, data: "", ok: false, error: e.message, headers: [], rows: [] };
+          }
+          if (opts.onItem) opts.onItem(items[i]);
+        }
+      };
+      try {
+        await Promise.all(Array.from({ length: Math.min(6, pending.length) }, worker));
+      } finally {
+        // Tengo solo le uscite ancora presenti nel Drive; se lo spazio non basta, pazienza: si rilegge.
+        const next = {};
+        list.forEach(f => {
+          if (fresh[f.id]) next[f.id] = fresh[f.id];
+          else if (cache[f.id] && cache[f.id].mt === f.modifiedTime) next[f.id] = cache[f.id];
+        });
+        writeJson(appStorage, EXC_CACHE_KEY, next);
+      }
+      return { ok: true, escursioni: items, updatedAt: new Date().toISOString() };
     },
 
     // Per le notifiche: una sola chiamata a Drive dice quali fogli sono cambiati.

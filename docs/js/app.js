@@ -169,7 +169,7 @@
     if (!n && !confirm("Uscire? Dal dispositivo verranno cancellati anche i dati in cache.")) return;
     await GoogleApi.signOut();
     // Sul dispositivo non deve restare nessun dato dei soci.
-    [STORAGE_KEY, PAPER_CARDS_KEY, LOCAL_NOTES_KEY, EXC_LOCAL_KEY, REMINDERS_KEY, "app35_pending_v1", "app35_watch_v1"].forEach(k => {
+    [STORAGE_KEY, PAPER_CARDS_KEY, LOCAL_NOTES_KEY, EXC_LOCAL_KEY, REMINDERS_KEY, "app35_pending_v1", "app35_watch_v1", "app35_exc_cache_v1"].forEach(k => {
       try { appStorage.removeItem(k); } catch (e) {}
     });
     location.reload();

@@ -135,6 +135,40 @@
     });
   }
 
+  // Simula lo script Apps Script: una richiesta "crea_uscita" in attesa da almeno 3 secondi
+  // diventa "fatto" e aggiunge il foglio risposte (vuoto) tra quelli demo.
+  const requestSeen = {};
+  function simulateScript() {
+    const db = Object.values(store.files).find(f => f.name === cfg.databaseName);
+    const grid = db && db.sheets["Richieste"];
+    if (!grid) return;
+    let changed = false;
+    for (let i = 1; i < grid.length; i++) {
+      const r = grid[i] || [];
+      if (r[3] !== "in_attesa") continue;
+      const id = r[0];
+      requestSeen[id] = requestSeen[id] || Date.now();
+      if (Date.now() - requestSeen[id] < 3000) continue;
+      let p = {};
+      try { p = JSON.parse(r[2] || "{}"); } catch (e) {}
+      const stamp = String(p.data || "").replace(/-/g, ".") + (p.data_fine ? "-" + p.data_fine.slice(8, 10) : "");
+      const foglio = `Iscrizioni ${stamp} - ${p.nome} (Risposte)`;
+      changed = true;
+      if (r[1] !== "crea_uscita") { r[3] = "errore"; r[5] = `Tipo di richiesta sconosciuto: "${r[1]}"`; continue; }
+      store.files["demo-new-" + id] = { name: foglio, sheets: { "Risposte del modulo 1": [formHeaderDemo] } };
+      r[3] = "fatto";
+      r[4] = JSON.stringify({
+        form_nome: `Form iscrizione ${stamp} - "${p.nome}"`, foglio_nome: foglio,
+        link_compilazione: "https://example.com/demo-form/viewform", link_modifica: "https://example.com/demo-form/edit"
+      });
+      r[8] = new Date().toLocaleString("it-IT");
+    }
+    if (changed) persist();
+  }
+  setInterval(simulateScript, 1000);
+  const formHeaderDemo = ["Informazioni cronologiche", "Nome e Cognome", "Indirizzo email", "Numero di telefono",
+    "Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?"];
+
   async function handle(method, url, body) {
     await new Promise(r => setTimeout(r, 120)); // simula la rete
     const u = new URL(url);

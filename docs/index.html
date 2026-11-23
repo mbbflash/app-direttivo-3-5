@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.4.2" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.4.2" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.4.2" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.0" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.0" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.4.2"></script>
-  <script src="js/config.js?v=2.4.2"></script>
-  <script src="js/google.js?v=2.4.2"></script>
-  <script src="js/clouddb.js?v=2.4.2"></script>
+  <script src="js/storage.js?v=2.5.0"></script>
+  <script src="js/config.js?v=2.5.0"></script>
+  <script src="js/google.js?v=2.5.0"></script>
+  <script src="js/clouddb.js?v=2.5.0"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -587,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.4.2" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.5.0" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +599,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.4.2" alt="" />
+        <img src="icons/icon-192.png?v=2.5.0" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -741,6 +741,10 @@
           </div>
         </div>
         <div id="excStatusMsg" class="muted" style="font-size:0.82rem;margin-top:10px;"></div>
+        <div class="mail-actions" style="margin-top:12px;">
+          <button type="button" id="btnNewExc" class="btn" style="white-space:normal;height:auto;text-align:left;max-width:100%;"><svg class="ico"><use href="#i-plus"/></svg>Nuova escursione programmata (Crea Form + Foglio risposte)</button>
+        </div>
+        <div id="newExcPanel"></div>
 
         <div class="stats" id="excStats" style="margin:12px 0 0;">
           <div class="stat-box tone-info"><span class="stat-icon"><svg class="ico"><use href="#i-card"/></svg></span><span><span class="stat-label">Adesioni nel foglio</span><span class="stat-value" id="excStatCount" style="display:block">0</span></span></div>
@@ -1043,9 +1047,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.4.2" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.0" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.4.2" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.0" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -1983,6 +1987,7 @@
     // Una sola lettura alla volta, anche se la chiedono più parti dell'app insieme.
     let excLoadPromise = null;
     function ensureEscursioni() {
+      if (excLoadPromise) return excLoadPromise.then(() => excList);
       if (excList.length) return Promise.resolve(excList);
       return loadEscursioniFromServer({ quiet: true }).then(() => excList);
     }
@@ -2146,8 +2151,16 @@
       const q = String(byId("excSearch").value || "").toLowerCase().trim();
       currentExcRows = [];
 
+      const pendingCount = excList.filter(e => e.loading).length;
+      const progress = pendingCount ? ` · lettura uscite ${excList.length - pendingCount}/${excList.length}…` : "";
+
       if (!currentEsc) {
         tbody.innerHTML = `<tr><td colspan="5" class="empty">${icon("map")}Nessun foglio "Iscrizioni AAAA.MM.GG - Nome (Risposte)" trovato nel Drive.</td></tr>`;
+      } else if (currentEsc.loading && !currentEsc.rows.length) {
+        if (statusMsg) statusMsg.textContent = "Lettura di questa uscita…" + progress;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty">${icon("clock")}Lettura del foglio in corso…</td></tr>`;
+        byId("excStatCount").textContent = "…";
+        byId("excStatMembers").textContent = "…";
       } else if (!currentEsc.ok) {
         if (statusMsg) statusMsg.textContent = "Errore lettura foglio";
         tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger-fg)">${icon("alert")}Impossibile leggere il foglio: ${escapeHtml(currentEsc.error || "verifica che l'account vi abbia accesso")}</td></tr>`;
@@ -2181,7 +2194,7 @@
 
         byId("excStatCount").textContent = String(currentEsc.rows.length);
         byId("excStatMembers").textContent = String(memberCount);
-        if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} iscritti · ${confirmed} confermati · ${excList.length} uscite nel Drive`;
+        if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} iscritti · ${confirmed} confermati · ${excList.length} uscite nel Drive` + progress;
       }
 
       const people = Array.from(counterMap.values()).sort((a, b) => b.trips.length - a.trips.length || a.name.localeCompare(b.name, "it"));
@@ -2202,12 +2215,34 @@
       const btn = byId("btnLoadEscursioni");
       if (statusMsg) statusMsg.textContent = "Caricamento delle escursioni dal Drive…";
       setBusy(btn, true);
+      let renderTimer = null;
+      const scheduleRender = () => {
+        if (renderTimer) return;
+        renderTimer = setTimeout(() => { renderTimer = null; renderEscursioni(); }, 150);
+      };
       excLoadPromise = (async () => {
         try {
-          const data = await AppData.loadEscursioni();
+          const data = await AppData.loadEscursioni({
+            // Mentre rileggo un'uscita già mostrata, tengo i dati vecchi invece di svuotarla.
+            onList: (items) => {
+              const old = new Map(excList.map(e => [e.id, e]));
+              excList = items.map(it => {
+                const o = it.loading && old.get(it.id);
+                return o && o.ok && o.rows.length ? Object.assign({}, o, { titolo: it.titolo, loading: true }) : it;
+              });
+              renderEscursioni();
+            },
+            onItem: (esc) => {
+              excList = excList.map(e => (e.id === esc.id ? esc : e));
+              scheduleRender();
+            },
+            wanted: () => byId("excSelect").value
+          });
+          clearTimeout(renderTimer);
           excList = Array.isArray(data.escursioni) ? data.escursioni : [];
           Watcher.absorbForms(excList);
           renderEscursioni();
+          if (!byId("viewStats").classList.contains("hidden")) renderStats();
         } catch (err) {
           if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
           const msg = (err && (err.message || String(err))) || "Errore sconosciuto";
@@ -2220,6 +2255,127 @@
         }
       })();
       return excLoadPromise;
+    }
+
+    // ---- Nuova escursione programmata (form + foglio risposte creati dallo script) ----
+    let newExcTimer = null;
+
+    function openNewExcPanel() {
+      clearTimeout(newExcTimer);
+      byId("newExcPanel").innerHTML = `
+        <div class="collapsible" style="background:var(--surface-2);margin-top:12px;">
+          <div class="collapsible-body" style="padding-top:14px;">
+            <strong>Nuova escursione programmata</strong>
+            <div class="muted" style="font-size:0.82rem;margin-top:4px;">Lo script copia il form template e crea il foglio "Iscrizioni AAAA.MM.GG - Nome (Risposte)" collegato. Ci vuole circa un minuto.</div>
+            <div class="form-grid">
+              <label style="grid-column: span 2;">Nome escursione<input type="text" id="neNome" placeholder="es. Il Monte Fiocca" maxlength="80" /></label>
+              <label>Data<input type="date" id="neData" /></label>
+              <label>Data di fine (più giorni)<input type="date" id="neFine" /></label>
+            </div>
+            <div class="mail-actions" style="margin-top:12px;">
+              <button type="button" class="btn primary" id="neSend">${icon("check", "ico-sm")}Crea form e foglio</button>
+              <button type="button" class="btn ghost" id="neCancel">Annulla</button>
+            </div>
+          </div>
+        </div>`;
+      byId("neSend").addEventListener("click", sendNewExc);
+      byId("neCancel").addEventListener("click", () => { byId("newExcPanel").innerHTML = ""; });
+      byId("neNome").focus();
+    }
+
+    function isoToIt(iso) { const [y, m, d] = String(iso).split("-"); return `${d}/${m}/${y}`; }
+
+    async function sendNewExc() {
+      const nome = byId("neNome").value.replace(/\s+/g, " ").trim();
+      const data = byId("neData").value;
+      const fine = byId("neFine").value;
+      if (!nome) { toast("Manca il nome dell'escursione", "err"); byId("neNome").focus(); return; }
+      if (/["\/\\]/.test(nome)) { toast("Il nome non può contenere virgolette o barre", "err"); byId("neNome").focus(); return; }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) { toast("Data non valida", "err"); byId("neData").focus(); return; }
+      if (fine) {
+        if (fine <= data) { toast("La data di fine deve essere dopo la data di inizio", "err"); byId("neFine").focus(); return; }
+        if (fine.slice(0, 7) !== data.slice(0, 7)) { toast("Le uscite di più giorni devono stare nello stesso mese", "err"); byId("neFine").focus(); return; }
+      }
+      // Niente doppioni: stessa data e stesso nome di un'uscita già nell'elenco.
+      if (!excList.length) { try { await loadEscursioniFromServer({ quiet: true }); } catch (_) {} }
+      const dup = excList.find(e => {
+        const p = GoogleApi.parseExcursionName(e.titolo);
+        return p && p.dataIso === data && p.nome.toLowerCase() === nome.toLowerCase();
+      });
+      if (dup) { toast(`"${nome}" del ${isoToIt(data)} esiste già`, "err"); return; }
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      if (new Date(data + "T00:00:00") < today && !confirm(`La data ${isoToIt(data)} è già passata. Creo lo stesso form e foglio?`)) return;
+
+      const btn = byId("neSend");
+      setBusy(btn, true);
+      try {
+        const id = await CloudDB.addRequest("crea_uscita", { nome, data, data_fine: fine || "" });
+        showNewExcStatus({ id, nome, data, startedAt: Date.now(), stato: "in_attesa" });
+      } catch (err) {
+        if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+        toast(err.message || String(err), "err");
+        setBusy(btn, false);
+      }
+    }
+
+    const NEW_EXC_LABEL = {
+      in_attesa: "In attesa dello script di automazione…",
+      in_corso: "Lo script sta creando form e foglio…"
+    };
+
+    function renderNewExcBox(inner) {
+      byId("newExcPanel").innerHTML = `
+        <div class="collapsible" style="background:var(--surface-2);margin-top:12px;">
+          <div class="collapsible-body" style="padding-top:14px;">${inner}</div>
+        </div>`;
+    }
+
+    function showNewExcStatus(req) {
+      const head = `<strong>${escapeHtml(req.nome)} · ${escapeHtml(isoToIt(req.data))}</strong>`;
+      if (req.stato === "fatto") {
+        const r = req.risultato || {};
+        renderNewExcBox(`${head}
+          <div style="margin-top:6px;">${icon("check", "ico-sm")} Form pronto: <span class="muted">${escapeHtml(r.foglio_nome || "")}</span></div>
+          <div class="mail-actions" style="margin-top:12px;">
+            <button type="button" class="btn primary" id="neCopy">${icon("copy", "ico-sm")}Copia link</button>
+            <a class="btn" id="neOpen" href="${escapeHtml(r.link_modifica || "#")}" target="_blank" rel="noopener">${icon("send", "ico-sm")}Apri il form</a>
+            <button type="button" class="btn ghost" id="neClose">Chiudi</button>
+          </div>`);
+        byId("neCopy").addEventListener("click", () => copyText(r.link_compilazione || "", "Link del form copiato"));
+        byId("neClose").addEventListener("click", () => { byId("newExcPanel").innerHTML = ""; });
+        loadEscursioniFromServer().catch(() => {});
+        return;
+      }
+      if (req.stato === "errore") {
+        renderNewExcBox(`${head}
+          <div style="margin-top:6px;color:var(--danger-fg)">${icon("alert", "ico-sm")} ${escapeHtml(req.errore || "Errore sconosciuto")}</div>
+          <div class="mail-actions" style="margin-top:12px;">
+            <button type="button" class="btn" id="neRetry">Riprova</button>
+            <button type="button" class="btn ghost" id="neClose">Chiudi</button>
+          </div>`);
+        byId("neRetry").addEventListener("click", openNewExcPanel);
+        byId("neClose").addEventListener("click", () => { byId("newExcPanel").innerHTML = ""; });
+        return;
+      }
+      if (req.stato === "in_attesa" && Date.now() - req.startedAt > 5 * 60 * 1000) {
+        renderNewExcBox(`${head}
+          <div style="margin-top:6px;color:var(--danger-fg)">${icon("alert", "ico-sm")} Lo script di automazione non ha risposto: controlla che sia installato e attivo (guida SETUP-APPS-SCRIPT.md nel repository). La richiesta resta in attesa e partirà appena lo script torna attivo.</div>
+          <div class="mail-actions" style="margin-top:12px;"><button type="button" class="btn ghost" id="neClose">Chiudi</button></div>`);
+        byId("neClose").addEventListener("click", () => { byId("newExcPanel").innerHTML = ""; });
+        return;
+      }
+      renderNewExcBox(`${head}
+        <div class="muted" style="margin-top:6px;">${icon("clock", "ico-sm")} ${NEW_EXC_LABEL[req.stato] || NEW_EXC_LABEL.in_attesa}</div>`);
+      clearTimeout(newExcTimer);
+      newExcTimer = setTimeout(async () => {
+        try {
+          const cur = await CloudDB.getRequest(req.id);
+          if (cur) Object.assign(req, { stato: cur.stato, risultato: cur.risultato, errore: cur.errore });
+        } catch (err) {
+          if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
+        }
+        if (byId("newExcPanel").innerHTML) showNewExcStatus(req);
+      }, 10000);
     }
 
     function exportEscursioneCsv() {
@@ -2263,7 +2419,7 @@
       if (which === "statistiche") {
         if (!statsData) loadStats();
         else renderStats();
-        if (!excList.length) ensureEscursioni().then(renderStats).catch(() => {});
+        if (!excList.length || excLoadPromise) ensureEscursioni().then(renderStats).catch(() => {});
       }
       if (which === "prossima") {
         if (!schedeData) loadNextData();
@@ -2276,6 +2432,7 @@
     byId("tabBtnStats").addEventListener("click", () => switchMainTab("statistiche"));
     byId("tabBtnNext").addEventListener("click", () => switchMainTab("prossima"));
     byId("btnLoadEscursioni").addEventListener("click", () => loadEscursioniFromServer());
+    byId("btnNewExc").addEventListener("click", openNewExcPanel);
     byId("btnExportExc").addEventListener("click", exportEscursioneCsv);
     byId("excSelect").addEventListener("change", renderEscursioni);
     byId("excSearch").addEventListener("input", debounce(renderEscursioni, 150));
@@ -2388,7 +2545,7 @@
 
     function getCurriculumInfo(m) {
       if (statsData) return Object.assign({ loaded: true, source: "stats" }, memberStatsInfo(m));
-      if (excList.length) return Object.assign({}, getMemberTripsInfo(m), { loaded: true, source: "form" });
+      if (excList.length && !excLoadPromise) return Object.assign({}, getMemberTripsInfo(m), { loaded: true, source: "form" });
       return { loaded: false };
     }
 
@@ -2409,7 +2566,7 @@
     }
 
     function missingFromStats() {
-      if (!statsData || !excList.length) return [];
+      if (!statsData || !excList.length || excLoadPromise) return [];
       const all = aggregateStats("").excursions;
       const dates = new Set(all.map(e => e.data));
       const names = new Set(all.map(e => e.year + "|" + nameKey(e.nome)));
@@ -2967,7 +3124,7 @@
           // Presenze e form arricchiscono le proposte, ma non sono indispensabili.
           const extra = [];
           if (!statsData) extra.push(ensureStats().catch(() => {}));
-          if (!excList.length) extra.push(ensureEscursioni().catch(() => {}));
+          if (!excList.length || excLoadPromise) extra.push(ensureEscursioni().catch(() => {}));
           if (extra.length) Promise.all(extra).then(renderNext);
         } catch (err) {
           if (err instanceof GoogleApi.AuthError && window.AuthUI) window.AuthUI.require(err.message);
@@ -3186,7 +3343,7 @@
       function refreshFormInApp(f, records) {
         if (!excList.length) return;
         const i = excList.findIndex(e => e.id === f.id);
-        const fresh = { id: f.id, titolo: f.name, data: "", ok: true, headers: [], rows: records };
+        const fresh = { id: f.id, titolo: f.name, data: "", ok: true, loading: false, headers: [], rows: records };
         if (i >= 0 && excList[i].rows.length === records.length) return;
         excList = i >= 0 ? excList.map((e, j) => (j === i ? Object.assign({}, e, fresh) : e)) : excList.concat([fresh]);
         // Un'uscita nuova va al suo posto in ordine di data, non in fondo.
@@ -3277,6 +3434,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.4.2"></script>
+<script src="js/app.js?v=2.5.0"></script>
 </body>
 </html>
