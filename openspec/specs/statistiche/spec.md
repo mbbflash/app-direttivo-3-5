@@ -16,6 +16,18 @@ Il sistema SHALL leggere tutte le schede del foglio statistiche il cui nome è "
 - **WHEN** il foglio contiene una scheda "Totali"
 - **THEN** il sistema la ignora
 
+### Requirement: Uscite rimandate o annullate escluse
+Il sistema SHALL considerare rimandata o annullata un'uscita il cui nome del foglio iscrizioni contiene "rimandata" o "annullata" (anche "rimandato", "annullato", "cancellata", tra parentesi quadre o tonde o senza, maiuscole e minuscole indifferenti), e MUST escluderla da: contatore partecipazioni e curriculum dai form, uscite dei form mancanti nel foglio statistiche, uscite già fatte o in programma dell'assistente. Le righe del foglio statistiche il cui NomeEscursione contiene le stesse parole MUST essere escluse da totali, grafico, classifica, elenco e curriculum. L'uscita resta visibile nella scheda Escursioni con lo stato accanto al nome, e il nome mostrato non contiene il segno.
+
+#### Scenario: Uscita rimandata nei form
+- **WHEN** esiste il foglio "Iscrizioni 2026.10.11 - [RIMANDATA] Lago (Risposte)" con 2 iscritti
+- **THEN** l'uscita compare nella scheda Escursioni come "Lago · RIMANDATA"
+- **AND** non aumenta il numero di uscite di nessun iscritto e non viene proposta tra quelle da aggiungere al foglio statistiche
+
+#### Scenario: Riga annullata nel foglio statistiche
+- **WHEN** una riga del foglio statistiche ha NomeEscursione "Monte Cella (annullata)"
+- **THEN** la riga non conta in presenze, uscite, km, dislivello, ore e classifica
+
 ### Requirement: Riepilogo e grafici
 Il sistema SHALL mostrare, per un anno scelto o per tutti gli anni e con ricerca per escursionista o uscita: numero di uscite, presenze, escursionisti, media per uscita, km, dislivello e ore totali; il grafico delle presenze per uscita; la classifica degli escursionisti (ordinabile); l'elenco delle uscite.
 

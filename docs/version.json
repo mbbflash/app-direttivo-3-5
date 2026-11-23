@@ -1,6 +1,15 @@
 {
-  "version": "2.5.1",
+  "version": "2.5.2",
   "releases": [
+    {
+      "version": "2.5.2",
+      "date": "23/11/2026",
+      "notes": [
+        "Le uscite rimandate o annullate non contano più nelle statistiche, nel contatore partecipazioni e nel curriculum dei soci",
+        "Basta scrivere [RIMANDATA] o [ANNULLATA] nel nome del foglio iscrizioni: l'uscita resta visibile nell'elenco, con l'indicazione accanto al nome",
+        "Le uscite rimandate o annullate non vengono più proposte tra quelle da aggiungere al foglio statistiche"
+      ]
+    },
     {
       "version": "2.5.1",
       "date": "23/11/2026",

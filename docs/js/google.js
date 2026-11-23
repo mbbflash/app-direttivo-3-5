@@ -235,14 +235,27 @@
     "^\\s*(?:" + (cfg.escursioniNamePrefixes || []).map(p => escapeRe(p).replace(/\s+/g, "\\s+")).join("|") + ")" +
     "\\s+(\\d{4})\\.(\\d{2})\\.(\\d{2})(?:-(\\d{2}))?\\s*-\\s*(.+?)\\s*(?:\\(Risposte\\))?\\s*$", "i");
 
-  // Restituisce { data: "GG/MM/AAAA", dataIso: "AAAA-MM-GG", nome } oppure null se non è un'uscita.
+  // Uscite rimandate o annullate: "[RIMANDATA]", "(Annullata)", "RIMANDATO" ovunque nel nome.
+  // Restano visibili nell'elenco ma non contano nelle presenze e nelle statistiche.
+  const EXC_STATUS_RE = /[\[(]?\s*\b(rimandat|annullat|cancellat)[aoie]\b\s*[\])]?/gi;
+  function excursionStatus(text) {
+    const m = /\b(rimandat|annullat|cancellat)[aoie]\b/i.exec(String(text || ""));
+    return m ? (m[1].toLowerCase() === "rimandat" ? "rimandata" : "annullata") : null;
+  }
+  function stripExcursionStatus(text) {
+    return String(text || "").replace(EXC_STATUS_RE, " ").replace(/^[\s\-–:]+|[\s\-–:]+$/g, "").replace(/\s{2,}/g, " ");
+  }
+
+  // Restituisce { data: "GG/MM/AAAA", dataIso: "AAAA-MM-GG", nome, stato } oppure null se non è un'uscita.
+  // stato è "rimandata", "annullata" oppure null.
   function parseExcursionName(fileName) {
-    const m = EXC_NAME_RE.exec(String(fileName || ""));
+    const raw = String(fileName || "");
+    const m = EXC_NAME_RE.exec(stripExcursionStatus(raw));
     if (!m) return null;
     const [, y, mo, d, , rest] = m;
     const quoted = rest.match(/["«“]([^"»”]+)["»”]/);
-    const nome = (quoted ? quoted[1] : rest).trim();
-    return { data: `${d}/${mo}/${y}`, dataIso: `${y}-${mo}-${d}`, nome };
+    const nome = stripExcursionStatus((quoted ? quoted[1] : rest).trim());
+    return { data: `${d}/${mo}/${y}`, dataIso: `${y}-${mo}-${d}`, nome, stato: excursionStatus(raw) };
   }
 
   function excursionDriveQuery() {
@@ -452,7 +465,7 @@
     AuthError, isDemo, isConfigured, init, signIn, signOut,
     isSignedIn: tokenValid,
     email: () => (token ? token.email : ""),
-    findSpreadsheetId, forgetSpreadsheetId, Sheets, rowsToRecords, parseExcursionName
+    findSpreadsheetId, forgetSpreadsheetId, Sheets, rowsToRecords, parseExcursionName, excursionStatus
   };
   window.AppData = AppData;
 })();

@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.0" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.0" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.0" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.2" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.5.0"></script>
-  <script src="js/config.js?v=2.5.0"></script>
-  <script src="js/google.js?v=2.5.0"></script>
-  <script src="js/clouddb.js?v=2.5.0"></script>
+  <script src="js/storage.js?v=2.5.2"></script>
+  <script src="js/config.js?v=2.5.2"></script>
+  <script src="js/google.js?v=2.5.2"></script>
+  <script src="js/clouddb.js?v=2.5.2"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -587,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.5.0" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.5.2" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +599,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.5.0" alt="" />
+        <img src="icons/icon-192.png?v=2.5.2" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1047,9 +1047,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.0" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.2" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.0" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.2" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -1936,7 +1936,7 @@
       if (c.counter && c.excList === excList) return c.counter;
       const map = new Map();
       excList.forEach((esc) => {
-        if (!esc.ok || !Array.isArray(esc.rows)) return;
+        if (!esc.ok || !Array.isArray(esc.rows) || excStatus(esc)) return;   // rimandate e annullate non contano
         const seenInThisEsc = new Set();
         const tripLabel = formatNomeUscita(esc.titolo) || esc.id || "Escursione";
         esc.rows.forEach((r) => {
@@ -2143,7 +2143,7 @@
       const ordered = excList.slice().reverse();
       const selectedId = excList.some(e => e.id === sel.value) ? sel.value : (ordered[0] ? ordered[0].id : "");
       sel.innerHTML = ordered.length
-        ? ordered.map(e => `<option value="${escapeHtml(e.id)}" ${e.id === selectedId ? "selected" : ""}>${escapeHtml(formatNomeUscita(e.titolo || e.id))}</option>`).join("")
+        ? ordered.map(e => `<option value="${escapeHtml(e.id)}" ${e.id === selectedId ? "selected" : ""}>${escapeHtml(formatNomeUscita(e.titolo || e.id))}${excStatus(e) ? " · " + excStatus(e).toUpperCase() : ""}</option>`).join("")
         : `<option value="">Nessuna escursione trovata</option>`;
 
       const currentEsc = excList.find(e => e.id === selectedId) || null;
@@ -2515,6 +2515,7 @@
       let presences = 0;
       (statsData ? statsData.years : []).filter(y => !year || String(y.year) === String(year)).forEach(y => {
         y.rows.forEach(r => {
+          if (GoogleApi.excursionStatus(r.nome)) return;   // righe di uscite rimandate o annullate
           presences++;
           const ek = y.year + "|" + r.data + "|" + r.nome.toLowerCase();
           let e = exc.get(ek);
@@ -2574,7 +2575,7 @@
       const firstYear = years.length ? Math.min(...years) : new Date().getFullYear();
       const today = new Date(); today.setHours(0, 0, 0, 0);
       return excList.filter(esc => {
-        if (!esc.ok || !esc.rows.length) return false;
+        if (!esc.ok || !esc.rows.length || excStatus(esc)) return false;   // rimandate e annullate non vanno nel foglio
         const d = formDateFromTitle(esc.titolo);
         const dt = parseItDate(d);
         if (!dt || dt > today || dt.getFullYear() < firstYear) return false;   // futura o precedente al foglio
@@ -2914,6 +2915,7 @@
         });
       }
       excList.forEach(esc => {
+        if (excStatus(esc)) return;   // rimandate e annullate non sono "già fatte"
         const d = parseItDate(formDateFromTitle(esc.titolo));
         if (!d) return;
         if (events.some(e => e.source === "stats" && e.date.getTime() === d.getTime())) return;
@@ -3424,6 +3426,11 @@
     });
     updateNotifButton();
 
+    // "rimandata", "annullata" oppure null: le uscite rimandate o annullate restano in elenco ma non contano.
+    function excStatus(esc) {
+      return esc ? GoogleApi.excursionStatus(esc.titolo) : null;
+    }
+
     function formatNomeUscita(titoloRaw) {
       const s = String(titoloRaw || "").trim();
       const info = GoogleApi.parseExcursionName(s);
@@ -3434,6 +3441,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.5.0"></script>
+<script src="js/app.js?v=2.5.2"></script>
 </body>
 </html>

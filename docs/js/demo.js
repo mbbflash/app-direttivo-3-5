@@ -77,6 +77,11 @@
         "demo-esc-4": { name: `Iscrizioni 2026.09.05-06 - Due giorni, Crinale Finto (Risposte)`, sheets: { "Risposte del modulo 1": form([
           ["01/09/2026 21.00", "Elena Marrone", "elena.marrone@esempio.it", "3330000006", "SI"],
           ["02/09/2026 10.15", "Marco Viola", "marco.viola@esempio.it", "3330000007", "SI"]
+        ]) } },
+        // Uscita rimandata: resta nell'elenco ma non conta nelle presenze e nelle statistiche.
+        "demo-esc-5": { name: `Iscrizioni 2026.10.11 - [RIMANDATA] Lago Finto (Risposte)`, sheets: { "Risposte del modulo 1": form([
+          ["05/10/2026 20.00", "Mario Rossi", "mario.rossi@esempio.it", "3330000000", "SI"],
+          ["06/10/2026 9.30", "Luca Verdi", "luca.verdi@esempio.it", "3330000002", "SI"]
         ]) } }
       }
     };
