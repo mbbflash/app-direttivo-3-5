@@ -853,7 +853,7 @@
     <div id="viewNext" class="view-section hidden">
       <section class="card">
         <h2 class="card-title"><svg class="ico"><use href="#i-compass"/></svg>Assistente scelta prossima escursione</h2>
-        <p class="muted next-intro">Incrocia le schede tecniche dei percorsi con presenze e iscrizioni e propone i più adatti alla data scelta. Il punteggio segue regole fisse: stagione e quota, tempo dall'ultima volta, partecipazione e varietà.</p>
+        <p class="muted next-intro">Incrocia le schede tecniche dei percorsi con presenze e iscrizioni e propone i più adatti alla data scelta. Il punteggio segue regole fisse: stagione e quota, tempo dall'ultima volta, partecipazione, varietà e uscite rimandate da recuperare.</p>
         <div class="form-grid next-filters">
           <label>Data prevista<input type="date" id="nextDate" /></label>
           <label>Difficoltà massima
@@ -2906,6 +2906,8 @@
     }
 
     // Uscite già fatte o in programma: presenze (foglio statistiche) + date dei form.
+    // Le uscite rimandate o annullate arrivano con "stato": non contano come fatte né in programma,
+    // ma danno al percorso il bonus "da recuperare".
     function buildEvents() {
       const events = [];
       if (statsData) {
@@ -2915,9 +2917,13 @@
         });
       }
       excList.forEach(esc => {
-        if (excStatus(esc)) return;   // rimandate e annullate non sono "già fatte"
         const d = parseItDate(formDateFromTitle(esc.titolo));
         if (!d) return;
+        const stato = excStatus(esc);
+        if (stato) {
+          events.push({ date: d, nome: formatNomeUscita(esc.titolo), presenti: null, source: "form", stato, iscritti: esc.ok ? esc.rows.length : 0 });
+          return;
+        }
         if (events.some(e => e.source === "stats" && e.date.getTime() === d.getTime())) return;
         events.push({ date: d, nome: formatNomeUscita(esc.titolo), presenti: null, source: "form" });
       });
@@ -2959,7 +2965,9 @@
       const month = target.getMonth();
       const winter = [11, 0, 1, 2].includes(month), summer = [5, 6, 7].includes(month);
       const routes = buildRoutes();
-      const events = buildEvents();
+      const allEvents = buildEvents();
+      const events = allEvents.filter(e => !e.stato);
+      const postponed = allEvents.filter(e => e.stato);
       const past = events.filter(e => e.date < today);
       const withPres = past.filter(e => e.presenti);
       const globalAvg = withPres.length ? withPres.reduce((s, e) => s + e.presenti, 0) / withPres.length : null;
@@ -3006,6 +3014,14 @@
           if (delta >= 3) pros.push(`molto partecipata: in media ${fmtNum(avgPres)} presenti (media generale ${fmtNum(globalAvg)})`);
           else if (delta <= -3) cons.push(`poco partecipata: in media ${fmtNum(avgPres)} presenti (media generale ${fmtNum(globalAvg)})`);
         }
+        // Rimandata o annullata e non ancora recuperata: va riproposta (entro 18 mesi).
+        // Il bonus non scavalca stagione e quota: molte uscite saltano per maltempo o neve.
+        const lastDone = done.length ? done[done.length - 1].date : null;
+        const toRecover = postponed.filter(e => routeMatches(r.tokens, e.nome) && (!lastDone || e.date > lastDone)).pop() || null;
+        if (toRecover && !planned && monthsBetween(toRecover.date, target) <= 18) {
+          score += 20;
+          pros.push(`${toRecover.stato} il ${fmtDateIt(toRecover.date)}: da recuperare` + (toRecover.iscritti ? ` (${toRecover.iscritti} iscritti)` : ""));
+        }
         if (r.level && lastLevels.length) {
           if (lastLevels.length >= 2 && lastLevels.every(l => l === r.level)) { score -= 5; cons.push("stessa difficoltà delle ultime due uscite"); }
           else if (lastLevels[0] !== r.level) { score += 5; pros.push(`difficoltà diversa dall'ultima uscita (${DIFF_LABELS[lastLevels[0]] || ""})`); }
@@ -3018,7 +3034,7 @@
         if (f.ore && r.ore !== null && r.ore > Number(f.ore)) excluded.push(`durata ${fmtNum(r.ore)} h`);
         if (f.ritrovo && r.ritrovoLabel !== f.ritrovo) excluded.push("altro ritrovo");
         if (f.exclRecent && months !== null && months < 12) excluded.push(lastDate ? "fatta negli ultimi 12 mesi" : `già proposta nel ${lastYear}`);
-        return Object.assign({}, r, { score, pros, cons, excluded, lastDate, lastYear, avgPres, planned, history: done });
+        return Object.assign({}, r, { score, pros, cons, excluded, lastDate, lastYear, avgPres, planned, history: done, toRecover });
       }).sort((a, b) => b.score - a.score || a.nome.localeCompare(b.nome, "it"));
       return { ranked, target, hasStats: Boolean(statsData), hasForms: excList.length > 0 };
     }

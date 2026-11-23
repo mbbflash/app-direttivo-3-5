@@ -18,7 +18,8 @@ Il foglio delle schede tecniche ha una riga per uscita con le colonne: Anno, Esc
   - stagione: quota massima > 1500 m tra dicembre e marzo −30 (neve), > 1200 m in quei mesi −10; quota massima < 700 m tra giugno e agosto −20 (caldo), > 1300 m d'estate +10; < 1000 m d'inverno +5;
   - ultima volta: mai registrato +10; da ≥ 24 mesi +15; 12-24 mesi +5; < 12 mesi −25 (o escluso se richiesto);
   - partecipazione: presenze medie sopra la media generale fino a +15, sotto fino a −10;
-  - varietà: difficoltà diversa dall'ultima uscita fatta +5; stessa difficoltà delle ultime due −5.
+  - varietà: difficoltà diversa dall'ultima uscita fatta +5; stessa difficoltà delle ultime due −5;
+  - da recuperare: ultima uscita del percorso rimandata o annullata (segno nel nome del foglio), non ancora rifatta né in programma, da non più di 18 mesi +20. Rimandate e annullate non contano come fatte né come in programma.
 - **Filtri rigidi** (difficoltà, dislivello, durata, ritrovo, recenti) escludono; i percorsi già in un form futuro sono esclusi con la nota "già in programma".
 - Le fonti presenze e form sono facoltative: se non si caricano l'assistente funziona con la sola colonna Anno.
 

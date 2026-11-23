@@ -17,7 +17,7 @@ Il sistema SHALL leggere tutte le schede del foglio statistiche il cui nome è "
 - **THEN** il sistema la ignora
 
 ### Requirement: Uscite rimandate o annullate escluse
-Il sistema SHALL considerare rimandata o annullata un'uscita il cui nome del foglio iscrizioni contiene "rimandata" o "annullata" (anche "rimandato", "annullato", "cancellata", tra parentesi quadre o tonde o senza, maiuscole e minuscole indifferenti), e MUST escluderla da: contatore partecipazioni e curriculum dai form, uscite dei form mancanti nel foglio statistiche, uscite già fatte o in programma dell'assistente. Le righe del foglio statistiche il cui NomeEscursione contiene le stesse parole MUST essere escluse da totali, grafico, classifica, elenco e curriculum. L'uscita resta visibile nella scheda Escursioni con lo stato accanto al nome, e il nome mostrato non contiene il segno.
+Il sistema SHALL considerare rimandata o annullata un'uscita il cui nome del foglio iscrizioni contiene "rimandata" o "annullata" (anche "rimandato", "annullato", "cancellata", tra parentesi quadre o tonde o senza, maiuscole e minuscole indifferenti), e MUST escluderla da: contatore partecipazioni e curriculum dai form, uscite dei form mancanti nel foglio statistiche, uscite già fatte o in programma dell'assistente (che invece le usa per il bonus "da recuperare"). Le righe del foglio statistiche il cui NomeEscursione contiene le stesse parole MUST essere escluse da totali, grafico, classifica, elenco e curriculum. L'uscita resta visibile nella scheda Escursioni con lo stato accanto al nome, e il nome mostrato non contiene il segno.
 
 #### Scenario: Uscita rimandata nei form
 - **WHEN** esiste il foglio "Iscrizioni 2026.10.11 - [RIMANDATA] Lago (Risposte)" con 2 iscritti

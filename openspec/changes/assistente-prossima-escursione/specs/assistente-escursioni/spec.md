@@ -33,6 +33,11 @@ Il sistema SHALL ordinare i percorsi con un punteggio da 0 a 100 calcolato con r
 - **WHEN** il percorso risulta fatto meno di 12 mesi prima della data prevista
 - **THEN** il punteggio si abbassa e la motivazione indica quanti mesi sono passati
 
+#### Scenario: Uscita rimandata da recuperare
+- **WHEN** l'ultima uscita del percorso ha il foglio iscrizioni segnato rimandata o annullata, da non più di 18 mesi, e il percorso non è stato rifatto né è in programma
+- **THEN** il punteggio sale di 20 e compare la motivazione "rimandata il GG/MM/AAAA: da recuperare (N iscritti)"
+- **AND** quell'uscita non conta come fatta (nessuna penalità "fatta da poco") né come "già in programma"
+
 ### Requirement: Incrocio con presenze e iscrizioni
 Il sistema SHALL ricavare la data dell'ultima volta e le presenze medie di ogni percorso dal foglio statistiche e dai fogli risposte delle uscite ("Iscrizioni AAAA.MM.GG - …" o "Form Iscrizione AAAA.MM.GG - …"), abbinando i nomi per parole in comune, e SHALL funzionare anche senza queste fonti usando la colonna Anno. I percorsi che hanno un form con data futura SHALL essere esclusi con l'indicazione "già in programma".
 
