@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.4.1-blue)
+![Versione](https://img.shields.io/badge/versione-2.5.2-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -90,14 +90,16 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 
 | Funzione | Cosa fa |
 |---|---|
+| **Caricamento veloce** | L'elenco delle uscite compare subito e l'uscita aperta si legge per prima; le altre arrivano in sottofondo con il conteggio di avanzamento. Le uscite non modificate restano salvate sul dispositivo e non vengono rilette |
 | **Elenco uscite automatico** | Trova da solo nel Drive tutti i fogli risposte *"Iscrizioni AAAA.MM.GG - Nome (Risposte)"* (riconosce ancora anche la vecchia sintassi *"Form Iscrizione AAAA.MM.GG - "Nome" (Risposte)"*), anche quelli nuovi, in ordine di data |
+| **Uscite rimandate o annullate** | Basta scrivere `[RIMANDATA]` o `[ANNULLATA]` nel nome del foglio iscrizioni: l'uscita resta nell'elenco con lo stato accanto al nome, ma non conta nelle statistiche, nel contatore partecipazioni e nel curriculum dei soci |
 | **Adesioni** | Tabella dei partecipanti all'uscita scelta, con contatti (e collegamenti rapidi WhatsApp/Telegram), stato socio e n° di escursioni fatte |
 | **Ricerca partecipanti** | Cerca per nome, email o telefono |
 | **Statistiche uscita** | Adesioni nel foglio, quanti sono **già soci**, partecipanti unici |
 | **Abbinamento al Libro Soci** | Riconosce i soci da email, telefono o nome e cognome (anche in ordine invertito) |
 | **Note e conferme per partecipante** | Nota e spunta *Confermato* su ogni iscritto, **condivise con il direttivo** |
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
-| **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli |
+| **Contatore partecipazioni** | Classifica di tutti gli escursionisti con il numero di uscite fatte e l'elenco delle uscite, su tutti i fogli (escluse le uscite rimandate o annullate) |
 | **Nuova escursione programmata** | Pulsante che crea il form di iscrizione (copia del template, con titolo e giorno della settimana) e il foglio *Iscrizioni AAAA.MM.GG - Nome (Risposte)* collegato, poi dà il link da condividere. Lo fa lo script di automazione: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |
 
 ### 📊 Statistiche
@@ -107,7 +109,7 @@ Legge il foglio **"Tre Quinti Wrapped - Foglio Calcolo"** (presenze effettive, u
 - scelta dell'**anno** o di tutti gli anni, ricerca per escursionista o uscita;
 - totali: uscite, presenze, escursionisti, media per uscita, km, dislivello e ore;
 - grafico delle **presenze per uscita**, **classifica** degli escursionisti (ordinabile) ed elenco delle uscite;
-- **uscite dei form non ancora nel foglio**: l'app le segnala e, con *Aggiungi al foglio*, propone le righe da scrivere (presenti segnati *Confermato*, più eventuali presenti senza iscrizione, ore, km e dislivello). Scrive solo dopo conferma, nello stesso formato di sempre (`Socio | =UPPER(A) | Data | NomeEscursione | Ore | Km | Dislivello`), riusando la grafia dei nomi già presente nel foglio;
+- **uscite dei form non ancora nel foglio**: l'app le segnala e, con *Aggiungi al foglio*, propone le righe da scrivere (presenti segnati *Confermato*, più eventuali presenti senza iscrizione, ore, km e dislivello). Scrive solo dopo conferma, nello stesso formato di sempre (`Socio | =UPPER(A) | Data | NomeEscursione | Ore | Km | Dislivello`), riusando la grafia dei nomi già presente nel foglio. Le uscite rimandate o annullate non vengono proposte, e le righe del foglio con quelle parole nel nome vengono scartate;
 - nella **scheda socio** il curriculum mostra le presenze vere con ore, km e dislivello totali.
 
 ### 🧭 Prossima uscita (assistente)
@@ -117,6 +119,7 @@ Aiuta il direttivo a scegliere la prossima escursione. Legge il foglio **"Tre Qu
 - filtri: **data prevista**, difficoltà, dislivello e durata massimi, **punto di ritrovo**, *escludi i percorsi fatti negli ultimi 12 mesi*;
 - classifica con un **punteggio da 0 a 100** e le **motivazioni**: quota adatta alla stagione (neve d'inverno, caldo d'estate), tempo dall'ultima volta, partecipazione media rispetto alle altre uscite, varietà di difficoltà rispetto alle ultime uscite;
 - i percorsi con un form già aperto per una data futura risultano **già in programma**;
+- un percorso la cui ultima uscita è stata **rimandata o annullata** (negli ultimi 18 mesi) e non ancora rifatta riceve **+20** con la motivazione *da recuperare*; stagione e quota continuano a pesare;
 - per ogni proposta: dati tecnici, ritrovo, descrizione, uscite passate e **Copia annuncio** (testo pronto per Telegram, WhatsApp o email);
 - tabella **Tutti i percorsi** con l'esito di ognuno.
 
@@ -247,9 +250,12 @@ Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automat
         ├──►  Google Drive API   →  trova i fogli per nome
         ├──►  Google Sheets API  →  legge Libro Soci ed escursioni
         └──►  Google Sheets API  →  legge e scrive il database condiviso
+                                        │
+              Script Apps Script  ◄─────┘  scheda `Richieste` (es. nuova escursione)
+              (ogni minuto)  →  crea form e foglio risposte con l'account dell'associazione
 ```
 
-Nessun server intermedio: il browser parla direttamente con Google.
+Nessun server intermedio: il browser parla direttamente con Google. Le poche operazioni che il browser non può fare da solo (come creare il form di una nuova uscita) le esegue uno script Apps Script collegato al foglio database.
 
 Permessi richiesti all'account:
 
@@ -263,7 +269,10 @@ Permessi richiesti all'account:
 
 ## ⚙️ Prima configurazione
 
-Va fatta **una volta sola**: creare il *Client ID* Google per il login. Istruzioni passo passo in **[SETUP-GOOGLE.md](SETUP-GOOGLE.md)**.
+Va fatta **una volta sola**:
+
+1. creare il *Client ID* Google per il login: istruzioni passo passo in **[SETUP-GOOGLE.md](SETUP-GOOGLE.md)**;
+2. *(facoltativo, serve per **Nuova escursione programmata**)* installare lo script di automazione sul foglio database: guida in **[SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md)**.
 
 Le impostazioni dell'app sono in [`docs/js/config.js`](docs/js/config.js): Client ID, account abilitati e nomi dei fogli da cercare.
 
@@ -277,14 +286,23 @@ app-direttivo-3-5/
 │   ├── index.html                     # Interfaccia
 │   ├── manifest.webmanifest           # Dati per installarla come app
 │   ├── sw.js                          # Funzionamento offline e aggiornamenti
+│   ├── version.json                   # Versione e novità mostrate agli utenti
 │   ├── icons/                         # Icone dell'app
 │   └── js/
 │       ├── config.js                  # Impostazioni (Client ID, nomi dei fogli)
 │       ├── google.js                  # Accesso Google, Drive e Sheets
 │       ├── clouddb.js                 # Database condiviso e coda delle modifiche
+│       ├── storage.js                 # Memoria del dispositivo (separata in demo)
 │       ├── app.js                     # Collegamento tra pagina, login e database
 │       └── demo.js                    # Dati finti per la modalità ?demo=1
-└── SETUP-GOOGLE.md                    # Guida per creare il Client ID
+├── apps-script/                       # ⚙️ Script di automazione (Apps Script)
+│   ├── Codice.gs                      # Esegue le richieste dell'app (es. nuova escursione)
+│   └── appsscript.json                # Impostazioni e permessi dello script
+├── openspec/                          # 📐 Specifiche dell'app (OpenSpec)
+│   ├── specs/                         # Comportamento attuale, per area
+│   └── changes/                       # Modifiche proposte o in corso
+├── SETUP-GOOGLE.md                    # Guida per creare il Client ID
+└── SETUP-APPS-SCRIPT.md               # Guida per installare lo script di automazione
 ```
 
 ---
@@ -301,3 +319,4 @@ app-direttivo-3-5/
 | *⚠ accedi per salvare* | La sessione è scaduta: clicca l'avviso e accedi, le modifiche in coda vengono salvate |
 | *⚠ Offline* | Le modifiche restano in coda e partono appena torna la connessione |
 | Non vedo le modifiche di un altro | Premi **Aggiorna dati** |
+| *Nuova escursione programmata* non parte | Lo script di automazione non è installato o non è attivo: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |
