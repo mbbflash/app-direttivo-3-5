@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.2" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.2" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.2" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.3" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.3" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.3" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.5.2"></script>
-  <script src="js/config.js?v=2.5.2"></script>
-  <script src="js/google.js?v=2.5.2"></script>
-  <script src="js/clouddb.js?v=2.5.2"></script>
+  <script src="js/storage.js?v=2.5.3"></script>
+  <script src="js/config.js?v=2.5.3"></script>
+  <script src="js/google.js?v=2.5.3"></script>
+  <script src="js/clouddb.js?v=2.5.3"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -587,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.5.2" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.5.3" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +599,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.5.2" alt="" />
+        <img src="icons/icon-192.png?v=2.5.3" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1047,9 +1047,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.2" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.3" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.2" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.3" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -1876,16 +1876,30 @@
       return d.length > 10 && d.startsWith("39") ? d.slice(2) : d;
     }
 
+    // Tutte le email presenti in un testo, in forma canonica: minuscole, e per Gmail
+    // senza punti né "+etichetta" (mario.rossi+trek@gmail.com = mariorossi@gmail.com).
+    function emailKeys(str) {
+      const found = String(str || "").toLowerCase().match(/[a-z0-9._%+'-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/g) || [];
+      return found.map(e => {
+        let [user, domain] = e.split("@");
+        if (domain === "googlemail.com") domain = "gmail.com";
+        if (domain === "gmail.com") user = user.split("+")[0].replace(/\./g, "");
+        return user + "@" + domain;
+      });
+    }
+
     function extractMemberContacts(m) {
       const emails = [], phones = [];
       Object.entries(m || {}).forEach(([k, v]) => {
         const val = String(v || "").trim();
         if (!val) return;
         const kl = k.toLowerCase();
-        if (val.includes("@") || kl.includes("mail")) emails.push(val.toLowerCase());
+        if (val.includes("@")) emails.push(...emailKeys(val));
         if (kl.includes("tel") || kl.includes("cell") || kl.includes("mobile") || kl.includes("whatsapp")) {
-          const nd = normalizePhoneDigits(val);
-          if (nd.length >= 6) phones.push(nd);
+          val.split(/[\/;,]| - /).forEach(part => {
+            const nd = normalizePhoneDigits(part);
+            if (nd.length >= 6) phones.push(nd);
+          });
         }
       });
       return { emails, phones };
@@ -1897,30 +1911,98 @@
     function getMatchCache() {
       if (matchCache.members === members) return matchCache;
       const emails = new Map(), phones = new Map(), names = new Map();
+      const tokenIndex = new Map(), memberTokens = new Map();
+      const addUnique = (map, k, m) => { const cur = map.get(k); map.set(k, cur === undefined || cur === m ? m : null); };
       for (const m of members) {
         const mc = extractMemberContacts(m);
-        mc.emails.forEach(e => { if (!emails.has(e)) emails.set(e, m); });
-        mc.phones.forEach(p => { if (!phones.has(p)) phones.set(p, m); });
+        mc.emails.forEach(e => addUnique(emails, e, m));
+        mc.phones.forEach(p => addUnique(phones, p, m));
+        const sets = [];
         [memberFullName(m), m["NOMINATIVO"] || m["SOCIO"] || ""].forEach(n => {
-          const k = nameKey(n);
-          if (k.includes(" ") && !names.has(k)) names.set(k, m);
+          const toks = [...new Set(tokenizeName(n))];
+          if (toks.length < 2) return;
+          const k = toks.slice().sort().join(" ");
+          if (!names.has(k)) names.set(k, m);
+          sets.push(new Set(toks));
+          toks.forEach(t => { if (!tokenIndex.has(t)) tokenIndex.set(t, new Set()); tokenIndex.get(t).add(m); });
         });
+        if (sets.length) memberTokens.set(m, sets);
       }
-      matchCache = { members, emails, phones, names, memo: new Map(), excList: null, counter: null, byMember: null };
+      matchCache = { members, emails, phones, names, tokenIndex, memberTokens, memo: new Map(), excList: null, counter: null, byMember: null, formContacts: null, formContactsFor: null };
       return matchCache;
+    }
+
+    // Nome con secondo nome o doppio cognome: "Stefano Picchi" e "Picchi Stefano Maria" sono
+    // la stessa persona se tutte le parole del nome più corto (almeno due) stanno nell'altro.
+    // Se le corrispondenze sono più di una non scelgo: meglio "Non socio" che il socio sbagliato.
+    function findMemberByPartialName(name) {
+      const c = getMatchCache();
+      const toks = [...new Set(tokenizeName(name))];
+      if (toks.length < 2) return null;
+      const tset = new Set(toks);
+      const candidates = new Set();
+      toks.forEach(t => (c.tokenIndex.get(t) || []).forEach(m => candidates.add(m)));
+      const hits = [];
+      candidates.forEach(m => {
+        const ok = c.memberTokens.get(m).some(s => {
+          const [small, big] = s.size <= tset.size ? [s, tset] : [tset, s];
+          return small.size >= 2 && [...small].every(t => big.has(t));
+        });
+        if (ok) hits.push(m);
+      });
+      return hits.length === 1 ? hits[0] : null;
+    }
+
+    // Dai moduli d'iscrizione: nome → email e telefoni con cui quella persona si è iscritta.
+    // Serve dove c'è solo il nome (foglio statistiche): il nome porta all'email, l'email al socio.
+    function getFormContacts() {
+      const c = getMatchCache();
+      if (c.formContacts && c.formContactsFor === excList) return c.formContacts;
+      const byName = new Map();
+      excList.forEach(esc => {
+        if (!esc.ok || !Array.isArray(esc.rows)) return;
+        esc.rows.forEach(r => {
+          const f = extractFormFields(r);
+          const k = nameKey(f.displayName);
+          if (!k.includes(" ")) return;
+          let rec = byName.get(k);
+          if (!rec) { rec = { emails: new Set(), phones: new Set() }; byName.set(k, rec); }
+          emailKeys(f.email).forEach(e => rec.emails.add(e));
+          const p = normalizePhoneDigits(f.phone);
+          if (p.length >= 6) rec.phones.add(p);
+        });
+      });
+      c.formContacts = byName;
+      c.formContactsFor = excList;
+      return byName;
+    }
+
+    function memberByContacts(c, emails, phones) {
+      const found = new Set();
+      emails.forEach(e => { const m = c.emails.get(e); if (m) found.add(m); });
+      if (!found.size) phones.forEach(p => { const m = c.phones.get(p); if (m) found.add(m); });
+      return found.size === 1 ? [...found][0] : null;
     }
 
     function findMatchingMember(name, email, phone) {
       const c = getMatchCache();
+      const onlyName = !email && !phone;
       const memoKey = `${name}\u0001${email}\u0001${phone}`;
-      if (c.memo.has(memoKey)) return c.memo.get(memoKey);
-      const e = String(email || "").toLowerCase().trim();
-      const p = normalizePhoneDigits(phone);
-      let m = (e && c.emails.get(e)) || (p.length >= 6 && c.phones.get(p)) || null;
-      if (!m) {
-        const k = nameKey(name);
-        if (k.includes(" ")) m = c.names.get(k) || null;
+      if (c.memo.has(memoKey) && !(onlyName && c.memoFor !== excList)) return c.memo.get(memoKey);
+      if (onlyName && c.memoFor !== excList) {
+        // l'elenco delle uscite è cambiato: i risultati "solo nome" potrebbero migliorare
+        [...c.memo.keys()].forEach(k => { if (k.endsWith("\u0001\u0001")) c.memo.delete(k); });
+        c.memoFor = excList;
       }
+      const p = normalizePhoneDigits(phone);
+      let m = memberByContacts(c, emailKeys(email), p.length >= 6 ? [p] : []);
+      const k = nameKey(name);
+      if (!m && k.includes(" ")) m = c.names.get(k) || null;
+      if (!m && onlyName && k.includes(" ")) {
+        const fc = getFormContacts().get(k);
+        if (fc) m = memberByContacts(c, [...fc.emails], [...fc.phones]);
+      }
+      if (!m) m = findMemberByPartialName(name);
       c.memo.set(memoKey, m);
       return m;
     }
@@ -2467,7 +2549,7 @@
     let statsYear = null;          // null = non ancora scelto, "" = tutti gli anni
     let statsSort = { key: "count", dir: "desc" };
     let statsAggCache = new Map();
-    let statsAggFor = { data: null, members: null };
+    let statsAggFor = { data: null, members: null, exc: null };
 
     function fmtNum(n, dec) {
       const v = Number(n) || 0;
@@ -2505,9 +2587,10 @@
     function ensureStats() { return statsData ? Promise.resolve(statsData) : loadStats({ quiet: true }); }
 
     function aggregateStats(year) {
-      if (statsAggFor.data !== statsData || statsAggFor.members !== members) {
+      // anche excList: dai moduli arrivano le email che collegano i nomi delle statistiche ai soci
+      if (statsAggFor.data !== statsData || statsAggFor.members !== members || statsAggFor.exc !== excList) {
         statsAggCache = new Map();
-        statsAggFor = { data: statsData, members };
+        statsAggFor = { data: statsData, members, exc: excList };
       }
       const ck = String(year || "");
       if (statsAggCache.has(ck)) return statsAggCache.get(ck);
@@ -3457,6 +3540,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.5.2"></script>
+<script src="js/app.js?v=2.5.3"></script>
 </body>
 </html>

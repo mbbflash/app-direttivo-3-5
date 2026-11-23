@@ -1,6 +1,15 @@
 {
-  "version": "2.5.2",
+  "version": "2.5.3",
   "releases": [
+    {
+      "version": "2.5.3",
+      "date": "23/11/2026",
+      "notes": [
+        "Soci riconosciuti anche con secondo nome o doppio cognome: \"Stefano Picchi\" trova \"Picchi Stefano Maria\" (solo se il socio compatibile è uno)",
+        "Classifica delle statistiche: se il nome non basta, il socio si trova dall'email o dal telefono usati nei moduli d'iscrizione",
+        "Email più tolleranti: maiuscole, punti e \"+etichetta\" di Gmail, e più email o telefoni nella stessa cella del Libro Soci"
+      ]
+    },
     {
       "version": "2.5.2",
       "date": "23/11/2026",

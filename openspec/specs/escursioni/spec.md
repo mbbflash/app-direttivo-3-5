@@ -24,11 +24,23 @@ Il sistema SHALL riconoscere nelle colonne del form nome e cognome (anche in un'
 - **THEN** il sistema usa quel valore come nome del partecipante
 
 ### Requirement: Abbinamento al Libro Soci
-Il sistema SHALL abbinare ogni iscritto a un socio cercando nell'ordine: email (senza distinzione di maiuscole), telefono (solo cifre, senza prefisso 39, almeno 6 cifre), e infine nome e cognome considerati come insieme di parole (accenti, punteggiatura e ordine ignorati, almeno due parole).
+Il sistema SHALL abbinare ogni iscritto a un socio cercando nell'ordine: email (senza distinzione di maiuscole; per Gmail ignorando punti e "+etichetta"; tutte le email presenti in una cella del Libro Soci), telefono (solo cifre, senza prefisso 39, almeno 6 cifre; tutti i numeri di una cella), nome e cognome considerati come insieme di parole (accenti, punteggiatura e ordine ignorati, almeno due parole), e infine nome parziale: tutte le parole del nome più corto (almeno due) contenute nell'altro. Un'email o un telefono condivisi da più soci non bastano a decidere. Se il nome parziale corrisponde a più soci, l'iscritto resta non abbinato. Dove c'è solo il nome (foglio statistiche), il sistema SHALL usare anche le email e i telefoni con cui quel nome compare nei moduli d'iscrizione.
 
 #### Scenario: Nome in ordine invertito
 - **WHEN** nel form c'è "Rossi Mario" e nel Libro Soci "Mario Rossi", senza email o telefono in comune
 - **THEN** l'iscritto viene riconosciuto come quel socio
+
+#### Scenario: Secondo nome o doppio cognome
+- **WHEN** nel form c'è "Stefano Picchi" e nel Libro Soci l'unico socio compatibile è "Picchi Stefano Maria"
+- **THEN** l'iscritto viene riconosciuto come quel socio
+
+#### Scenario: Nome parziale ambiguo
+- **WHEN** nel form c'è "Marco Rossi" e nel Libro Soci ci sono "Rossi Marco Luigi" e "Rossi Marco Antonio"
+- **THEN** l'iscritto resta "Non socio"
+
+#### Scenario: Nome delle statistiche collegato tramite email
+- **WHEN** nel foglio statistiche un nome non corrisponde a nessun socio, ma nei moduli d'iscrizione lo stesso nome ha un'email presente nel Libro Soci
+- **THEN** in classifica la persona viene riconosciuta come quel socio
 
 ### Requirement: Adesioni e statistiche dell'uscita
 Il sistema SHALL mostrare per l'uscita scelta la tabella dei partecipanti con contatti (e collegamenti WhatsApp/Telegram), stato socio e numero di escursioni fatte, una ricerca per nome, email o telefono, e i totali: adesioni nel foglio, quanti sono già soci, partecipanti unici.
