@@ -6,6 +6,19 @@ l'utente debba ripeterle.
 
 Rispondi all'utente **in italiano**.
 
+## 0. Chi lavora al progetto e nuovi collaboratori
+
+Al progetto lavorano **Matteo** (proprietario del repository, utente GitHub `mbbflash`) e
+**Mattia** (collaboratore, utente GitHub `mattia307`). La guida completa per chi sviluppa,
+compreso il deploy su GitHub Pages, è in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+**Regola per Claude**: se all'inizio della sessione l'utente sembra nuovo al progetto
+(lo dice, chiede come funziona o cosa installare, oppure `git config user.name` non è
+`mbbflash` e non ha ancora commit nel repository), proponigli subito la
+skill **`/benvenuto`**, che controlla gli strumenti e gli spiega progetto, metodo di
+lavoro e deploy. Se chiede come si pubblica, spiega il deploy seguendo
+`CONTRIBUTING.md` §6.
+
 ## 1. Prima configurazione (una volta sola, per ogni collaboratore)
 
 1. Clona il repository e apri la cartella con Claude Code.
@@ -70,7 +83,15 @@ di ogni lavoro. Riassunto delle regole per gli artefatti:
 ## 4. Rilascio (ogni modifica a `docs/` che va online)
 
 Ogni push su `main` che tocca `docs/` va **online per tutto il direttivo** in pochi
-minuti (GitHub Pages). Per ogni rilascio:
+minuti. Come funziona: GitHub Pages è impostato su "Deploy from a branch", branch `main`,
+cartella `/docs`; a ogni push GitHub esegue da solo il job "pages build and deployment"
+(nessun file di workflow nel repository). Un branch diverso da `main` non va online.
+`apps-script/` non si pubblica col push: va copiato a mano (SETUP-APPS-SCRIPT.md).
+Dopo il push si controlla con
+`gh run list --workflow "pages-build-deployment" --limit 3` e aprendo
+`https://mbbflash.github.io/app-direttivo-3-5/version.json`. Se un rilascio rompe l'app:
+`git revert` del commit, nuova versione più alta, push (mai `push --force` su `main`).
+Spiegazione estesa in `CONTRIBUTING.md` §6. Per ogni rilascio:
 
 1. Aumenta `version` in `docs/js/config.js`.
 2. Aggiorna tutti i `?v=` in `docs/index.html` e in `docs/manifest.webmanifest`.

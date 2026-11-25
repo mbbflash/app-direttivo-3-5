@@ -19,6 +19,9 @@ context: |
   - App attuale: `docs/` (PWA pubblicata su GitHub Pages:
     https://mbbflash.github.io/app-direttivo-3-5/). Ogni push su `main` che tocca `docs/`
     va online in pochi minuti per tutti.
+  - Ci lavorano due collaboratori (Matteo e Mattia): prima di iniziare `git pull`, non
+    toccare le modifiche aperte dall'altro senza accordarsi, numero di versione condiviso.
+    Guida per chi sviluppa e deploy su GitHub Pages: CONTRIBUTING.md.
   - La vecchia versione locale (`server.py` + pagina HTML + Web App Apps Script) è stata
     eliminata: esiste solo l'app in `docs/`.
 

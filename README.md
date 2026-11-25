@@ -240,6 +240,8 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 
 Ogni push su `main` che modifica la cartella `docs/` viene pubblicato in automatico su GitHub Pages in un paio di minuti, e alla successiva apertura tutti hanno la nuova versione. Ricordati di aumentare `version` in `docs/js/config.js`, il `?v=` di script e icone in `docs/index.html` e `docs/manifest.webmanifest` (così nessuno resta con file vecchi in cache) e di aggiungere le novità in `docs/version.json`: è da lì che l'app avvisa tutti dell'aggiornamento.
 
+👉 Guida completa per i collaboratori (strumenti, metodo di lavoro con OpenSpec, deploy su GitHub Pages, lavoro in due): **[CONTRIBUTING.md](CONTRIBUTING.md)**. Con Claude Code aperto nel progetto basta scrivere `/benvenuto`.
+
 ---
 
 ## 🔧 Come funziona
@@ -301,6 +303,8 @@ app-direttivo-3-5/
 ├── openspec/                          # 📐 Specifiche dell'app (OpenSpec)
 │   ├── specs/                         # Comportamento attuale, per area
 │   └── changes/                       # Modifiche proposte o in corso
+├── CLAUDE.md                          # Regole del progetto lette da Claude Code
+├── CONTRIBUTING.md                    # Guida per chi sviluppa (anche il deploy)
 ├── SETUP-GOOGLE.md                    # Guida per creare il Client ID
 └── SETUP-APPS-SCRIPT.md               # Guida per installare lo script di automazione
 ```
