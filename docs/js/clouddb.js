@@ -8,7 +8,7 @@
   const TABS = {
     paper: { name: "Tessere", headers: ["chiave", "tessera", "socio", "preparata", "consegnata", "aggiornato_il", "aggiornato_da"] },
     note: { name: "Note", headers: ["chiave", "tessera", "socio", "nota", "aggiornato_il", "aggiornato_da"] },
-    exc: { name: "Conferme_Escursioni", headers: ["chiave", "escursione", "partecipante", "confermato", "nota", "aggiornato_il", "aggiornato_da"] },
+    exc: { name: "Conferme_Escursioni", headers: ["chiave", "escursione", "partecipante", "confermato", "nota", "aggiornato_il", "aggiornato_da", "disdetto"] },
     remind: { name: "Solleciti", headers: ["chiave", "tessera", "socio", "canale", "data_sollecito", "aggiornato_il", "aggiornato_da"] },
     log: { name: "Log", headers: ["quando", "chi", "tipo", "chiave", "valore"] },
     // Richieste per lo script Apps Script (SETUP-APPS-SCRIPT.md): righe aggiunte, mai riscritte dall'app.
@@ -88,6 +88,18 @@
     schemaReady = true;
   }
 
+  // Colonne aggiunte in coda a una scheda già esistente (es. "disdetto"): scrivo solo le
+  // intestazioni mancanti, senza toccare le altre celle.
+  async function ensureTailHeaders(type, values) {
+    const t = TABS[type];
+    const head = (Array.isArray(values) && values[0]) || [];
+    let first = -1;
+    for (let i = t.headers.length - 1; i >= 0 && !String(head[i] || "").trim(); i--) first = i;
+    if (first < 0 || first === 0) return;
+    const range = `'${t.name}'!${colLetter(first + 1)}1:${colLetter(t.headers.length)}1`;
+    try { await GoogleApi.Sheets.update(dbId, range, [t.headers.slice(first)]); } catch (e) {}
+  }
+
   async function openDb() {
     if (!dbId) dbId = await GoogleApi.findSpreadsheetId(cfg.databaseName);
     await ensureSchema();
@@ -111,9 +123,11 @@
         const nota = String(r[3] || "");
         if (nota.trim()) map[key] = nota; else delete map[key];
       } else if (type === "exc") {
-        const confirmed = yes(r[3]);
+        // La colonna "disdetto" (H) è in coda: le righe scritte dalle versioni precedenti non ce l'hanno.
+        const cancelled = yes(r[7]);
+        const confirmed = yes(r[3]) && !cancelled;
         const note = String(r[4] || "");
-        if (confirmed || note.trim()) map[key] = { confirmed, note }; else delete map[key];
+        if (confirmed || cancelled || note.trim()) map[key] = { confirmed, note, cancelled }; else delete map[key];
       } else if (type === "remind") {
         const canale = String(r[3] || "").trim();
         const data = String(r[4] || "").trim();
@@ -141,6 +155,7 @@
       await openDb();
       const res = await GoogleApi.Sheets.batchGet(dbId, [tabRange("paper"), tabRange("note"), tabRange("exc"), tabRange("remind")]);
       const vr = res.valueRanges || [];
+      await ensureTailHeaders("exc", vr[2] && vr[2].values);
       const data = {
         paper: parseTab("paper", vr[0] && vr[0].values),
         note: parseTab("note", vr[1] && vr[1].values),
@@ -171,15 +186,15 @@
       const v = value || {};
       return [key, info.tessera || "", info.socio || "", v.canale || "", v.data || "", ...stamp];
     }
-    const v = value || { confirmed: false, note: "" };
-    return [key, info.escursione || "", info.partecipante || "", yn(v.confirmed), v.note || "", ...stamp];
+    const v = value || { confirmed: false, note: "", cancelled: false };
+    return [key, info.escursione || "", info.partecipante || "", yn(v.confirmed && !v.cancelled), v.note || "", ...stamp, yn(v.cancelled)];
   }
 
   function logValue(type, value) {
     if (type === "paper") return value ? `preparata=${yn(value.preparata)} consegnata=${yn(value.consegnata)}` : "nessuna spunta";
     if (type === "note") return value || "(nota cancellata)";
     if (type === "remind") return value ? `sollecito ${value.canale || ""} del ${value.data || ""}` : "(sollecito annullato)";
-    return value ? `confermato=${yn(value.confirmed)} nota=${value.note || ""}` : "(cancellato)";
+    return value ? `confermato=${yn(value.confirmed)} disdetto=${yn(value.cancelled)} nota=${value.note || ""}` : "(cancellato)";
   }
 
   // Registra una modifica: viene salvata subito in locale e poi inviata al foglio.
