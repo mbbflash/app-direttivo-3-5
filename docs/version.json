@@ -1,6 +1,13 @@
 {
-  "version": "2.5.3",
+  "version": "2.5.4",
   "releases": [
+    {
+      "version": "2.5.4",
+      "date": "25/11/2026",
+      "notes": [
+        "Escursioni: tolta la tabella \"Contatore partecipazioni per escursionista\". Il numero di uscite di ogni iscritto resta nella colonna \"N° escursioni\" e nel curriculum dei soci; la classifica completa è nelle Statistiche"
+      ]
+    },
     {
       "version": "2.5.3",
       "date": "23/11/2026",
