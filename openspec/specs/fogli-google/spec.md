@@ -22,11 +22,15 @@ Il sistema SHALL individuare ogni foglio cercandolo per nome con la Drive API (n
 - **THEN** il sistema dimentica l'ID, ripete una volta la ricerca per nome e, se trova un ID diverso, riprova con quello
 
 ### Requirement: Fogli in sola lettura
-Il sistema MUST NOT scrivere nel Libro Soci ("2 - Libro Soci e Volontari", scheda "Libro Soci", colonne A:AZ), nei fogli "Form Iscrizione …" (primo foglio, colonne A:AZ) né nel foglio "3 - Modulo Iscrizione Tre Quinti Trekking APS (Risposte)", di cui SHALL leggere solo le colonne F:J.
+Il sistema MUST NOT scrivere nel Libro Soci ("2 - Libro Soci e Volontari", scheda "Libro Soci", colonne A:AZ), nei fogli risposte delle escursioni ("Iscrizioni AAAA.MM.GG - …" oppure "Form Iscrizione AAAA.MM.GG - …", primo foglio, colonne A:AZ), nel foglio "3 - Modulo Iscrizione Tre Quinti Trekking APS (Risposte)", di cui SHALL leggere solo le colonne F:J, né nel foglio delle schede tecniche "Tre Quinti Trekking - Schede Tecniche Escursioni …", di cui SHALL leggere solo il primo foglio, colonne A:K.
 
 #### Scenario: Libro Soci in sola lettura
 - **WHEN** l'utente lavora sui soci (spunte, note, solleciti)
 - **THEN** il sistema non scrive mai nel Libro Soci né nei fogli dei Form, ma solo nel database condiviso
+
+#### Scenario: Schede tecniche in sola lettura
+- **WHEN** l'utente usa l'assistente alla scelta della prossima escursione
+- **THEN** il sistema legge le schede tecniche senza mai modificarle
 
 ### Requirement: Fogli in scrittura
 Il sistema SHALL leggere e scrivere il foglio "NON TOCCARE - DATABASE APP DI GESTIONE" (database condiviso) e SHALL scrivere nel foglio "Tre Quinti Wrapped - Foglio Calcolo" (schede "DatiEscursioniAAAA") solo aggiungendo righe in fondo e dopo conferma dell'utente.

@@ -6,7 +6,7 @@ Permette al direttivo di condividere spunte delle tessere cartacee, note sui soc
 ## Requirements
 
 ### Requirement: Schema del database
-Il sistema SHALL usare nel foglio database le schede `Tessere`, `Note`, `Conferme_Escursioni`, `Solleciti` e `Log`, con colonne fisse, e MUST crearle con l'intestazione (riga 1 bloccata) se mancano.
+Il sistema SHALL usare nel foglio database le schede `Tessere`, `Note`, `Conferme_Escursioni`, `Solleciti`, `Log` e `Richieste`, con colonne fisse, e MUST crearle con l'intestazione (riga 1 bloccata) se mancano.
 
 #### Scenario: Colonne delle schede
 - **WHEN** l'app legge o scrive il database
@@ -16,6 +16,7 @@ Il sistema SHALL usare nel foglio database le schede `Tessere`, `Note`, `Conferm
   - `Conferme_Escursioni`: chiave, escursione, partecipante, confermato, nota, aggiornato_il, aggiornato_da
   - `Solleciti`: chiave, tessera, socio, canale, data_sollecito, aggiornato_il, aggiornato_da
   - `Log`: quando, chi, tipo, chiave, valore
+  - `Richieste`: id, tipo, parametri, stato, risultato, errore, creato_il, creato_da, completato_il
 
 #### Scenario: Database nuovo o incompleto
 - **WHEN** l'app apre il database e una delle schede non esiste
