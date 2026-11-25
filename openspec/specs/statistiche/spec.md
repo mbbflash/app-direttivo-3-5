@@ -54,7 +54,7 @@ Il sistema SHALL segnalare le uscite dei form che non risultano nel foglio stati
 - **THEN** non viene segnalata
 
 ### Requirement: Aggiunta al foglio con anteprima e conferma
-Il sistema SHALL proporre data, nome uscita, ore, km e dislivello e l'elenco dei presenti (preselezionati quelli segnati "Confermato" o, se nessuno lo è, tutti), permettere di aggiungere presenti senza iscrizione, e MUST scrivere solo dopo una conferma esplicita che riepiloga cosa verrà scritto.
+Il sistema SHALL proporre data, nome uscita, ore, km e dislivello e l'elenco dei presenti (preselezionati quelli segnati "Confermato" o, se nessuno lo è, tutti), permettere di aggiungere presenti senza iscrizione, e MUST scrivere solo dopo una conferma esplicita che riepiloga cosa verrà scritto. Gli iscritti segnati come disdetti MUST NOT comparire nell'elenco dei presenti proposti.
 
 #### Scenario: Dati incompleti
 - **WHEN** manca la data in formato gg/mm/aaaa, il nome, uno tra ore/km/dislivello, o nessun presente è selezionato
@@ -68,6 +68,10 @@ Il sistema SHALL proporre data, nome uscita, ore, km e dislivello e l'elenco dei
 #### Scenario: Anno senza scheda
 - **WHEN** l'uscita è di un anno per cui la scheda non esiste
 - **THEN** il sistema crea la scheda DatiEscursioniAAAA con l'intestazione prima di scrivere, e lo dice nella richiesta di conferma
+
+#### Scenario: Disdetti esclusi dai presenti
+- **WHEN** l'utente apre "Aggiungi al foglio statistiche" per un'uscita con un iscritto disdetto
+- **THEN** il disdetto non compare tra i presenti proposti
 
 ### Requirement: Grafia dei nomi coerente
 Il sistema SHALL scrivere ogni presente usando la grafia del nome già presente nel foglio statistiche, se la persona c'è già, così che i totali della stessa persona restino uniti; altrimenti "Nome Cognome" con le iniziali maiuscole.

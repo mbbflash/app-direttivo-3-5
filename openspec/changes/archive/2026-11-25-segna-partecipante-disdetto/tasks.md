@@ -16,7 +16,7 @@
 ## 3. Prova e rilascio
 
 - [x] 3.1 Prova completa in `?demo=1`: disdetta, annullamento, ricarica pagina (la disdetta resta), nessun errore in console
-- [ ] 3.2 Prova con login sui dati veri su un'uscita di prova: la colonna H viene creata, il foglio risposte resta invariato
+- [x] 3.2 Prova con login sui dati veri su un'uscita di prova: la colonna H viene creata, il foglio risposte resta invariato
 - [x] 3.3 Rilascio: `git pull`, versione successiva a quella su `main` in `docs/js/config.js`, tutti i `?v=` in `index.html` e `manifest.webmanifest`, nuovo nome cache in `sw.js`, note in `version.json` (citare che le presenze già registrate nel foglio statistiche vanno tolte a mano), README (sezione Escursioni e badge)
 
 ## Workflow follow-up
