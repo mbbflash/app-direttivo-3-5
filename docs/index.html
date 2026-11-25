@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.3" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.3" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.3" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.4" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.4" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.5.3"></script>
-  <script src="js/config.js?v=2.5.3"></script>
-  <script src="js/google.js?v=2.5.3"></script>
-  <script src="js/clouddb.js?v=2.5.3"></script>
+  <script src="js/storage.js?v=2.5.4"></script>
+  <script src="js/config.js?v=2.5.4"></script>
+  <script src="js/google.js?v=2.5.4"></script>
+  <script src="js/clouddb.js?v=2.5.4"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -587,7 +587,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.5.3" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.5.4" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +599,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.5.3" alt="" />
+        <img src="icons/icon-192.png?v=2.5.4" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -773,24 +773,6 @@
         </div>
       </section>
 
-      <section class="card">
-        <h2 class="card-title">Contatore partecipazioni per escursionista</h2>
-        <div class="table-wrap responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Partecipante</th>
-                <th>Uscite</th>
-                <th>Elenco uscite</th>
-                <th>Stato socio</th>
-              </tr>
-            </thead>
-            <tbody id="excCounterBody">
-              <tr><td colspan="4" class="empty">Nessun dato caricato.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
     </div>
 
     <div id="viewStats" class="view-section hidden">
@@ -1047,9 +1029,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.3" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.4" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.3" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.4" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2216,9 +2198,8 @@
     function renderEscursioni() {
       const sel = byId("excSelect");
       const tbody = byId("excRowsBody");
-      const counterBody = byId("excCounterBody");
       const statusMsg = byId("excStatusMsg");
-      if (!sel || !tbody || !counterBody) return;
+      if (!sel || !tbody) return;
 
       els.tabCountEsc.textContent = excList.length ? String(excList.length) : "";
       // Le uscite più recenti in cima.
@@ -2279,15 +2260,7 @@
         if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} iscritti · ${confirmed} confermati · ${excList.length} uscite nel Drive` + progress;
       }
 
-      const people = Array.from(counterMap.values()).sort((a, b) => b.trips.length - a.trips.length || a.name.localeCompare(b.name, "it"));
-      byId("excStatTotalTrips").textContent = String(people.length);
-      counterBody.innerHTML = people.length ? people.map((p) => `
-        <tr>
-          <td class="cell-main"><strong>${escapeHtml(p.name)}</strong></td>
-          <td class="num" data-label="Uscite">${escapeHtml(String(p.trips.length))}</td>
-          <td class="wrap" data-label="Elenco">${escapeHtml(p.trips.join(", "))}</td>
-          <td data-label="Stato socio">${socioBadge(p.memberMatch)}</td>
-        </tr>`).join("") : `<tr><td colspan="4" class="empty">Nessuna partecipazione registrata.</td></tr>`;
+      byId("excStatTotalTrips").textContent = String(counterMap.size);
     }
 
     async function loadEscursioniFromServer(opts) {
@@ -3540,6 +3513,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.5.3"></script>
+<script src="js/app.js?v=2.5.4"></script>
 </body>
 </html>
