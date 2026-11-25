@@ -37,12 +37,12 @@ Il sistema MUST escludere gli iscritti disdetti da: adesioni nel foglio e soci n
 - **THEN** quell'uscita non conta nel suo numero di escursioni fatte
 
 ### Requirement: Email di conferma della disdetta
-Il sistema SHALL offrire su ogni iscritto disdetto il comando "Email di conferma", che apre il programma di posta con destinatario l'email dell'iscritto (quella del form o, se manca, quella del Libro Soci), oggetto e testo già pronti in italiano con nome e data dell'uscita. Il sistema MUST NOT inviare email da solo: l'invio lo fa l'utente dal suo programma di posta. Se l'iscritto non ha un'email valida, il comando SHALL essere disattivato con la spiegazione del motivo.
+Il sistema SHALL offrire su ogni iscritto disdetto il comando "Prepara email di disdetta", che apre il programma di posta con destinatario l'email dell'iscritto (quella del form o, se manca, quella del Libro Soci), oggetto e testo già pronti in italiano con nome e data dell'uscita. Il sistema MUST NOT inviare email da solo: l'invio lo fa l'utente dal suo programma di posta. Se l'iscritto non ha un'email valida, il comando SHALL essere disattivato con la spiegazione del motivo.
 
 #### Scenario: Email di conferma
-- **WHEN** l'utente preme "Email di conferma" su un iscritto disdetto con email
+- **WHEN** l'utente preme "Prepara email di disdetta" su un iscritto disdetto con email
 - **THEN** si apre il programma di posta con destinatario l'iscritto, oggetto "Disdetta escursione «<nome uscita>» del <gg/mm/aaaa>" e il testo di conferma con il nome dell'iscritto
 
 #### Scenario: Iscritto senza email
 - **WHEN** un iscritto disdetto non ha email né nel form né nel Libro Soci
-- **THEN** il comando "Email di conferma" è disattivato e indica che manca l'email
+- **THEN** il comando "Prepara email di disdetta" è disattivato e indica che manca l'email

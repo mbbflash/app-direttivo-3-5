@@ -2244,8 +2244,8 @@
     function cancelMailButton(esc, x) {
       const href = cancelMailHref(esc, x);
       return href
-        ? `<a class="btn exc-mini-btn" href="${escapeHtml(href)}">${icon("mail")}Email di conferma</a>`
-        : `<span class="btn exc-mini-btn" aria-disabled="true" title="Manca l'email: non è né nel modulo né nel Libro Soci">${icon("mail")}Email di conferma (manca l'email)</span>`;
+        ? `<a class="btn exc-mini-btn" href="${escapeHtml(href)}">${icon("mail")}Prepara email di disdetta</a>`
+        : `<span class="btn exc-mini-btn" aria-disabled="true" title="Manca l'email: non è né nel modulo né nel Libro Soci">${icon("mail")}Prepara email di disdetta (manca l'email)</span>`;
     }
 
     function renderEscursioni() {
@@ -2582,7 +2582,7 @@
       saveExcLocalState();
       CloudDB.exc(k, excLocalState[k]);
       renderEscursioni();
-      toast(cancelled ? "Segnato come disdetto: puoi mandargli l'email di conferma" : "Disdetta annullata");
+      toast(cancelled ? "Segnato come disdetto: con «Prepara email di disdetta» puoi avvisarlo" : "Disdetta annullata");
     });
     viewEsc.addEventListener("input", (e) => {
       const inp = e.target.closest(".exc-note-inp");

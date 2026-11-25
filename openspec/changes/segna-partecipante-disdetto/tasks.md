@@ -11,7 +11,7 @@
 - [x] 2.4 Export partecipanti senza disdetti — verifica: CSV scaricato in demo senza la riga del disdetto
 - [x] 2.5 "Aggiungi al foglio statistiche" senza disdetti tra i presenti — verifica: in demo il disdetto non compare nell'elenco
 
-- [x] 2.6 Pulsante "Email di conferma" sulla riga disdetta: `mailto:` con destinatario (form o Libro Soci), oggetto e testo concordati nel design; disattivato con spiegazione se manca l'email — verifica: in demo il link contiene destinatario, oggetto e testo giusti; su un iscritto senza email il pulsante è disattivato
+- [x] 2.6 Pulsante "Prepara email di disdetta" sulla riga disdetta: `mailto:` con destinatario (form o Libro Soci), oggetto e testo concordati nel design; disattivato con spiegazione se manca l'email — verifica: in demo il link contiene destinatario, oggetto e testo giusti; su un iscritto senza email il pulsante è disattivato
 
 ## 3. Prova e rilascio
 

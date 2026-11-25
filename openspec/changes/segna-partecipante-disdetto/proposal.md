@@ -16,7 +16,7 @@ oggi si limita a leggere).
   avvisi dell'uscita, email in CCN, export dei partecipanti, numero di escursioni fatte
   (colonna "N° escursioni", "Escursionisti unici", curriculum del socio dai form) e presenti
   proposti in "Aggiungi al foglio statistiche".
-- Sulla riga di un disdetto il comando **"Email di conferma"** apre il programma di posta con
+- Sulla riga di un disdetto il comando **"Prepara email di disdetta"** apre il programma di posta con
   la mail all'iscritto già scritta (destinatario, oggetto, testo con nome e data dell'uscita):
   l'utente la rilegge e la invia lui. Disattivato se l'iscritto non ha email.
 - La disdetta si salva nel database condiviso, quindi è visibile a tutto il direttivo, e
