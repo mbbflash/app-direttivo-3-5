@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.5.4-blue)
+![Versione](https://img.shields.io/badge/versione-2.5.5-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -98,6 +98,7 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 | **Statistiche uscita** | Adesioni nel foglio, quanti sono **già soci**, partecipanti unici |
 | **Abbinamento al Libro Soci** | Riconosce i soci da email, telefono o nome e cognome (anche in ordine invertito, con secondo nome o doppio cognome); in classifica collega i nomi ai soci tramite l'email usata nei moduli |
 | **Note e conferme per partecipante** | Nota e spunta *Confermato* su ogni iscritto, **condivise con il direttivo** |
+| **Disdette** | Pulsante *Disdetto* su ogni iscritto: resta barrato in fondo e non conta in totali, avvisi, CCN, export e numero di escursioni (la riga nel foglio del modulo resta). *Prepara email di disdetta* apre la posta con il messaggio già pronto |
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Uscite per iscritto** | Colonna *N° escursioni* con le uscite fatte da ogni iscritto, contate su tutti i fogli (escluse le uscite rimandate o annullate) |
 | **Nuova escursione programmata** | Pulsante che crea il form di iscrizione (copia del template, con titolo e giorno della settimana) e il foglio *Iscrizioni AAAA.MM.GG - Nome (Risposte)* collegato, poi dà il link da condividere. Lo fa lo script di automazione: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |

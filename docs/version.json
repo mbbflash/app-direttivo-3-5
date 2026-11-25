@@ -1,6 +1,15 @@
 {
-  "version": "2.5.4",
+  "version": "2.5.5",
   "releases": [
+    {
+      "version": "2.5.5",
+      "date": "25/11/2026",
+      "notes": [
+        "Escursioni: pulsante \"Disdetto\" su ogni iscritto. Chi ha disdetto resta barrato in fondo all'elenco e non conta più in totali, avvisi, email in CCN, export, numero di escursioni e presenti proposti per le statistiche. La riga nel foglio del modulo non viene toccata; si annulla con \"Annulla disdetta\"",
+        "Escursioni: \"Prepara email di disdetta\" sulla riga di chi ha disdetto apre la posta con il messaggio già pronto",
+        "Se una presenza di chi ha disdetto è già nel foglio statistiche, va tolta a mano"
+      ]
+    },
     {
       "version": "2.5.4",
       "date": "25/11/2026",

@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.4" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.4" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.4" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.5.5" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.5.5" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.5.5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.5.4"></script>
-  <script src="js/config.js?v=2.5.4"></script>
-  <script src="js/google.js?v=2.5.4"></script>
-  <script src="js/clouddb.js?v=2.5.4"></script>
+  <script src="js/storage.js?v=2.5.5"></script>
+  <script src="js/config.js?v=2.5.5"></script>
+  <script src="js/google.js?v=2.5.5"></script>
+  <script src="js/clouddb.js?v=2.5.5"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -340,6 +340,13 @@
     .paper-flags { display: flex; flex-direction: column; gap: 4px; }
     .flag-label { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; cursor: pointer; user-select: none; }
     .flag-label input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: var(--primary); }
+    .exc-row-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .exc-mini-btn { padding: 3px 9px; font-size: 0.74rem; border-radius: 8px; box-shadow: none; gap: 5px; }
+    .exc-mini-btn .ico { width: 13px; height: 13px; }
+    .exc-mini-btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+    tr.exc-cancelled td { color: var(--muted); }
+    tr.exc-cancelled .exc-name { text-decoration: line-through; }
+    .pill-cancelled { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; background: var(--warn-bg); color: var(--warn-fg); text-decoration: none; vertical-align: middle; }
     .local-note-input { min-width: 190px; padding: 6px 9px; font-size: 0.82rem; border-radius: 8px; background: var(--surface-2); }
     .local-note-input:focus { background: var(--surface); }
 
@@ -587,7 +594,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.5.4" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.5.5" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -599,7 +606,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.5.4" alt="" />
+        <img src="icons/icon-192.png?v=2.5.5" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1029,9 +1036,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.4" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.5.5" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.4" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.5.5" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -1995,15 +2002,32 @@
         : normalizePersonKey(f.displayName, f.email, f.phone);
     }
 
+    // ---- Iscritti disdetti (segnati dal direttivo, la riga del form resta) ----
+    function excItemKey(esc, pKey, rowNumber) { return `${esc.id}::${pKey || rowNumber}`; }
+    function isExcCancelled(key) { return Boolean((excLocalState[key] || {}).cancelled); }
+    function cancelledSignature() {
+      return Object.keys(excLocalState).filter(isExcCancelled).sort().join("|");
+    }
+    // Righe del form di un'uscita senza gli iscritti disdetti.
+    function activeExcRows(esc) {
+      const rows = Array.isArray(esc.rows) ? esc.rows : [];
+      return rows.filter((r) => {
+        const f = extractFormFields(r);
+        const matched = findMatchingMember(f.displayName, f.email, f.phone);
+        return !isExcCancelled(excItemKey(esc, personKeyFor(f, matched), r._rowNumber));
+      });
+    }
+
     function buildParticipationCounter() {
       const c = getMatchCache();
-      if (c.counter && c.excList === excList) return c.counter;
+      const sig = cancelledSignature();
+      if (c.counter && c.excList === excList && c.cancelSig === sig) return c.counter;
       const map = new Map();
       excList.forEach((esc) => {
         if (!esc.ok || !Array.isArray(esc.rows) || excStatus(esc)) return;   // rimandate e annullate non contano
         const seenInThisEsc = new Set();
         const tripLabel = formatNomeUscita(esc.titolo) || esc.id || "Escursione";
-        esc.rows.forEach((r) => {
+        activeExcRows(esc).forEach((r) => {
           const f = extractFormFields(r);
           const matched = findMatchingMember(f.displayName, f.email, f.phone);
           const canonicalName = matched ? (memberFullName(matched) || f.displayName) : f.displayName;
@@ -2025,6 +2049,7 @@
       for (const entry of map.values()) if (entry.memberMatch && !c.byMember.has(entry.memberMatch)) c.byMember.set(entry.memberMatch, entry);
       c.counter = map;
       c.excList = excList;
+      c.cancelSig = sig;
       return map;
     }
 
@@ -2111,7 +2136,7 @@
     }
 
     function analyzeEscursione(esc) {
-      const rows = Array.isArray(esc.rows) ? esc.rows : [];
+      const rows = activeExcRows(esc);   // i disdetti non hanno avvisi e non ricevono le comunicazioni
       const seen = new Set();
       const emails = [];
       const notMatched = [], missingEmail = [], cardTodo = [];
@@ -2195,6 +2220,34 @@
 
     let currentExcRows = [];
 
+    function countExcConfirmed() {
+      return currentExcRows.filter(x => !x.cancelled && (excLocalState[x.itemKey] || {}).confirmed).length;
+    }
+
+    // Email di conferma della disdetta: si apre il programma di posta, l'invio lo fa l'utente.
+    function cancelMailHref(esc, x) {
+      const email = String(x.f.email || memberEmail(x.matched) || "").trim();
+      if (!email.includes("@")) return "";
+      const nome = formatNomeUscita(esc.titolo);
+      const data = formDateFromTitle(esc.titolo);
+      const quando = data ? ` del ${data}` : "";
+      const firstName = x.matched && x.matched["NOME"]
+        ? titleCase(String(x.matched["NOME"]).trim().split(/\s+/)[0])
+        : titleCase(String(x.f.displayName || "").trim().split(/\s+/)[0] || "");
+      const subject = `Disdetta escursione «${nome}»${quando}`;
+      const body = `Ciao${firstName ? " " + firstName : ""},\n` +
+        `ti confermiamo che abbiamo ricevuto la tua disdetta per l'escursione «${nome}»${quando}.\n` +
+        `Speriamo di vederti presto alle prossime uscite!\n\n` +
+        `Un saluto,\nil Direttivo Tre Quinti Trekking APS`;
+      return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+    function cancelMailButton(esc, x) {
+      const href = cancelMailHref(esc, x);
+      return href
+        ? `<a class="btn exc-mini-btn" href="${escapeHtml(href)}">${icon("mail")}Prepara email di disdetta</a>`
+        : `<span class="btn exc-mini-btn" aria-disabled="true" title="Manca l'email: non è né nel modulo né nel Libro Soci">${icon("mail")}Prepara email di disdetta (manca l'email)</span>`;
+    }
+
     function renderEscursioni() {
       const sel = byId("excSelect");
       const tbody = byId("excRowsBody");
@@ -2233,21 +2286,29 @@
         currentEsc.rows.forEach((r) => {
           const f = extractFormFields(r);
           const matched = findMatchingMember(f.displayName, f.email, f.phone);
-          if (matched) memberCount++;
           const pKey = personKeyFor(f, matched);
           const statObj = counterMap.get(pKey);
-          currentExcRows.push({ f, matched, pKey, trips: statObj ? statObj.trips.length : 1, itemKey: `${currentEsc.id}::${pKey || r._rowNumber}` });
+          const itemKey = excItemKey(currentEsc, pKey, r._rowNumber);
+          const cancelled = isExcCancelled(itemKey);
+          if (matched && !cancelled) memberCount++;
+          currentExcRows.push({ f, matched, pKey, trips: statObj ? statObj.trips.length : (cancelled ? 0 : 1), itemKey, cancelled });
         });
+        // I disdetti in fondo, nello stesso ordine del foglio.
+        currentExcRows = currentExcRows.filter(x => !x.cancelled).concat(currentExcRows.filter(x => x.cancelled));
         const visible = q ? currentExcRows.filter(x => `${x.f.displayName} ${x.f.email} ${x.f.phone}`.toLowerCase().includes(q)) : currentExcRows;
-        const confirmed = currentExcRows.filter(x => (excLocalState[x.itemKey] || {}).confirmed).length;
+        const confirmed = countExcConfirmed();
 
         tbody.innerHTML = visible.length ? visible.map((x) => {
           const loc = excLocalState[x.itemKey] || {};
           const k = escapeHtml(x.itemKey);
+          const actions = x.cancelled
+            ? `<button type="button" class="exc-mini-btn exc-cancel-btn" data-exc-key="${k}" data-cancel="0">${icon("refresh")}Annulla disdetta</button>${cancelMailButton(currentEsc, x)}`
+            : `<label class="flag-label" style="font-size:0.76rem;color:var(--muted);"><input type="checkbox" class="exc-conf-cb" data-exc-key="${k}" ${loc.confirmed ? "checked" : ""} /><span>Confermato</span></label>
+                <button type="button" class="exc-mini-btn exc-cancel-btn" data-exc-key="${k}" data-cancel="1" title="Segna che ha disdetto: la riga nel foglio del modulo resta">${icon("x")}Disdetto</button>`;
           return `
-            <tr>
-              <td class="cell-main"><div><strong>${escapeHtml(x.f.displayName)}</strong>
-                <label class="flag-label" style="margin-top:4px;display:flex;font-size:0.76rem;color:var(--muted);"><input type="checkbox" class="exc-conf-cb" data-exc-key="${k}" ${loc.confirmed ? "checked" : ""} /><span>Confermato</span></label></div></td>
+            <tr${x.cancelled ? ' class="exc-cancelled"' : ""}>
+              <td class="cell-main"><div><strong class="exc-name">${escapeHtml(x.f.displayName)}</strong>${x.cancelled ? '<span class="pill-cancelled">Disdetto</span>' : ""}
+                <div class="exc-row-actions">${actions}</div></div></td>
               <td data-label="Contatti">${contactsHtml(x.f)}</td>
               <td data-label="Stato socio">${socioBadge(x.matched)}</td>
               <td class="num" data-label="Escursioni">${escapeHtml(String(x.trips))}</td>
@@ -2255,9 +2316,13 @@
             </tr>`;
         }).join("") : `<tr><td colspan="5" class="empty">${icon("search")}Nessun partecipante corrisponde alla ricerca.</td></tr>`;
 
-        byId("excStatCount").textContent = String(currentEsc.rows.length);
+        const cancelledCount = currentExcRows.filter(x => x.cancelled).length;
+        const activeCount = currentExcRows.length - cancelledCount;
+        byId("excStatCount").textContent = String(activeCount);
         byId("excStatMembers").textContent = String(memberCount);
-        if (statusMsg) statusMsg.textContent = `${currentEsc.rows.length} iscritti · ${confirmed} confermati · ${excList.length} uscite nel Drive` + progress;
+        if (statusMsg) statusMsg.textContent = `${activeCount} iscritti · ${confirmed} confermati` +
+          (cancelledCount ? ` · ${cancelledCount} ${cancelledCount === 1 ? "disdetto" : "disdetti"}` : "") +
+          ` · ${excList.length} uscite nel Drive` + progress;
       }
 
       byId("excStatTotalTrips").textContent = String(counterMap.size);
@@ -2437,7 +2502,7 @@
       const esc = excList.find(e => e.id === byId("excSelect").value);
       if (!esc || !currentExcRows.length) { toast("Carica prima un'escursione", "err"); return; }
       const cols = ["Partecipante", "Email", "Telefono", "Socio", "Tessera n°", "Escursioni fatte", "Confermato", "Nota"];
-      const rows = currentExcRows.map(x => {
+      const rows = currentExcRows.filter(x => !x.cancelled).map(x => {
         const loc = excLocalState[x.itemKey] || {};
         return {
           "Partecipante": x.f.displayName, "Email": x.f.email || memberEmail(x.matched), "Telefono": x.f.phone,
@@ -2500,9 +2565,24 @@
       excLocalState[k] = Object.assign({}, excLocalState[k] || {}, { confirmed: cb.checked });
       saveExcLocalState();
       CloudDB.exc(k, excLocalState[k]);
-      const confirmed = currentExcRows.filter(x => (excLocalState[x.itemKey] || {}).confirmed).length;
+      const confirmed = countExcConfirmed();
       const statusMsg = byId("excStatusMsg");
       if (statusMsg) statusMsg.textContent = statusMsg.textContent.replace(/\d+ confermati/, confirmed + " confermati");
+    });
+    viewEsc.addEventListener("click", (e) => {
+      const btn = e.target.closest(".exc-cancel-btn");
+      if (!btn) return;
+      const k = btn.getAttribute("data-exc-key");
+      if (!k) return;
+      const cancelled = btn.getAttribute("data-cancel") === "1";
+      // Chi disdice non è più confermato; la nota resta.
+      const next = Object.assign({}, excLocalState[k] || {}, { cancelled });
+      if (cancelled) next.confirmed = false;
+      excLocalState[k] = next;
+      saveExcLocalState();
+      CloudDB.exc(k, excLocalState[k]);
+      renderEscursioni();
+      toast(cancelled ? "Segnato come disdetto: con «Prepara email di disdetta» puoi avvisarlo" : "Disdetta annullata");
     });
     viewEsc.addEventListener("input", (e) => {
       const inp = e.target.closest(".exc-note-inp");
@@ -2743,7 +2823,7 @@
       if (!esc) return;
       const seen = new Set();
       const people = [];
-      esc.rows.forEach(r => {
+      activeExcRows(esc).forEach(r => {
         const f = extractFormFields(r);
         const matched = findMatchingMember(f.displayName, f.email, f.phone);
         const name = statsNameFor(f, matched);
@@ -3513,6 +3593,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.5.4"></script>
+<script src="js/app.js?v=2.5.5"></script>
 </body>
 </html>
