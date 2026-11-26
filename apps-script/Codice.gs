@@ -19,7 +19,8 @@ var GIORNI = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'vene
 
 // Operazioni disponibili: tipo di richiesta -> funzione(parametri) che restituisce il risultato.
 var OPERAZIONI = {
-  crea_uscita: creaUscita
+  crea_uscita: creaUscita,
+  aggiungi_domande_auto: aggiungiDomandeAuto
 };
 
 /** Da eseguire una volta dall'editor: chiede i permessi e crea l'attivatore ogni minuto. */
@@ -99,14 +100,8 @@ function schedaRichieste_() {
   return sheet;
 }
 
-// ---------------------------------------------------------------------------
-// crea_uscita: { nome, data: "AAAA-MM-GG", data_fine: "AAAA-MM-GG" | "" }
-// ---------------------------------------------------------------------------
-
-function creaUscita(p) {
-  var n = nomiUscita_(p);
-
-  // Template: deve esserci esattamente un form con quel nome.
+/** Il form template: deve essercene esattamente uno con quel nome. */
+function template_() {
   var templates = [];
   var it = DriveApp.getFilesByName(TEMPLATE_NAME);
   while (it.hasNext()) {
@@ -117,7 +112,16 @@ function creaUscita(p) {
     throw new Error((templates.length ? 'Ci sono ' + templates.length + ' form' : 'Non trovo il form') +
       ' con il nome del template: ' + TEMPLATE_NAME + '. Nel Drive ce ne deve essere esattamente uno.');
   }
-  var template = templates[0];
+  return templates[0];
+}
+
+// ---------------------------------------------------------------------------
+// crea_uscita: { nome, data: "AAAA-MM-GG", data_fine: "AAAA-MM-GG" | "" }
+// ---------------------------------------------------------------------------
+
+function creaUscita(p) {
+  var n = nomiUscita_(p);
+  var template = template_();
 
   // Niente doppioni: nessun file (non nel cestino) con il nome del form o del foglio.
   [n.formNome, n.foglioNome].forEach(function (nome) {
@@ -208,4 +212,52 @@ function provaNomi() {
   Logger.log(JSON.stringify(nomiUscita_({ nome: 'giro di prova', data: '2026-11-22' })));
   Logger.log(JSON.stringify(nomiUscita_({ nome: 'Prado e Cusna', data: '2026-09-05', data_fine: '2026-09-06' })));
   Logger.log(JSON.stringify(nomiUscita_({ nome: 'Cena di Natale', data: '2026-12-25' })));
+}
+
+// ---------------------------------------------------------------------------
+// aggiungi_domande_auto: {} - aggiunge al form template le due domande usate
+// dalla sezione "Auto per l'uscita" dell'app. Si può anche eseguire una volta
+// dall'editor (funzione aggiungiDomandeAuto). Non tocca le altre domande e non
+// aggiunge doppioni: se le domande ci sono già, non fa niente.
+// ---------------------------------------------------------------------------
+
+var DOMANDA_RITROVO = '📍 Ci vediamo al punto di ritrovo o vai direttamente alla partenza dell\'escursione?';
+var RISPOSTE_RITROVO = ['Al punto di ritrovo', 'Direttamente alla partenza'];
+var DOMANDA_POSTI = '🪑 Se metti il tuo mezzo a disposizione, quanti posti liberi hai (escluso te)?';
+var RISPOSTE_POSTI = ['1', '2', '3', '4', '5', '6'];
+
+function aggiungiDomandeAuto() {
+  var form = FormApp.openById(template_().getId());
+  var norm = function (t) {
+    return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+  };
+  var indice = function (re, not) {
+    var items = form.getItems();
+    for (var i = 0; i < items.length; i++) {
+      var t = norm(items[i].getTitle());
+      if (re.test(t) && !(not && not.test(t))) return i;
+    }
+    return -1;
+  };
+  var fatto = [];
+
+  // Ritrovo o partenza: subito dopo "Città da dove parti", vale per tutti.
+  if (indice(/ci vediamo|direttamente alla partenza/) < 0) {
+    var dopoCitta = indice(/da dove parti/);
+    var r = form.addMultipleChoiceItem().setTitle(DOMANDA_RITROVO).setChoiceValues(RISPOSTE_RITROVO).setRequired(true);
+    if (dopoCitta >= 0) form.moveItem(r.getIndex(), dopoCitta + 1);
+    fatto.push('ritrovo o partenza');
+  }
+
+  // Posti liberi: subito dopo "saresti disposto/a a mettere il tuo mezzo a disposizione?".
+  if (indice(/posti liberi/) < 0) {
+    var dopoMezzo = indice(/dispost|mettere il tuo mezzo/, /posti/);
+    var q = form.addMultipleChoiceItem().setTitle(DOMANDA_POSTI).setChoiceValues(RISPOSTE_POSTI).setRequired(false);
+    if (dopoMezzo >= 0) form.moveItem(q.getIndex(), dopoMezzo + 1);
+    fatto.push('posti liberi');
+  }
+
+  var msg = fatto.length ? 'Aggiunte al template le domande: ' + fatto.join(', ') : 'Le domande erano già nel template: nessuna modifica';
+  Logger.log(msg);
+  return { messaggio: msg, link_modifica: form.getEditUrl() };
 }
