@@ -1,6 +1,16 @@
 {
-  "version": "2.6.1",
+  "version": "2.6.2",
   "releases": [
+    {
+      "version": "2.6.2",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto per l'uscita: ritrovi intermedi. Sotto ogni città scegli \"si ritrovano a …\" (per esempio i versiliesi a Camaiore): ogni punto di ritrovo forma le sue auto, e il riepilogo le elenca separate",
+        "Auto per l'uscita: le auto dal ritrovo sono equilibrate (per esempio 4 e 3 invece di 5 e 2) e nessuno guida da solo se può salire in un'altra auto",
+        "Posti dell'auto: nel modulo si sceglie \"4 posti\" o \"5 posti\" (chi guida compreso); lo stesso in \"Correggi a mano\". Senza risposta valgono 5 posti",
+        "Script di automazione: aggiungiDomandeAuto aggiorna la domanda sui posti alle due scelte, anche se era già stata aggiunta"
+      ]
+    },
     {
       "version": "2.6.1",
       "date": "26/11/2026",
