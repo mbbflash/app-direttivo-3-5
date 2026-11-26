@@ -1,6 +1,18 @@
 {
-  "version": "2.6.0",
+  "version": "2.6.1",
   "releases": [
+    {
+      "version": "2.6.1",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto per l'uscita più semplice e più ordinata: l'app forma solo le auto che partono dal ritrovo, con il minimo di auto che bastano per tutti, mostrate come schede con i posti occupati",
+        "Il ritrovo viene dalla scheda tecnica; se manca si sceglie dal menu in cima (nessun ritrovo predefinito)",
+        "Per arrivare al ritrovo, città per città: chi ha l'auto e chi cerca un passaggio",
+        "Chi guida si cambia dal menu accanto all'auto; chi va direttamente alla partenza è elencato a parte",
+        "Tolti distanze, deviazioni, zone e scelte di strada",
+        "Nuove domande nel modulo template (posti liberi; ritrovo o direttamente alla partenza), aggiunte dallo script di automazione"
+      ]
+    },
     {
       "version": "2.6.0",
       "date": "26/11/2026",

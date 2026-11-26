@@ -37,6 +37,15 @@ Il codice è nella cartella [`apps-script/`](apps-script/) di questo repository 
 
 Quando il codice in `apps-script/` cambia, ripeti i passi 2–4 incollando la versione nuova. Non serve rieseguire `installa`, a meno che le note della versione non lo dicano: l'attivatore resta quello di prima.
 
+### Domande sulle auto nel modulo template (v2.6.1)
+
+Dopo aver incollato il `Codice.gs` nuovo, scegli la funzione **`aggiungiDomandeAuto`** e premi **Esegui** una volta. Lo script aggiunge al form template due domande usate dalla sezione *Auto per l'uscita* dell'app:
+
+- dopo "Città da dove parti": *📍 Ci vediamo al punto di ritrovo o vai direttamente alla partenza dell'escursione?* (Al punto di ritrovo / Direttamente alla partenza);
+- dopo "saresti disposto/a a mettere il tuo mezzo a disposizione?": *🪑 Se metti il tuo mezzo a disposizione, quanti posti liberi hai (escluso te)?* (da 1 a 6, facoltativa).
+
+Nel registro compare il messaggio con le domande aggiunte. Se le domande ci sono già, non cambia nulla. Le uscite create da quel momento le avranno; quelle già create restano come sono. Apri il template e controlla che le due domande siano nel punto giusto: se serve, spostale a mano.
+
 ## Se qualcosa non va
 
 | Sintomo | Cosa fare |
