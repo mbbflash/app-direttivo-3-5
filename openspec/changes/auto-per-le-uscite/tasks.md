@@ -28,6 +28,17 @@
 
 - [x] 4.5 v2.7.0: schermata dell'uscita ridotta a ritrovo e auto; scheda del partecipante (ritrovo abituale, passaggio abituale, solo per questa uscita); sezione "Auto per le uscite" nella pagina del socio; tolti menu per città, "chi parte da dove" e lista abitudini; verificare in `?demo=1`
 
+- [x] 4.6 v2.7.1: gruppi "Partono da …" visibili; trasformazione delle scelte 2.6; abitudini trovate anche per nome; riga "dove si trova ora" nella scheda; ritrovo intermedio senza auto → principale; abitudini reciproche; "con …" anche verso chi non guida; verificare in `?demo=1`
+
+- [x] 4.7 Auto dai ritrovi intermedi che proseguono e si riempiono al principale; ricerca per nome del compagno abituale (scheda e pagina del socio); compagno abituale legato alla città; suggerimenti stesso comune o entro 10 km
+
+- [x] 4.8 v2.7.2: auto tutte da 5 posti; scheda corta ("Viaggia con", "Si ritrova a", "Questa volta è diverso?"); suggerimenti in vista con Accetta/✕; ritrovi intermedi di base via ritrovo principale con scelta "direttamente alla partenza"; ↪ al posto delle scritte; niente contatori; "Rifai da capo"; "con …" solo verso chi mette l'auto a disposizione; script senza domanda sui posti
+
+- [x] 4.9 Auto stabili dopo le modifiche (scelte salvate con l'uscita, uguali per tutto il direttivo); spunta "Ha la priorità alla guida" in scheda e pagina del socio
+
+- [x] 4.10 Ultima risposta per chi compila più volte, righe vuote ignorate; schede dei partecipanti una riga per persona (`_p:`) con trasformazione di `_persone`
+- [x] 4.11 Interfaccia: riquadro "Auto fissate" con "Rifai da capo", passeggeri del ritrovo principale elencati a parte (niente simbolo ↪), intestazioni "Si trovano a …"
+
 ## 5. Rilascio
 
 - [x] 5.1 Versione 2.6.0 (config, `?v=`, cache, version.json, badge)
@@ -35,6 +46,7 @@
 - [x] 5.3 Versione 2.6.2 (config, `?v=`, cache, version.json, badge)
 - [x] 5.3b Versione 2.6.3 (config, `?v=`, cache, version.json, badge)
 - [x] 5.3c Versione 2.7.0 (config, `?v=`, cache, version.json, badge)
+- [x] 5.3d Versione 2.7.2 (config, `?v=`, cache, version.json, badge; la 2.7.1 non è stata pubblicata)
 - [x] 5.4 Operazione `aggiungi_domande_auto` in `apps-script/Codice.gs` e istruzioni in SETUP-APPS-SCRIPT.md
 - [ ] 5.5 Incollare il nuovo `Codice.gs` nell'editor Apps Script ed eseguire una volta `aggiungiDomandeAuto`; controllare il template
 - [ ] 5.6 Dopo il push, prova con login sui dati veri: aprire un'uscita con iscrizioni, controllare che le domande del modulo siano riconosciute e che la scheda `Auto_Escursioni` venga creata alla prima correzione

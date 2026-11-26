@@ -1,12 +1,31 @@
 {
-  "version": "2.7.0",
+  "version": "2.7.2",
   "releases": [
+    {
+      "version": "2.7.2",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto per l'uscita più leggera: tutte le auto da 5 posti, niente contatori, una scheda più corta",
+        "Auto stabili: dopo una modifica restano alla guida gli stessi e ognuno nella sua auto, cambia solo quello che la modifica tocca; tutto il direttivo vede le stesse auto",
+        "Nuova spunta \"Ha la priorità alla guida\" nella scheda del partecipante e del socio: quando servono auto, viene scelto per primo",
+        "Scheda del partecipante: \"Viaggia con\" (si cerca scrivendo il nome, con i suggeriti dello stesso comune o entro 10 km) e \"Si ritrova a\"; \"Questa volta è diverso?\" per le eccezioni",
+        "\"Viaggia con\" vale da solo quando la persona parte dalla solita città; altrimenti è un suggerimento",
+        "Suggerimenti in vista: \"💡 Anna potrebbe andare con Bruno · Accetta\"; un tocco e diventa abitudine",
+        "Ritrovi intermedi visibili (\"Partono da Pisa\"): di base le auto passano dal ritrovo principale e lì si riempiono (↪); si può scegliere \"direttamente alla partenza\"",
+        "Le scelte delle versioni 2.6 diventano visibili nella scheda; abitudini riconosciute anche per nome; la scheda dice dove si trova ora la persona",
+        "\"Rifai da capo\" toglie le scelte di quella uscita senza toccare le abitudini",
+        "Script: la domanda sui posti non si aggiunge più (la si può cancellare dal template)",
+        "Chi compila il modulo più volte conta con l'ultima risposta; le righe vuote del foglio non contano",
+        "Le schede dei partecipanti si salvano una per riga nel database: due persone del direttivo che le modificano insieme non si cancellano le modifiche a vicenda",
+        "Più chiaro: le auto dei ritrovi intermedi mostrano a parte chi sale al ritrovo principale, e un riquadro spiega che le auto sono fissate, con «Rifai da capo» a portata di mano"
+      ]
+    },
     {
       "version": "2.7.0",
       "date": "26/11/2026",
       "notes": [
         "Auto per l'uscita più semplice: si vedono solo il ritrovo e le auto, con chi guida e chi sale; un pulsante \"Copia per il gruppo\"",
-        "Tocca un nome per aprire la scheda del partecipante: ritrovo abituale (es. Pisa, Camaiore), passaggio abituale (es. con Livio) e cosa fa solo in questa uscita",
+        "Tocca un nome per aprire la scheda del partecipante: ritrovo abituale (es. Pisa, Camaiore), passaggio abituale (es. con Bruno) e cosa fa solo in questa uscita",
         "Ritrovo e passaggio abituali valgono per tutte le uscite; si impostano anche dalla scheda del socio, nella nuova sezione \"Auto per le uscite\"",
         "Tolti i menu sotto le città, l'elenco \"chi parte da dove\" e la lista delle abitudini"
       ]
