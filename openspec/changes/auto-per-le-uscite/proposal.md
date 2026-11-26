@@ -13,7 +13,8 @@ Per ogni uscita il direttivo organizza a mano chi va in auto con chi, leggendo l
   - chi ha scritto "con chi sei in auto" resta nella stessa auto delle persone nominate;
   - chi ha detto che va **direttamente alla partenza** è elencato a parte;
   - chi ha disdetto non viene contato; se i posti non bastano, l'app lo dice.
-- **Per arrivare al ritrovo** l'app non decide: mostra, città per città, chi ha l'auto e chi cerca un passaggio, così ci si accorda.
+- **Per arrivare al ritrovo** l'app non decide: mostra, città per città, chi ha l'auto e chi cerca un passaggio; il direttivo può scegliere chi passa a prendere chi.
+- Passaggi e ritrovi intermedi scelti diventano **abituali** e valgono di base per le uscite successive, modificabili uscita per uscita.
 - Il ritrovo viene dalla scheda tecnica del percorso con lo stesso nome dell'uscita; se manca, si sceglie a mano tra i ritrovi abituali (nessun ritrovo predefinito).
 - Correzioni a mano condivise con il direttivo: chi guida (menu accanto all'auto), posti, chi va con chi; si annullano con un clic.
 - Pulsante "Copia riepilogo per il gruppo".

@@ -37,6 +37,8 @@
     auto: (key) => {
       if (key === "_zone") return { escursione: "Zone di provenienza (tutte le uscite)" };
       if (key === "_opzioni") return { escursione: "Opzioni auto (tutte le uscite)" };
+      if (key === "_abituali") return { escursione: "Passaggi abituali (tutte le uscite)" };
+      if (key === "_punti") return { escursione: "Ritrovi abituali per città (tutte le uscite)" };
       const esc = excList.find(e => e.id === key);
       return { escursione: esc ? formatNomeUscita(esc.titolo) : key };
     },

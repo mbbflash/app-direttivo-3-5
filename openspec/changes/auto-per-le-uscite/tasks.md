@@ -24,11 +24,14 @@
 
 - [x] 4.3 Ritrovi intermedi: menu per città "al ritrovo principale / si ritrovano a …", auto formate per ogni punto, riepilogo per punto; verificare in `?demo=1`
 
+- [x] 4.4 Passaggi fino al ritrovo scelti dalla schermata principale; passaggi e ritrovi intermedi abituali con cambio per singola uscita ed elenco "Abitudini"; verificare in `?demo=1`
+
 ## 5. Rilascio
 
 - [x] 5.1 Versione 2.6.0 (config, `?v=`, cache, version.json, badge)
 - [x] 5.2 Versione 2.6.1 (config, `?v=`, cache, version.json, badge)
 - [x] 5.3 Versione 2.6.2 (config, `?v=`, cache, version.json, badge)
+- [x] 5.3b Versione 2.6.3 (config, `?v=`, cache, version.json, badge)
 - [x] 5.4 Operazione `aggiungi_domande_auto` in `apps-script/Codice.gs` e istruzioni in SETUP-APPS-SCRIPT.md
 - [ ] 5.5 Incollare il nuovo `Codice.gs` nell'editor Apps Script ed eseguire una volta `aggiungiDomandeAuto`; controllare il template
 - [ ] 5.6 Dopo il push, prova con login sui dati veri: aprire un'uscita con iscrizioni, controllare che le domande del modulo siano riconosciute e che la scheda `Auto_Escursioni` venga creata alla prima correzione

@@ -54,6 +54,24 @@ Per ogni uscita il direttivo SHALL poter indicare, città per città, che chi pa
 - **WHEN** per Viareggio e Camaiore il direttivo sceglie "si ritrovano a Camaiore"
 - **THEN** la sezione mostra "Ritrovo intermedio a Camaiore" con le auto di chi parte da quelle città, e le altre città restano al ritrovo principale
 
+### Requirement: Passaggi fino al ritrovo
+Nella sezione "Per arrivare al ritrovo" il direttivo SHALL poter scegliere, per chi cerca un passaggio, chi lo passa a prendere tra gli iscritti automuniti. Chi riceve il passaggio SHALL avere lo stesso punto di ritrovo di chi lo porta e, dal ritrovo, SHALL stare nella sua stessa auto quando c'è posto.
+
+#### Scenario: Passaggio scelto
+- **WHEN** il direttivo sceglie che Livio passa a prendere Amal
+- **THEN** Amal risulta "con Livio", si ritrova dove si ritrova Livio e dal ritrovo viaggia con lui se lui guida e c'è posto
+
+### Requirement: Abitudini
+Un passaggio scelto e un punto intermedio scelto per una città SHALL diventare abituali e valere di base per le uscite successive, salvati nella scheda `Auto_Escursioni` con le chiavi `_abituali` e `_punti`. In ogni uscita il direttivo SHALL poterli cambiare senza modificare l'abitudine, e SHALL poterli togliere da "Correggi a mano".
+
+#### Scenario: Uscita successiva
+- **WHEN** in un'uscita Livio passa a prendere Amal e Pisa si ritrova a Pisa, e in un'uscita successiva sono iscritti di nuovo
+- **THEN** nella nuova uscita il passaggio e il ritrovo intermedio sono già impostati
+
+#### Scenario: Cambio solo per un'uscita
+- **WHEN** in un'uscita il direttivo rimette Amal su "cerca passaggio"
+- **THEN** il cambio vale solo per quell'uscita e l'abitudine resta
+
 ### Requirement: Direttamente alla partenza
 Gli iscritti che hanno risposto di andare direttamente alla partenza SHALL essere elencati a parte e MUST NOT entrare nelle auto dal ritrovo.
 
