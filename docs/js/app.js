@@ -39,6 +39,11 @@
       if (key === "_opzioni") return { escursione: "Opzioni auto (tutte le uscite)" };
       if (key === "_abituali") return { escursione: "Passaggi abituali (tutte le uscite)" };
       if (key === "_punti") return { escursione: "Ritrovi abituali per città (tutte le uscite)" };
+      if (key === "_persone") return { escursione: "Schede dei partecipanti (vecchio formato)" };
+      if (key.startsWith("_p:")) {
+        const v = (typeof carSettings !== "undefined" && carSettings[key]) || {};
+        return { escursione: "Scheda partecipante: " + (v.n || key.slice(3).replace(/^[a-z]+:/i, "").replace(/_/g, " ")) };
+      }
       const esc = excList.find(e => e.id === key);
       return { escursione: esc ? formatNomeUscita(esc.titolo) : key };
     },

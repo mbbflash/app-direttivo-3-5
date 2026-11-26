@@ -37,14 +37,11 @@ Il codice è nella cartella [`apps-script/`](apps-script/) di questo repository 
 
 Quando il codice in `apps-script/` cambia, ripeti i passi 2–4 incollando la versione nuova. Non serve rieseguire `installa`, a meno che le note della versione non lo dicano: l'attivatore resta quello di prima.
 
-### Domande sulle auto nel modulo template (v2.6.1, aggiornata in v2.6.2)
+### Domanda sulle auto nel modulo template (v2.6.1, aggiornata in v2.7.1)
 
-Dopo aver incollato il `Codice.gs` nuovo, scegli la funzione **`aggiungiDomandeAuto`** e premi **Esegui** una volta. Lo script aggiunge al form template due domande usate dalla sezione *Auto per l'uscita* dell'app:
+Dopo aver incollato il `Codice.gs` nuovo, scegli la funzione **`aggiungiDomandeAuto`** e premi **Esegui** una volta. Lo script aggiunge al form template, dopo "Città da dove parti", la domanda *📍 Ci vediamo al punto di ritrovo o vai direttamente alla partenza dell'escursione?* (Al punto di ritrovo / Direttamente alla partenza). Se c'è già, non cambia nulla.
 
-- dopo "Città da dove parti": *📍 Ci vediamo al punto di ritrovo o vai direttamente alla partenza dell'escursione?* (Al punto di ritrovo / Direttamente alla partenza);
-- dopo "saresti disposto/a a mettere il tuo mezzo a disposizione?": *🪑 Se metti il tuo mezzo a disposizione, quanti posti ha la tua auto (compreso chi guida)?* (4 posti / 5 posti, facoltativa). Se la domanda sui posti c'era già, la porta a queste due scelte.
-
-Nel registro compare il messaggio con le domande aggiunte. Se le domande ci sono già, non cambia nulla. Le uscite create da quel momento le avranno; quelle già create restano come sono. Apri il template e controlla che le due domande siano nel punto giusto: se serve, spostale a mano.
+I posti non si chiedono più: per l'app tutte le auto sono da 5 posti. Se nel template c'è la domanda sui posti aggiunta con le versioni 2.6.1–2.7.0, puoi cancellarla a mano: l'app non la usa.
 
 ## Se qualcosa non va
 
