@@ -1,6 +1,14 @@
 {
-  "version": "2.7.3",
+  "version": "2.7.4",
   "releases": [
+    {
+      "version": "2.7.4",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto: se serve un'auto in più e nessun altro può guidare, chi di solito viaggia con un compagno guida un'altra auto (prima chi ha la priorità); le solite auto non si dividono se c'è un altro guidatore libero",
+        "Corretto: chi ha l'auto ma di solito viaggia con un altro ora guida quando mancano posti, invece di lasciare persone senza posto"
+      ]
+    },
     {
       "version": "2.7.3",
       "date": "26/11/2026",
