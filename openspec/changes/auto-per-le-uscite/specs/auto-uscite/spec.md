@@ -167,3 +167,18 @@ Quando almeno un punto intermedio ha auto che passano dal ritrovo principale, il
 - **WHEN** Bruno parte da Pisa con Anna e al ritrovo principale salgono altre due persone
 - **THEN** sotto "Si trovano a Pisa" c'è l'auto di Bruno con Anna, e sotto "In partenza da" c'è l'auto di Bruno con tutte e quattro le persone, insieme alle auto che partono dal ritrovo principale
 
+### Requirement: Priorità e abitudine
+Quando servono più auto, il sistema SHALL poter mettere alla guida anche chi ha l'auto e di solito viaggia con un compagno (abitudine della scheda): ma solo dopo tutti quelli che non hanno abitudini; in ciascuno dei due gruppi prima chi ha la priorità alla guida. Una solita auto MUST NOT dividersi solo per dare il volante a chi ha la priorità. Le scelte "solo per questa uscita" MUST restare valide.
+
+#### Scenario: Due con priorità nella solita auto
+- **WHEN** Anna viaggia di solito con Bruno, entrambi hanno la priorità alla guida, i posti di un'auto non bastano e nessun altro può guidare
+- **THEN** Anna guida un'altra auto e Bruno la sua
+
+#### Scenario: Un altro guidatore libero
+- **WHEN** come sopra, ma Carlo (senza priorità e senza abitudini) può guidare
+- **THEN** guida Carlo e Anna resta in auto con Bruno
+
+#### Scenario: Posti che non bastano
+- **WHEN** Anna ha l'auto, di solito viaggia con Bruno e nessun altro può guidare
+- **THEN** Anna guida invece di lasciare persone senza posto
+

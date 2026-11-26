@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.7.3" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.7.3" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.7.3" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.7.4" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.7.4" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.7.4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.7.3"></script>
-  <script src="js/config.js?v=2.7.3"></script>
-  <script src="js/google.js?v=2.7.3"></script>
-  <script src="js/clouddb.js?v=2.7.3"></script>
+  <script src="js/storage.js?v=2.7.4"></script>
+  <script src="js/config.js?v=2.7.4"></script>
+  <script src="js/google.js?v=2.7.4"></script>
+  <script src="js/clouddb.js?v=2.7.4"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -665,7 +665,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.7.3" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.7.4" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -677,7 +677,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.7.3" alt="" />
+        <img src="icons/icon-192.png?v=2.7.4" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1106,9 +1106,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.7.3" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.7.4" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.7.3" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.7.4" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2543,7 +2543,7 @@
         prefs[who.k] = { r: x.r || "", c: t && !altrove ? t.k : "", cn: x.cn || "", sugg: t && altrove ? t.k : "", cc: x.cc || "", pg: Boolean(x.pg) };
       });
       // Scelte "solo per questa uscita" (prevalgono), poi le abitudini della scheda del partecipante.
-      const g = {}, c = {};
+      const g = {}, c = {}, cAbit = new Set();
       Object.entries(ecc).forEach(([k, v]) => {
         if (v === "guida") { g[k] = true; delete c[k]; }
         else if (v === "nonguida") { g[k] = false; }
@@ -2553,7 +2553,7 @@
         const p = by.get(k), t = x.c ? by.get(x.c) : null;
         if (!p || !t || p === t || ecc[k] !== undefined || c[k] || p.diretto || t.diretto) return;
         if (c[t.k] === k) return;                             // A con B e B con A: basta una volta
-        if (t.haAuto && g[t.k] !== false) c[k] = t.k;          // chi ha l'auto passa a prendere
+        if (t.haAuto && g[t.k] !== false) { c[k] = t.k; cAbit.add(k); }   // chi ha l'auto passa a prendere
         else {                                                // altrimenti viaggiano almeno insieme
           p.amici = (p.amici || []).concat([t.k]);
           t.amici = (t.amici || []).concat([k]);
@@ -2613,11 +2613,16 @@
         const giaPosti = drivers().filter(x => x.citta === d.citta).reduce((t, x) => t + posti(x), 0);
         return Math.max(0, senza - giaPosti);
       };
-      const cands = atR.filter(p => p.haAuto && !p.guida && !p.con && !off(p));
+      // Se serve un'auto in più può guidare anche chi di solito viaggia con qualcuno (abitudine, non le scelte
+      // "solo per questa uscita"), ma solo se nessun altro libero può farlo: le solite auto non si rompono per dare
+      // il volante a chi ha la priorità. Tra i liberi, e poi tra chi ha l'abitudine, prima chi ha la priorità.
+      const pg = (x) => Boolean(prefs[x.k] && prefs[x.k].pg);
+      const cands = atR.filter(p => p.haAuto && !p.guida && !off(p) && (!p.con || cAbit.has(p.k)));
       while (cap() < atR.length && cands.length) {
-        const pg = (x) => Boolean(prefs[x.k] && prefs[x.k].pg);
-        cands.sort((a, b) => (pg(b) - pg(a)) || (prevDrv.has(b.k) - prevDrv.has(a.k)) || needy(b) - needy(a) || ((b.amici || []).length - (a.amici || []).length) || posti(b) - posti(a) || atR.indexOf(a) - atR.indexOf(b));
-        cands.shift().guida = true;
+        cands.sort((a, b) => (Boolean(a.con) - Boolean(b.con)) || (pg(b) - pg(a)) || (prevDrv.has(b.k) - prevDrv.has(a.k)) || needy(b) - needy(a) || ((b.amici || []).length - (a.amici || []).length) || posti(b) - posti(a) || atR.indexOf(a) - atR.indexOf(b));
+        const nuovo = cands.shift();
+        if (nuovo.con) { nuovo.con = null; nuovo.fixed = false; delete c[nuovo.k]; }
+        nuovo.guida = true;
       }
 
       // Gruppi di chi ha scritto con chi viaggia: insieme nella stessa auto, se ci stanno.
@@ -4434,6 +4439,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.7.3"></script>
+<script src="js/app.js?v=2.7.4"></script>
 </body>
 </html>

@@ -39,6 +39,7 @@
 - [x] 4.10 Ultima risposta per chi compila più volte, righe vuote ignorate; schede dei partecipanti una riga per persona (`_p:`) con trasformazione di `_persone`
 - [x] 4.11 Interfaccia: riquadro "Auto fissate" con "Rifai da capo", passeggeri del ritrovo principale elencati a parte (niente simbolo ↪), intestazioni "Si trovano a …"
 - [x] 4.12 v2.7.3: vista in due tappe (punti intermedi, poi "In partenza da" con tutte le auto complete)
+- [x] 4.13 v2.7.4: chi ha l'abitudine di viaggiare con un altro può guidare se servono auto (prima chi ha la priorità)
 
 ## 5. Rilascio
 
