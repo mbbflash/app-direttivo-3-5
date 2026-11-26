@@ -1,6 +1,16 @@
 {
-  "version": "2.6.3",
+  "version": "2.7.0",
   "releases": [
+    {
+      "version": "2.7.0",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto per l'uscita più semplice: si vedono solo il ritrovo e le auto, con chi guida e chi sale; un pulsante \"Copia per il gruppo\"",
+        "Tocca un nome per aprire la scheda del partecipante: ritrovo abituale (es. Pisa, Camaiore), passaggio abituale (es. con Livio) e cosa fa solo in questa uscita",
+        "Ritrovo e passaggio abituali valgono per tutte le uscite; si impostano anche dalla scheda del socio, nella nuova sezione \"Auto per le uscite\"",
+        "Tolti i menu sotto le città, l'elenco \"chi parte da dove\" e la lista delle abitudini"
+      ]
+    },
     {
       "version": "2.6.3",
       "date": "26/11/2026",

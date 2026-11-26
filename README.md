@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.6.3-blue)
+![Versione](https://img.shields.io/badge/versione-2.7.0-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -102,7 +102,7 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Uscite per iscritto** | Colonna *N° escursioni* con le uscite fatte da ogni iscritto, contate su tutti i fogli (escluse le uscite rimandate o annullate) |
 | **Nuova escursione programmata** | Pulsante che crea il form di iscrizione (copia del template, con titolo e giorno della settimana) e il foglio *Iscrizioni AAAA.MM.GG - Nome (Risposte)* collegato, poi dà il link da condividere. Lo fa lo script di automazione: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |
-| **Auto per l'uscita** | Le auto che partono dal ritrovo si formano da sole dalle risposte del modulo: guida chi è automunito e mette il mezzo a disposizione, si usano le auto che bastano per tutti, chi ha scritto *con chi sei in auto* resta insieme, chi va *direttamente alla partenza* è a parte. Per arrivare al ritrovo, città per città, chi ha l'auto e chi cerca un passaggio. Ritrovo dalla scheda tecnica, altrimenti da scegliere. Correzioni a mano condivise e *Copia riepilogo per il gruppo* |
+| **Auto per l'uscita** | Si vedono solo il ritrovo e le auto: si formano da sole dalle risposte del modulo (guida chi mette il mezzo a disposizione, auto equilibrate, 4 o 5 posti, chi va *direttamente alla partenza* a parte). Toccando un nome si apre la scheda del partecipante con **ritrovo abituale** e **passaggio abituale** (validi per tutte le uscite, impostabili anche dalla pagina del socio) e la scelta *solo per questa uscita*. *Copia per il gruppo* |
 
 ### 📊 Statistiche
 

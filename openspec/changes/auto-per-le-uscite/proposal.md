@@ -8,13 +8,12 @@ Per ogni uscita il direttivo organizza a mano chi va in auto con chi, leggendo l
 - Il modulo chiede di mettere l'auto a disposizione *dal punto di ritrovo fino alla partenza*: l'app forma quindi **le auto che partono dal ritrovo**, senza calcoli di distanze:
   - guida solo chi è automunito **e** mette il mezzo a disposizione;
   - si usano le auto che bastano per tutti (auto da 5 posti di base, o 4/5 posti come dichiarato nel modulo), scegliendo prima chi ha in città qualcuno senza auto;
-  - per ogni uscita si può indicare che alcune città si ritrovano in un **punto intermedio** (es. i pisani a Pisa, i versiliesi a Camaiore): ogni punto forma le sue auto;
+  - chi ha un ritrovo abituale diverso dal principale (es. Pisa, Camaiore) forma le auto con gli altri di quel punto;
   - le auto sono equilibrate e nessuno guida da solo se può salire in un'altra auto;
   - chi ha scritto "con chi sei in auto" resta nella stessa auto delle persone nominate;
   - chi ha detto che va **direttamente alla partenza** è elencato a parte;
   - chi ha disdetto non viene contato; se i posti non bastano, l'app lo dice.
-- **Per arrivare al ritrovo** l'app non decide: mostra, città per città, chi ha l'auto e chi cerca un passaggio; il direttivo può scegliere chi passa a prendere chi.
-- Passaggi e ritrovi intermedi scelti diventano **abituali** e valgono di base per le uscite successive, modificabili uscita per uscita.
+- La schermata dell'uscita mostra solo ritrovo e auto; toccando un nome si apre la **scheda del partecipante** con ritrovo abituale, passaggio abituale (validi per tutte le uscite) e la scelta "solo per questa uscita". Per i soci si impostano anche dalla pagina del socio.
 - Il ritrovo viene dalla scheda tecnica del percorso con lo stesso nome dell'uscita; se manca, si sceglie a mano tra i ritrovi abituali (nessun ritrovo predefinito).
 - Correzioni a mano condivise con il direttivo: chi guida (menu accanto all'auto), posti, chi va con chi; si annullano con un clic.
 - Pulsante "Copia riepilogo per il gruppo".

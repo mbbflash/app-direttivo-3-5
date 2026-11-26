@@ -47,44 +47,12 @@ Il sistema SHALL distribuire i passeggeri in modo equilibrato tra le auto dal ri
 - **WHEN** un'auto resterebbe con il solo guidatore e un'altra auto ha posto
 - **THEN** quel guidatore sale nell'altra auto
 
-### Requirement: Ritrovi intermedi
-Per ogni uscita il direttivo SHALL poter indicare, città per città, che chi parte da quella città si ritrova in un punto intermedio (una delle città dell'uscita). Il sistema SHALL formare le auto separatamente per ogni punto intermedio e per il ritrovo principale, con le stesse regole. Chi non ha indicato la città SHALL seguire il punto del compagno di viaggio indicato.
-
-#### Scenario: Versiliesi a Camaiore
-- **WHEN** per Viareggio e Camaiore il direttivo sceglie "si ritrovano a Camaiore"
-- **THEN** la sezione mostra "Ritrovo intermedio a Camaiore" con le auto di chi parte da quelle città, e le altre città restano al ritrovo principale
-
-### Requirement: Passaggi fino al ritrovo
-Nella sezione "Per arrivare al ritrovo" il direttivo SHALL poter scegliere, per chi cerca un passaggio, chi lo passa a prendere tra gli iscritti automuniti. Chi riceve il passaggio SHALL avere lo stesso punto di ritrovo di chi lo porta e, dal ritrovo, SHALL stare nella sua stessa auto quando c'è posto.
-
-#### Scenario: Passaggio scelto
-- **WHEN** il direttivo sceglie che Livio passa a prendere Amal
-- **THEN** Amal risulta "con Livio", si ritrova dove si ritrova Livio e dal ritrovo viaggia con lui se lui guida e c'è posto
-
-### Requirement: Abitudini
-Un passaggio scelto e un punto intermedio scelto per una città SHALL diventare abituali e valere di base per le uscite successive, salvati nella scheda `Auto_Escursioni` con le chiavi `_abituali` e `_punti`. In ogni uscita il direttivo SHALL poterli cambiare senza modificare l'abitudine, e SHALL poterli togliere da "Correggi a mano".
-
-#### Scenario: Uscita successiva
-- **WHEN** in un'uscita Livio passa a prendere Amal e Pisa si ritrova a Pisa, e in un'uscita successiva sono iscritti di nuovo
-- **THEN** nella nuova uscita il passaggio e il ritrovo intermedio sono già impostati
-
-#### Scenario: Cambio solo per un'uscita
-- **WHEN** in un'uscita il direttivo rimette Amal su "cerca passaggio"
-- **THEN** il cambio vale solo per quell'uscita e l'abitudine resta
-
 ### Requirement: Direttamente alla partenza
 Gli iscritti che hanno risposto di andare direttamente alla partenza SHALL essere elencati a parte e MUST NOT entrare nelle auto dal ritrovo.
 
 #### Scenario: Va direttamente
 - **WHEN** un iscritto risponde "Direttamente alla partenza"
 - **THEN** compare in "Direttamente alla partenza" e non in un'auto dal ritrovo
-
-### Requirement: Chi parte da dove
-Per il viaggio fino al ritrovo il sistema SHALL mostrare, città per città, chi ha l'auto e chi cerca un passaggio, senza assegnare i passaggi.
-
-#### Scenario: Città con chi cerca un passaggio
-- **WHEN** da una città partono un iscritto automunito e uno senza auto
-- **THEN** la città mostra il primo tra chi ha l'auto e il secondo tra chi cerca un passaggio
 
 ### Requirement: Ritrovo
 Il sistema SHALL mostrare il ritrovo della scheda tecnica del percorso con lo stesso nome dell'uscita; se non c'è, SHALL mostrare "Scegli il ritrovo" senza un ritrovo predefinito. Il direttivo SHALL poterlo scegliere o cambiare tra i ritrovi abituali.
@@ -100,20 +68,32 @@ Lo script di automazione SHALL offrire l'operazione `aggiungi_domande_auto` (ese
 - **WHEN** il template ha già le due domande
 - **THEN** l'operazione non modifica nulla e lo dice nel risultato
 
-### Requirement: Correzioni condivise
-Accanto a ogni auto il sistema SHALL permettere di scegliere chi guida tra chi è a bordo e può guidare; chi guidava prima resta nella stessa auto. Le scelte a mano (chi guida, posti, chi va con chi, ritrovo) SHALL essere salvate nella scheda `Auto_Escursioni` del database condiviso e SHALL restare valide quando cambiano le iscrizioni. Un pulsante SHALL annullarle tutte.
+### Requirement: Schermata dell'uscita
+La sezione SHALL mostrare solo il ritrovo, le auto (chi guida, eventuale "parte da …", passeggeri), chi è senza posto, chi va direttamente alla partenza e il pulsante "Copia per il gruppo". Ogni nome SHALL aprire la scheda del partecipante.
 
-#### Scenario: Cambio di chi guida
-- **WHEN** nell'auto di un iscritto viaggia un altro che può guidare e l'utente lo sceglie
-- **THEN** guida il nuovo, il precedente viaggia nella stessa auto e gli altri passeggeri restano
+#### Scenario: Apertura della scheda
+- **WHEN** l'utente tocca un nome nella sezione
+- **THEN** si apre la scheda di quel partecipante
 
-#### Scenario: Nuova iscrizione
-- **WHEN** dopo una correzione a mano arriva una nuova iscrizione
-- **THEN** la correzione resta e il nuovo iscritto viene sistemato in automatico
+### Requirement: Scheda del partecipante
+La scheda SHALL permettere di impostare il ritrovo abituale e il passaggio abituale (chi lo passa a prendere), validi per tutte le uscite e salvati nella scheda `Auto_Escursioni` con la chiave `_persone`, e la scelta "solo per questa uscita" (come al solito, guida, non guida, con un'auto), salvata con l'uscita. Per i soci gli stessi ritrovo e passaggio abituali SHALL potersi impostare anche dalla pagina del socio.
+
+#### Scenario: Passaggio abituale
+- **WHEN** nella scheda di un partecipante si sceglie "con Livio" come passaggio abituale e Livio mette l'auto a disposizione
+- **THEN** in ogni uscita in cui sono iscritti tutti e due il partecipante viaggia nell'auto di Livio e parte da dove parte Livio
+
+#### Scenario: Ritrovo abituale
+- **WHEN** un partecipante ha "Pisa" come ritrovo abituale
+- **THEN** le sue auto si formano con gli altri che si ritrovano a Pisa e la sezione indica "parte da Pisa"
+
+#### Scenario: Solo per questa uscita
+- **WHEN** per un'uscita si sceglie "con Pietro"
+- **THEN** il partecipante viaggia con Pietro solo in quell'uscita e le abitudini restano
 
 ### Requirement: Riepilogo
-La sezione SHALL offrire "Copia riepilogo per il gruppo" con il ritrovo, le auto dal ritrovo, chi va direttamente alla partenza e chi parte dalla stessa città.
+La sezione SHALL offrire "Copia per il gruppo" con il ritrovo, le auto (con "parte da …" se c'è), chi va direttamente alla partenza e chi è senza posto.
 
 #### Scenario: Copia
-- **WHEN** l'utente preme "Copia riepilogo per il gruppo"
+- **WHEN** l'utente preme "Copia per il gruppo"
 - **THEN** negli appunti c'è il testo con le auto nello stesso ordine della sezione
+
