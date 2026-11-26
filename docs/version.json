@@ -1,6 +1,16 @@
 {
-  "version": "2.6.2",
+  "version": "2.6.3",
   "releases": [
+    {
+      "version": "2.6.3",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto per l'uscita: in \"Per arrivare al ritrovo\" tocca chi cerca un passaggio e scegli chi lo passa a prendere; dal ritrovo viaggiano nella stessa auto se c'è posto",
+        "Passaggi abituali: un passaggio scelto vale di base anche per le uscite successive; in ogni uscita si può cambiare a mano",
+        "Ritrovi abituali: il punto intermedio scelto per una città (es. Pisa, Camaiore) vale di base anche per le uscite successive",
+        "Le abitudini si vedono e si tolgono in \"Correggi a mano\"; sono condivise con il direttivo"
+      ]
+    },
     {
       "version": "2.6.2",
       "date": "26/11/2026",
