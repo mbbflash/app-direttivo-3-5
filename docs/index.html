@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.7.4" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.7.4" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.7.4" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.7.5" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.7.5" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.7.5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.7.4"></script>
-  <script src="js/config.js?v=2.7.4"></script>
-  <script src="js/google.js?v=2.7.4"></script>
-  <script src="js/clouddb.js?v=2.7.4"></script>
+  <script src="js/storage.js?v=2.7.5"></script>
+  <script src="js/config.js?v=2.7.5"></script>
+  <script src="js/google.js?v=2.7.5"></script>
+  <script src="js/clouddb.js?v=2.7.5"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -665,7 +665,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.7.4" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.7.5" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -677,7 +677,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.7.4" alt="" />
+        <img src="icons/icon-192.png?v=2.7.5" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1106,9 +1106,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.7.4" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.7.5" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.7.4" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.7.5" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2540,7 +2540,11 @@
         const t = x.c ? (by.get(x.c) || (x.cn && byName.get(nk(x.cn)))) : null;
         // Il compagno di viaggio abituale vale da solo solo se oggi parte dalla solita città; altrimenti è un suggerimento.
         const altrove = Boolean(x.cc && who.citta !== CAR_NO_ZONE && nk(x.cc) !== nk(who.citta));
-        prefs[who.k] = { r: x.r || "", c: t && !altrove ? t.k : "", cn: x.cn || "", sugg: t && altrove ? t.k : "", cc: x.cc || "", pg: Boolean(x.pg) };
+        // Anche il ritrovo abituale vale solo se oggi parte dalla solita città (se la scheda la conosce).
+        const rAltrove = Boolean(x.r && x.rc && who.citta !== CAR_NO_ZONE && nk(x.rc) !== nk(who.citta));
+        const rLab = carTitle(String(x.r || "").replace(/\s+/g, " ").trim());
+        if (rAltrove) who.rSaltato = rLab;
+        prefs[who.k] = { r: rAltrove ? "" : rLab, c: t && !altrove ? t.k : "", cn: x.cn || "", sugg: t && altrove ? t.k : "", cc: x.cc || "", pg: Boolean(x.pg) };
       });
       // Scelte "solo per questa uscita" (prevalgono), poi le abitudini della scheda del partecipante.
       const g = {}, c = {}, cAbit = new Set();
@@ -2553,6 +2557,9 @@
         const p = by.get(k), t = x.c ? by.get(x.c) : null;
         if (!p || !t || p === t || ecc[k] !== undefined || c[k] || p.diretto || t.diretto) return;
         if (c[t.k] === k) return;                             // A con B e B con A: basta una volta
+        // Chi ha un suo ritrovo intermedio ci va: il compagno abituale vale solo se si ritrova nello stesso punto.
+        const rP = nk(x.r || ""), rT = nk((prefs[t.k] && prefs[t.k].r) || "");
+        if (rP && rP !== rT && !(ritrovo && rP === nk(ritrovo) && !rT)) { p.cSaltato = t.nome; return; }
         if (t.haAuto && g[t.k] !== false) { c[k] = t.k; cAbit.add(k); }   // chi ha l'auto passa a prendere
         else {                                                // altrimenti viaggiano almeno insieme
           p.amici = (p.amici || []).concat([t.k]);
@@ -2784,12 +2791,32 @@
           .sort((a, b) => a.km - b.km || a.d.nome.localeCompare(b.d.nome, "it"))[0];
         if (best) out.push({ p, d: best.d, km: best.km });
       });
-      return out;
+      // Ritrovo intermedio dalla città del modulo: chi parte da una città dove altri si ritrovano già,
+      // oppure almeno due persone della stessa città (una con l'auto) senza un ritrovo.
+      const nk = (x) => carNorm(x).split(" ").filter(Boolean).sort().join(" ");
+      const libero = (p) => !p.diretto && p.citta !== CAR_NO_ZONE && !ecc[p.k] && !(plan.prefs[p.k] && (plan.prefs[p.k].r || plan.prefs[p.k].c)) && !p.punto;
+      const punti = new Map();
+      plan.P.forEach(p => { if (p.punto) punti.set(nk(p.punto), p.punto); });
+      const mainNk = nk(plan.ritrovo || "");
+      const perCitta = new Map();
+      plan.P.filter(libero).forEach(p => { const k = nk(p.citta); if (!perCitta.has(k)) perCitta.set(k, []); perCitta.get(k).push(p); });
+      const outR = [];
+      perCitta.forEach((ps, k) => {
+        if (no["r:" + k]) return;
+        const noto = punti.get(k);
+        const nelPrincipale = mainNk && k.split(" ").every(t => mainNk.split(" ").includes(t));
+        if (noto || (!nelPrincipale && ps.length >= 2 && ps.some(p => p.haAuto))) outR.push({ tipo: "r", ps, punto: noto || ps[0].citta, key: "r:" + k, noto: Boolean(noto) });
+      });
+      return outR.concat(out);
     }
     function carSuggHtml(plan, s) {
       const sg = carSuggerimenti(plan, s);
       if (!sg.length) return "";
-      return `<div class="car-sugg">${sg.slice(0, 3).map(o => `<div class="car-sugg-row"><span>💡 <strong>${escapeHtml(o.p.nome)}</strong> potrebbe andare con <strong>${escapeHtml(o.d.nome)}</strong> <span class="muted">(${o.km ? Math.round(o.km) + " km" : "stesso comune"})</span></span>
+      const riga = (o) => o.tipo === "r"
+        ? `<div class="car-sugg-row"><span>💡 <strong>${o.ps.map(p => escapeHtml(p.nome)).join(", ")}</strong> ${o.ps.length > 1 ? "partono" : "parte"} da ${escapeHtml(o.punto)}: ${o.ps.length > 1 ? "si ritrovano" : "si ritrova"} a <strong>${escapeHtml(o.punto)}</strong>?${o.noto ? ` <span class="muted">(c'è già chi si ritrova lì)</span>` : ""}</span>
+          <span><button type="button" class="exc-mini-btn" data-car-sugg-r="${escapeHtml(o.punto)}" data-ks="${escapeHtml(o.ps.map(p => p.k).join("|"))}">Accetta</button><button type="button" class="ghost exc-mini-btn" data-car-sugg-no="${escapeHtml(o.key)}" aria-label="Ignora">✕</button></span></div>`
+        : null;
+      return `<div class="car-sugg">${sg.slice(0, 3).map(o => riga(o) || `<div class="car-sugg-row"><span>💡 <strong>${escapeHtml(o.p.nome)}</strong> potrebbe andare con <strong>${escapeHtml(o.d.nome)}</strong> <span class="muted">(${o.km ? Math.round(o.km) + " km" : "stesso comune"})</span></span>
           <span><button type="button" class="exc-mini-btn" data-car-sugg-ok="${escapeHtml(o.p.k)}" data-d="${escapeHtml(o.d.k)}">Accetta</button><button type="button" class="ghost exc-mini-btn" data-car-sugg-no="${escapeHtml(o.p.k)}" aria-label="Ignora">✕</button></span></div>`).join("")}
         ${sg.length > 3 ? `<div class="car-empty">e altri ${sg.length - 3} suggerimenti dopo questi</div>` : ""}</div>`;
     }
@@ -2875,7 +2902,8 @@
     }
     function carSetPref(k, patch) {
       const cur = Object.assign({}, carSettings[CAR_P + k] || {}, patch);
-      if (!cur.r) delete cur.r;
+      if (!cur.r) { delete cur.r; delete cur.rc; }
+      if (!cur.rc) delete cur.rc;
       if (!cur.c) { delete cur.c; delete cur.cn; delete cur.cc; }
       if (!cur.cc) delete cur.cc;
       if (!cur.pg) delete cur.pg;
@@ -2888,7 +2916,9 @@
     function carOra(p, plan) {
       if (p.diretto) return "In questa uscita: va direttamente alla partenza.";
       const da = p.punto ? ` · parte da ${p.punto}` : "";
-      const nota = p.puntoMancato ? ` (a ${p.puntoMancato} nessuno può guidare: va al ritrovo principale)` : "";
+      const nota = (p.puntoMancato ? ` (a ${p.puntoMancato} nessuno può guidare: va al ritrovo principale)` : "") +
+        (p.rSaltato ? ` (oggi parte da ${p.citta}: il ritrovo abituale ${p.rSaltato} non vale)` : "") +
+        (p.cSaltato ? ` (si ritrova a ${p.punto || "un altro punto"}: il passaggio abituale con ${p.cSaltato} vale solo se si ritrovano nello stesso punto)` : "");
       if (p.guida) { const o = plan.occ(p); return `In questa uscita: guida${o.length ? ", con " + o.map(x => x.nome).join(", ") : ", da solo/a"}${da}${nota}.`; }
       if (p.con) {
         const d = plan.by.get(p.con);
@@ -2988,7 +3018,8 @@
             const me = plan.by.get(key) || {};
             const pgEl = byId("carSheetPG");
             carSetPref(key, { r, c: cK, cn: cP ? cP.nome : (cK === old.c ? old.cn : ""), n: me.nome || old.n || "", pg: pgEl ? pgEl.checked : Boolean(old.pg),
-              cc: !cK ? "" : (cK === old.c && old.cc ? old.cc : (me.citta && me.citta !== CAR_NO_ZONE ? me.citta : "")) });
+              cc: !cK ? "" : (cK === old.c && old.cc ? old.cc : (me.citta && me.citta !== CAR_NO_ZONE ? me.citta : "")),
+              rc: !r ? "" : (r === old.r && old.rc ? old.rc : (me.citta && me.citta !== CAR_NO_ZONE ? me.citta : "")) });
             updateCarSettings((s) => { if (ecc) s.ecc[key] = ecc; else delete s.ecc[key]; });
             el.hidden = true;
             toast("Scheda salvata");
@@ -3039,6 +3070,13 @@
           if (p && dd) carSetPref(k, { c: d, cn: dd.nome, n: p.nome, cc: p.citta !== CAR_NO_ZONE ? p.citta : "" });
           updateCarSettings(() => {});
           toast(`${p ? p.nome : ""} viaggia con ${dd ? dd.nome : ""}`);
+          return;
+        }
+        if (b.dataset.carSuggR) {
+          const punto = b.dataset.carSuggR, plan = carView.plan;
+          (b.dataset.ks || "").split("|").forEach(k => { const p = plan.by.get(k); if (p) carSetPref(k, { r: punto, rc: p.citta !== CAR_NO_ZONE ? p.citta : "", n: p.nome }); });
+          updateCarSettings(() => {});
+          toast(`Ritrovo a ${punto} salvato nelle schede`);
           return;
         }
         if (b.dataset.carSuggNo) { const k = b.dataset.carSuggNo; updateCarSettings((s) => { s.noSugg = Object.assign({}, s.noSugg || {}, { [k]: true }); }); return; }
@@ -4439,6 +4477,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.7.4"></script>
+<script src="js/app.js?v=2.7.5"></script>
 </body>
 </html>
