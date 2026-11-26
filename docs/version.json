@@ -1,6 +1,18 @@
 {
-  "version": "2.5.5",
+  "version": "2.6.0",
   "releases": [
+    {
+      "version": "2.6.0",
+      "date": "26/11/2026",
+      "notes": [
+        "Escursioni: nuova sezione \"Auto per l'uscita\". Le auto si formano da sole dalle risposte del modulo: città da dove parti, automunito, auto messa a disposizione e \"con chi sei in auto\"",
+        "Per ogni città il minor numero di auto; chi non ha un'auto della sua città va nella più vicina che passa sulla sua strada verso il ritrovo, altrimenti va per conto suo",
+        "Conta il punto di ritrovo (dalla scheda tecnica, di base il Bar Millibar) e la partenza dell'escursione: chi ha la partenza più vicina del ritrovo ci va direttamente",
+        "Dal ritrovo alla partenza ripartono solo le auto necessarie: chi arriva da solo lascia l'auto al ritrovo e sale dove c'è posto",
+        "Correzioni a mano (chi guida, posti, chi va con chi) condivise con il direttivo nella nuova scheda \"Auto_Escursioni\" del database; si possono annullare con un clic",
+        "Pulsante \"Copia riepilogo per il gruppo\" con le auto da casa e dal ritrovo"
+      ]
+    },
     {
       "version": "2.5.5",
       "date": "25/11/2026",

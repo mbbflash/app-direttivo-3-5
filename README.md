@@ -7,7 +7,7 @@
 Una web app installabile su PC, Android e Chromebook, collegata direttamente ai Fogli Google dell'associazione.
 
 [![Apri l'app](https://img.shields.io/badge/Apri%20l'app-mbbflash.github.io-1f6feb?logo=googlechrome&logoColor=white)](https://mbbflash.github.io/app-direttivo-3-5/)
-![Versione](https://img.shields.io/badge/versione-2.5.5-blue)
+![Versione](https://img.shields.io/badge/versione-2.6.0-blue)
 ![Login](https://img.shields.io/badge/accesso-Google-4285F4?logo=google&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installabile-5A0FC8)
 ![Piattaforme](https://img.shields.io/badge/Windows%20%7C%20Android%20%7C%20ChromeOS%20%7C%20macOS%20%7C%20iOS-supportati-lightgrey)
@@ -102,6 +102,7 @@ Nella scheda di un socio in scadenza o scaduto compare **Sollecita rinnovo**:
 | **Esporta partecipanti** | CSV degli iscritti all'uscita con contatti, stato socio, conferme e note |
 | **Uscite per iscritto** | Colonna *N° escursioni* con le uscite fatte da ogni iscritto, contate su tutti i fogli (escluse le uscite rimandate o annullate) |
 | **Nuova escursione programmata** | Pulsante che crea il form di iscrizione (copia del template, con titolo e giorno della settimana) e il foglio *Iscrizioni AAAA.MM.GG - Nome (Risposte)* collegato, poi dà il link da condividere. Lo fa lo script di automazione: vedi [SETUP-APPS-SCRIPT.md](SETUP-APPS-SCRIPT.md) |
+| **Auto per l'uscita** | Le auto si formano da sole dalle risposte del modulo (*Città da dove parti*, automunito, mezzo a disposizione, *con chi sei in auto*): per ogni città meno auto possibile, passaggi solo a chi è sulla strada verso il ritrovo o la partenza, chi non ha un'auto vicina va per conto suo. Il ritrovo viene dalla scheda tecnica (di base il Bar Millibar); dal ritrovo alla partenza ripartono solo le auto necessarie. Correzioni a mano condivise e *Copia riepilogo per il gruppo* |
 
 ### 📊 Statistiche
 
@@ -208,6 +209,7 @@ L'app installata si apre a schermo intero, con la sua icona, come un programma n
 | Spunte tessere cartacee | Foglio *NON TOCCARE - DATABASE APP DI GESTIONE* → `Tessere` | ✅ Sì |
 | Note sui soci | Database → `Note` | ✅ Sì |
 | Note e conferme escursioni | Database → `Conferme_Escursioni` | ✅ Sì |
+| Correzioni alle auto delle uscite | Database → `Auto_Escursioni` | ✅ Sì |
 | Solleciti di rinnovo | Database → `Solleciti` | ✅ Sì |
 | Presenze e statistiche | Foglio *Tre Quinti Wrapped - Foglio Calcolo* | ✅ Sì |
 | Schede tecniche dei percorsi | Foglio *Tre Quinti Trekking - Schede Tecniche Escursioni …* (solo lettura) | ✅ Sì |

@@ -2,7 +2,7 @@
 // Nessun dato reale, nessuna chiamata a Google. Serve per provare l'app senza account.
 (function () {
   const cfg = window.APP_CONFIG;
-  const STORE_KEY = "app35_demo_store_v2";
+  const STORE_KEY = "app35_demo_store_v3";
 
   function fmt(d) {
     return String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear();
@@ -26,7 +26,10 @@
         String(days), i === 2 ? "Rinnovo da sollecitare" : ""]);
     });
     const formHeader = ["Informazioni cronologiche", "Nome e Cognome", "Indirizzo email", "Numero di telefono",
-      "Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?"];
+      "Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?",
+      "🏘️ Città da dove parti:", "🚗 Sei automunito/a per questo evento?",
+      "👥 Se si, saresti disposto/a a mettere il tuo mezzo a disposizione?",
+      "🤝 Se sei già organizzato per dare il passaggio ad altri partecipanti, scrivici con chi sei in auto"];
     const form = (rows) => [formHeader, ...rows];
     const store = {
       files: {
@@ -60,7 +63,15 @@
         ] } },
         // Uscita futura: l'assistente "Prossima uscita" la deve segnare come già in programma.
         "demo-esc-3": { name: `Iscrizioni ${futureStamp(20)} - Il Borgo Abbandonato (Risposte)`, sheets: { "Risposte del modulo 1": form([
-          [fmt(shift(-1)) + " 18.00", "Anna Neri", "anna.neri@esempio.it", "3330000003", "SI"]
+          [fmt(shift(-1)) + " 18.00", "Anna Neri", "anna.neri@esempio.it", "3330000003", "SI", "Lucca", "SI", "SI", ""],
+          // Iscritti di prova per la sezione "Auto per l'uscita" (nomi inventati, città vere).
+          [fmt(shift(-1)) + " 18.10", "Mario Rossi", "mario.rossi@esempio.it", "3330000000", "SI", "Lucca", "NO", "", ""],
+          [fmt(shift(-1)) + " 18.20", "Giulia Bianchi", "giulia.bianchi@esempio.it", "3330000001", "SI", "Capannori", "SI", "SI", ""],
+          [fmt(shift(-1)) + " 18.30", "Luca Verdi", "luca.verdi@esempio.it", "3330000002", "SI", "Pisa", "SI", "SI", ""],
+          [fmt(shift(-1)) + " 18.40", "Sara Blu", "sara.blu@esempio.it", "3330000005", "SI", "Camaiore", "NO", "", "Marco"],
+          [fmt(shift(-1)) + " 18.50", "Marco Viola", "marco.viola@esempio.it", "3330000007", "SI", "Viareggio", "SI", "SI", ""],
+          [fmt(shift(-1)) + " 19.00", "Elena Marrone", "elena.marrone@esempio.it", "3330000006", "SI", "Capannori", "NO", "", ""],
+          [fmt(shift(-1)) + " 19.10", "Paolo Gialli", "", "3330000008", "NO", "Borgo a Mozzano", "SI", "NO", ""]
         ]) } },
         // Sintassi vecchia, con il nome tra virgolette: l'app la riconosce ancora.
         "demo-esc-1": { name: `Form Iscrizione 2026.10.25 - "Monte Esempio" (Risposte)`, sheets: { "Risposte del modulo 1": form([
@@ -172,7 +183,10 @@
   }
   setInterval(simulateScript, 1000);
   const formHeaderDemo = ["Informazioni cronologiche", "Nome e Cognome", "Indirizzo email", "Numero di telefono",
-    "Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?"];
+    "Sei un/una tesserato/a della TRE QUINTI TREKKING APS e la tua tessera è ancora attiva?",
+      "🏘️ Città da dove parti:", "🚗 Sei automunito/a per questo evento?",
+      "👥 Se si, saresti disposto/a a mettere il tuo mezzo a disposizione?",
+      "🤝 Se sei già organizzato per dare il passaggio ad altri partecipanti, scrivici con chi sei in auto"];
 
   async function handle(method, url, body) {
     await new Promise(r => setTimeout(r, 120)); // simula la rete

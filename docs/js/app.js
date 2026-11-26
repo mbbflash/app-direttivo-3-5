@@ -34,6 +34,12 @@
     paper: memberInfo,
     note: memberInfo,
     remind: memberInfo,
+    auto: (key) => {
+      if (key === "_zone") return { escursione: "Zone di provenienza (tutte le uscite)" };
+      if (key === "_opzioni") return { escursione: "Opzioni auto (tutte le uscite)" };
+      const esc = excList.find(e => e.id === key);
+      return { escursione: esc ? formatNomeUscita(esc.titolo) : key };
+    },
     exc: (key) => {
       const sep = key.indexOf("::");
       const escId = sep >= 0 ? key.slice(0, sep) : key;
@@ -100,6 +106,7 @@
       appStorage.setItem(REMINDERS_KEY, JSON.stringify(reminders));
     } catch (e) {}
     saveExcLocalState();
+    saveCarSettings();
   }
 
   async function loadCloud() {
@@ -109,6 +116,7 @@
       localNotes = data.note;
       excLocalState = data.exc;
       reminders = data.remind || {};
+      carSettings = data.auto || {};
       cacheMaps();
       lastCloudLoad = Date.now();
       rerender();

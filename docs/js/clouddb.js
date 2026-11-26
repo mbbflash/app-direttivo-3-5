@@ -10,6 +10,8 @@
     note: { name: "Note", headers: ["chiave", "tessera", "socio", "nota", "aggiornato_il", "aggiornato_da"] },
     exc: { name: "Conferme_Escursioni", headers: ["chiave", "escursione", "partecipante", "confermato", "nota", "aggiornato_il", "aggiornato_da", "disdetto"] },
     remind: { name: "Solleciti", headers: ["chiave", "tessera", "socio", "canale", "data_sollecito", "aggiornato_il", "aggiornato_da"] },
+    // Auto per le uscite: per ogni escursione le scelte fatte a mano (JSON), il resto si calcola.
+    auto: { name: "Auto_Escursioni", headers: ["chiave", "escursione", "impostazioni", "aggiornato_il", "aggiornato_da"] },
     log: { name: "Log", headers: ["quando", "chi", "tipo", "chiave", "valore"] },
     // Richieste per lo script Apps Script (SETUP-APPS-SCRIPT.md): righe aggiunte, mai riscritte dall'app.
     req: { name: "Richieste", headers: ["id", "tipo", "parametri", "stato", "risultato", "errore", "creato_il", "creato_da", "completato_il"] }
@@ -17,12 +19,12 @@
 
   let dbId = "";
   let schemaReady = false;
-  const rowIndex = { paper: {}, note: {}, exc: {}, remind: {} };
+  const rowIndex = { paper: {}, note: {}, exc: {}, remind: {}, auto: {} };
   let pending = readPending();
   let flushing = false;
   let flushTimer = null;
   let retryTimer = null;
-  let resolver = { paper: () => ({}), note: () => ({}), exc: () => ({}), remind: () => ({}) };
+  let resolver = { paper: () => ({}), note: () => ({}), exc: () => ({}), remind: () => ({}), auto: () => ({}) };
   let statusCb = () => {};
   let lastStatus = { state: "idle", pending: 0, message: "" };
 
@@ -132,6 +134,10 @@
         const canale = String(r[3] || "").trim();
         const data = String(r[4] || "").trim();
         if (canale || data) map[key] = { canale, data, by: String(r[6] || "").trim() }; else delete map[key];
+      } else if (type === "auto") {
+        let v = null;
+        try { v = JSON.parse(String(r[2] || "")); } catch (e) { v = null; }
+        if (v && typeof v === "object") map[key] = v; else delete map[key];
       }
     }
     rowIndex[type] = idx;
@@ -153,14 +159,15 @@
     setStatus("loading", "Lettura database condiviso…");
     try {
       await openDb();
-      const res = await GoogleApi.Sheets.batchGet(dbId, [tabRange("paper"), tabRange("note"), tabRange("exc"), tabRange("remind")]);
+      const res = await GoogleApi.Sheets.batchGet(dbId, [tabRange("paper"), tabRange("note"), tabRange("exc"), tabRange("remind"), tabRange("auto")]);
       const vr = res.valueRanges || [];
       await ensureTailHeaders("exc", vr[2] && vr[2].values);
       const data = {
         paper: parseTab("paper", vr[0] && vr[0].values),
         note: parseTab("note", vr[1] && vr[1].values),
         exc: parseTab("exc", vr[2] && vr[2].values),
-        remind: parseTab("remind", vr[3] && vr[3].values)
+        remind: parseTab("remind", vr[3] && vr[3].values),
+        auto: parseTab("auto", vr[4] && vr[4].values)
       };
       overlayPending(data);
       setStatus(pendingCount() ? "pending" : "idle");
@@ -182,6 +189,9 @@
     if (type === "note") {
       return [key, info.tessera || "", info.socio || "", value || "", ...stamp];
     }
+    if (type === "auto") {
+      return [key, info.escursione || "", value ? JSON.stringify(value) : "", ...stamp];
+    }
     if (type === "remind") {
       const v = value || {};
       return [key, info.tessera || "", info.socio || "", v.canale || "", v.data || "", ...stamp];
@@ -193,6 +203,7 @@
   function logValue(type, value) {
     if (type === "paper") return value ? `preparata=${yn(value.preparata)} consegnata=${yn(value.consegnata)}` : "nessuna spunta";
     if (type === "note") return value || "(nota cancellata)";
+    if (type === "auto") return value ? "auto modificate a mano" : "auto ripristinate in automatico";
     if (type === "remind") return value ? `sollecito ${value.canale || ""} del ${value.data || ""}` : "(sollecito annullato)";
     return value ? `confermato=${yn(value.confirmed)} disdetto=${yn(value.cancelled)} nota=${value.note || ""}` : "(cancellato)";
   }
@@ -304,6 +315,7 @@
     note: (key, text) => queue("note", key, String(text || "").trim() ? text : null, 1000),
     exc: (key, value) => queue("exc", key, value, 1000),
     remind: (key, value) => queue("remind", key, value, 300),
+    auto: (key, value) => queue("auto", key, value, 800),
     addRequest,
     getRequest,
     pendingCount,
