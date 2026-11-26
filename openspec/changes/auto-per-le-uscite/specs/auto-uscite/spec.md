@@ -182,3 +182,21 @@ Quando servono più auto, il sistema SHALL poter mettere alla guida anche chi ha
 - **WHEN** Anna ha l'auto, di solito viaggia con Bruno e nessun altro può guidare
 - **THEN** Anna guida invece di lasciare persone senza posto
 
+### Requirement: Ritrovo intermedio e compagno abituale
+Se una persona ha un ritrovo intermedio abituale diverso da quello del suo compagno abituale, il sistema SHALL mandarla al suo ritrovo e MUST NOT applicare il compagno abituale; la scheda del partecipante SHALL spiegarlo. Le scelte "solo per questa uscita" restano prioritarie. I nomi dei ritrovi SHALL essere confrontati senza badare a maiuscole e spazi.
+
+#### Scenario: Due da Viareggio
+- **WHEN** Vito e Vera si ritrovano a Viareggio, entrambi possono guidare e di solito viaggiano con Mario che parte dal ritrovo principale
+- **THEN** compare il gruppo "Si trovano a Viareggio" con l'auto di uno dei due
+
+### Requirement: Ritrovo intermedio suggerito dalla città
+Il sistema SHALL suggerire un ritrovo intermedio a partire dalla città del modulo per chi non ha ritrovo, compagno abituale né scelte per l'uscita: quando la città coincide con un ritrovo intermedio già usato nell'uscita, oppure quando almeno due persone partono dalla stessa città, almeno una ha l'auto e la città non è quella del ritrovo principale. "Accetta" SHALL salvare il ritrovo nelle schede delle persone (abitudine); "✕" SHALL nascondere il suggerimento per quell'uscita. Il ritrovo abituale MUST valere solo se la persona parte dalla città da cui è stato impostato, quando nota.
+
+#### Scenario: Due da Viareggio senza ritrovo
+- **WHEN** Vito e Vera partono da Viareggio, Vito ha l'auto e nessuno dei due ha un ritrovo
+- **THEN** compare "💡 Vito, Vera partono da Viareggio: si ritrovano a Viareggio?" e con "Accetta" nasce il gruppo "Si trovano a Viareggio"
+
+#### Scenario: Partenza da un'altra città
+- **WHEN** Vito ha il ritrovo abituale a Pisa impostato quando partiva da Pisa, ma oggi parte da Viareggio
+- **THEN** il ritrovo di Pisa non vale per questa uscita e la scheda lo spiega
+

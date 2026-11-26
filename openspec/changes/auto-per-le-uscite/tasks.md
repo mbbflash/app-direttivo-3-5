@@ -40,6 +40,8 @@
 - [x] 4.11 Interfaccia: riquadro "Auto fissate" con "Rifai da capo", passeggeri del ritrovo principale elencati a parte (niente simbolo ↪), intestazioni "Si trovano a …"
 - [x] 4.12 v2.7.3: vista in due tappe (punti intermedi, poi "In partenza da" con tutte le auto complete)
 - [x] 4.13 v2.7.4: chi ha l'abitudine di viaggiare con un altro può guidare se servono auto (prima chi ha la priorità)
+- [x] 4.14 v2.7.5: il ritrovo intermedio della persona prevale sul compagno abituale che parte da un altro punto; nomi dei ritrovi normalizzati
+- [x] 4.15 v2.7.5: suggerimenti di ritrovo intermedio dalla città; ritrovo abituale legato alla città di partenza (`rc`)
 
 ## 5. Rilascio
 

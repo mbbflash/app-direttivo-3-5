@@ -1,6 +1,16 @@
 {
-  "version": "2.7.4",
+  "version": "2.7.5",
   "releases": [
+    {
+      "version": "2.7.5",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto: chi ha un suo ritrovo intermedio (es. Viareggio) ci va anche se ha un passaggio abituale con qualcuno che parte da un altro punto; la scheda spiega perché",
+        "Auto: «Viareggio», «viareggio» e «Viareggio » sono lo stesso ritrovo intermedio",
+        "Auto: nuovi suggerimenti di ritrovo intermedio dalla città del modulo («💡 Vito, Vera partono da Viareggio: si ritrovano a Viareggio?»), con Accetta o ✕ come per i compagni di viaggio",
+        "Auto: il ritrovo abituale vale solo se la persona parte dalla solita città; se oggi parte da un'altra, la scheda lo spiega"
+      ]
+    },
     {
       "version": "2.7.4",
       "date": "26/11/2026",
