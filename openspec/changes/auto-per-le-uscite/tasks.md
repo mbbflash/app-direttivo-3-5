@@ -17,13 +17,21 @@
 - [x] 3.3 Dati di prova in `docs/js/demo.js` (domande sull'auto, posti, ritrovo/partenza, iscritti inventati) e verifica in `?demo=1` senza errori in console
 - [x] 3.4 README: funzione nella scheda Escursioni e scheda `Auto_Escursioni` nella tabella "Dove finiscono i dati"
 
-## 4. Rilascio
+## 4. Equilibrio e posti (v2.6.2)
 
-- [x] 4.1 Versione 2.6.0 (config, `?v=`, cache, version.json, badge)
-- [x] 4.2 Versione 2.6.1 (config, `?v=`, cache, version.json, badge)
-- [x] 4.3 Operazione `aggiungi_domande_auto` in `apps-script/Codice.gs` e istruzioni in SETUP-APPS-SCRIPT.md
-- [ ] 4.5 Incollare il nuovo `Codice.gs` nell'editor Apps Script ed eseguire una volta `aggiungiDomandeAuto`; controllare il template
-- [ ] 4.4 Dopo il push, prova con login sui dati veri: aprire un'uscita con iscrizioni, controllare che le domande del modulo siano riconosciute e che la scheda `Auto_Escursioni` venga creata alla prima correzione
+- [x] 4.1 Domanda sui posti con scelta "4 posti" / "5 posti" (chi guida compreso) nello script e nella lettura dell'app; "Correggi a mano" con auto da 4 o 5 posti
+- [x] 4.2 Passeggeri distribuiti in modo equilibrato; nessun guidatore da solo se può salire in un'altra auto; verificare in `?demo=1`
+
+- [x] 4.3 Ritrovi intermedi: menu per città "al ritrovo principale / si ritrovano a …", auto formate per ogni punto, riepilogo per punto; verificare in `?demo=1`
+
+## 5. Rilascio
+
+- [x] 5.1 Versione 2.6.0 (config, `?v=`, cache, version.json, badge)
+- [x] 5.2 Versione 2.6.1 (config, `?v=`, cache, version.json, badge)
+- [x] 5.3 Versione 2.6.2 (config, `?v=`, cache, version.json, badge)
+- [x] 5.4 Operazione `aggiungi_domande_auto` in `apps-script/Codice.gs` e istruzioni in SETUP-APPS-SCRIPT.md
+- [ ] 5.5 Incollare il nuovo `Codice.gs` nell'editor Apps Script ed eseguire una volta `aggiungiDomandeAuto`; controllare il template
+- [ ] 5.6 Dopo il push, prova con login sui dati veri: aprire un'uscita con iscrizioni, controllare che le domande del modulo siano riconosciute e che la scheda `Auto_Escursioni` venga creata alla prima correzione
 
 ## Workflow follow-up
 

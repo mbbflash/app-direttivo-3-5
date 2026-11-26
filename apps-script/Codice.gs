@@ -223,8 +223,8 @@ function provaNomi() {
 
 var DOMANDA_RITROVO = '📍 Ci vediamo al punto di ritrovo o vai direttamente alla partenza dell\'escursione?';
 var RISPOSTE_RITROVO = ['Al punto di ritrovo', 'Direttamente alla partenza'];
-var DOMANDA_POSTI = '🪑 Se metti il tuo mezzo a disposizione, quanti posti liberi hai (escluso te)?';
-var RISPOSTE_POSTI = ['1', '2', '3', '4', '5', '6'];
+var DOMANDA_POSTI = '🪑 Se metti il tuo mezzo a disposizione, quanti posti ha la tua auto (compreso chi guida)?';
+var RISPOSTE_POSTI = ['4 posti', '5 posti'];
 
 function aggiungiDomandeAuto() {
   var form = FormApp.openById(template_().getId());
@@ -249,12 +249,21 @@ function aggiungiDomandeAuto() {
     fatto.push('ritrovo o partenza');
   }
 
-  // Posti liberi: subito dopo "saresti disposto/a a mettere il tuo mezzo a disposizione?".
-  if (indice(/posti liberi/) < 0) {
+  // Posti dell'auto: subito dopo "saresti disposto/a a mettere il tuo mezzo a disposizione?".
+  // Se c'è già una domanda sui posti (anche la versione vecchia "posti liberi"), la porta a "4 posti / 5 posti".
+  var giaPosti = indice(/posti/);
+  if (giaPosti >= 0) {
+    var item = form.getItems()[giaPosti];
+    if (item.getType() === FormApp.ItemType.MULTIPLE_CHOICE &&
+        (item.getTitle() !== DOMANDA_POSTI || item.asMultipleChoiceItem().getChoices().length !== RISPOSTE_POSTI.length)) {
+      item.asMultipleChoiceItem().setTitle(DOMANDA_POSTI).setChoiceValues(RISPOSTE_POSTI);
+      fatto.push('posti dell\'auto (aggiornata a 4 o 5 posti)');
+    }
+  } else {
     var dopoMezzo = indice(/dispost|mettere il tuo mezzo/, /posti/);
     var q = form.addMultipleChoiceItem().setTitle(DOMANDA_POSTI).setChoiceValues(RISPOSTE_POSTI).setRequired(false);
     if (dopoMezzo >= 0) form.moveItem(q.getIndex(), dopoMezzo + 1);
-    fatto.push('posti liberi');
+    fatto.push('posti dell\'auto');
   }
 
   var msg = fatto.length ? 'Aggiunte al template le domande: ' + fatto.join(', ') : 'Le domande erano già nel template: nessuna modifica';

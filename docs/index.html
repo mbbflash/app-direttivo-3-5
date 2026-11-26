@@ -8,9 +8,9 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="Gestione soci, tessere ed escursioni per il direttivo" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.6.1" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.6.1" />
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.6.1" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png?v=2.6.2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=2.6.2" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2.6.2" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <script>
@@ -22,10 +22,10 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/storage.js?v=2.6.1"></script>
-  <script src="js/config.js?v=2.6.1"></script>
-  <script src="js/google.js?v=2.6.1"></script>
-  <script src="js/clouddb.js?v=2.6.1"></script>
+  <script src="js/storage.js?v=2.6.2"></script>
+  <script src="js/config.js?v=2.6.2"></script>
+  <script src="js/google.js?v=2.6.2"></script>
+  <script src="js/clouddb.js?v=2.6.2"></script>
   <title>APP Direttivo 3/5 — Soci ed Escursioni</title>
   <style>
     :root {
@@ -624,7 +624,7 @@
 
   <div id="loginOverlay" class="login-overlay show" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <div class="login-card">
-      <div class="login-logo"><img src="icons/logo.png?v=2.6.1" alt="Tre Quinti Trekking APS" /></div>
+      <div class="login-logo"><img src="icons/logo.png?v=2.6.2" alt="Tre Quinti Trekking APS" /></div>
       <h2 id="loginTitle">APP Direttivo 3/5</h2>
       <p id="loginHint">Accedi con l'account Google dell'associazione per consultare soci ed escursioni.</p>
       <button type="button" class="primary btn-google" id="btnLoginOverlay">Accedi con Google</button>
@@ -636,7 +636,7 @@
   <header class="appbar">
     <div class="appbar-inner">
       <div class="brand">
-        <img src="icons/icon-192.png?v=2.6.1" alt="" />
+        <img src="icons/icon-192.png?v=2.6.2" alt="" />
         <div class="brand-text">
           <h1>APP Direttivo 3/5 <span class="pill" id="appVersion">v…</span></h1>
           <p class="subtitle">Soci in sola lettura dai Fogli Google · spunte e note condivise con il direttivo</p>
@@ -1068,9 +1068,9 @@
       // Su Android le notifiche funzionano solo tramite il service worker.
       try {
         const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.6.1" }); return; }
+        if (reg) { await reg.showNotification(title, { body, icon: "icons/icon-192.png?v=2.6.2" }); return; }
       } catch (_) {}
-      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.6.1" }); } catch (_) {}
+      try { new Notification(title, { body, icon: "icons/icon-192.png?v=2.6.2" }); } catch (_) {}
     }
 
     // ===================================================================
@@ -2346,6 +2346,13 @@
       });
     }
 
+    // Il modulo chiede quanti posti ha l'auto (4 o 5, chi guida compreso): i posti per i passeggeri sono uno in meno.
+    // Con la domanda vecchia "posti liberi" il numero è già quello dei passeggeri.
+    function carPostiForm(v, header) {
+      const n = carPosti(v, 0);
+      if (!n) return CAR_DEF_POSTI;
+      return /liber/.test(carNorm(header)) ? n : Math.max(1, n - 1);
+    }
     function carPeople(esc, cols) {
       const seen = new Set();
       const out = [];
@@ -2361,7 +2368,7 @@
         const dir = cols.diretto ? carNorm(r[cols.diretto]) : "";
         out.push({
           k, nome: f.displayName.replace(/\s+/g, " ").trim(), citta: citta || CAR_NO_ZONE, automunito, haAuto: guidabile,
-          postiForm: cols.posti ? carPosti(r[cols.posti], CAR_DEF_POSTI) : CAR_DEF_POSTI,
+          postiForm: cols.posti ? carPostiForm(r[cols.posti], cols.posti) : CAR_DEF_POSTI,
           diretto: /direttament|partenza/.test(dir) && !/ritrovo/.test(dir),
           compagniTxt: cols.compagni ? String(r[cols.compagni] || "").trim() : ""
         });
@@ -2401,22 +2408,34 @@
       const g = s.guida || {}, c = s.con || {};
       const P = people.map(p => Object.assign({}, p, { guida: false, con: null, fixed: false }));
       const by = new Map(P.map(p => [p.k, p]));
-      const atR = P.filter(p => !p.diretto);
+      // Punto di ritrovo di ognuno: "" = ritrovo principale; altrimenti il punto intermedio scelto per la sua città.
+      const punti = s.punti || {};
+      P.forEach(p => { p.punto = p.diretto ? null : (punti[carNorm(p.citta)] || ""); });
+      // Chi non ha indicato la città si ritrova dove si ritrova chi ha scritto come compagno di viaggio.
+      P.forEach(p => {
+        if (p.diretto || p.citta !== CAR_NO_ZONE) return;
+        const amico = (p.amici || []).map(a => by.get(a)).find(q => q && !q.diretto && q.citta !== CAR_NO_ZONE);
+        if (amico) p.punto = amico.punto;
+      });
+      const atRAll = P.filter(p => !p.diretto);
       const off = (p) => g[p.k] === false;
       const posti = (p) => carPosti((s.posti || {})[p.k], p.postiForm || CAR_DEF_POSTI);
-      const drivers = () => atR.filter(p => p.guida);
       const occ = (d) => P.filter(p => p.con === d.k);
       const free = (d) => posti(d) - occ(d).length;
 
-      atR.forEach(p => { if (g[p.k] === true) p.guida = true; });
+      atRAll.forEach(p => { if (g[p.k] === true) p.guida = true; });
       Object.entries(c).forEach(([k, d]) => {
         const p = by.get(k), dd = by.get(d);
-        if (p && dd && k !== d && !p.diretto && !dd.diretto && !off(dd) && !p.guida) dd.guida = true;
+        if (p && dd && k !== d && !p.diretto && !dd.diretto && p.punto === dd.punto && !off(dd) && !p.guida) dd.guida = true;
       });
       Object.entries(c).forEach(([k, d]) => {
         const p = by.get(k), dd = by.get(d);
-        if (p && dd && dd.guida && !p.guida && !p.diretto && free(dd) > 0) { p.con = d; p.fixed = true; }
+        if (p && dd && dd.guida && !p.guida && !p.diretto && p.punto === dd.punto && free(dd) > 0) { p.con = d; p.fixed = true; }
       });
+
+      // Ogni punto di ritrovo forma le sue auto, con le stesse regole.
+      const planGroup = (atR, punto) => {
+      const drivers = () => atR.filter(p => p.guida);
 
       // Quante auto: si aggiunge chi guida (più posti prima) finché i posti bastano.
       const cap = () => drivers().reduce((t, d) => t + 1 + posti(d), 0);
@@ -2440,7 +2459,7 @@
       unplaced().forEach(p => {
         if (seen.has(p)) return;
         const t = [p];
-        for (let i = 0; i < t.length; i++) (t[i].amici || []).forEach(a => { const q = by.get(a); if (q && !q.guida && !q.con && !q.diretto && !t.includes(q)) t.push(q); });
+        for (let i = 0; i < t.length; i++) (t[i].amici || []).forEach(a => { const q = by.get(a); if (q && q.punto === punto && !q.guida && !q.con && !q.diretto && !t.includes(q)) t.push(q); });
         t.forEach(q => seen.add(q));
         teams.push(t);
       });
@@ -2448,14 +2467,40 @@
       teams.forEach(t => {
         const friendCar = drivers().find(d => free(d) >= t.length && t.some(p => (p.amici || []).some(a => a === d.k || (by.get(a) && by.get(a).con === d.k))));
         const sameCity = (d) => t.some(p => p.citta === d.citta && p.citta !== CAR_NO_ZONE);
-        const car = friendCar || drivers().filter(d => free(d) >= t.length).sort((a, b) => (sameCity(b) - sameCity(a)) || free(a) - free(b))[0];
+        // Auto equilibrate: prima quella con meno persone a bordo.
+        const car = friendCar || drivers().filter(d => free(d) >= t.length).sort((a, b) => occ(a).length - occ(b).length || (sameCity(b) - sameCity(a)) || free(b) - free(a))[0];
         if (car) { t.forEach(p => { p.con = car.k; }); return; }
         t.forEach(p => {
-          const d = drivers().filter(x => free(x) > 0).sort((a, b) => free(b) - free(a))[0];
+          const d = drivers().filter(x => free(x) > 0).sort((a, b) => occ(a).length - occ(b).length)[0];
           if (d) p.con = d.k;
         });
       });
-      return { P, by, posti, occ, free, s, atR, drivers: drivers(), direct: P.filter(p => p.diretto), left: unplaced() };
+
+      // Nessuno da solo in auto: chi guida senza passeggeri (se non l'ha deciso il direttivo) sale dove c'è posto.
+      const usedAsCar = new Set(Object.values(c));
+      for (let guard = 0; guard < 20; guard++) {
+        const lonely = drivers().find(d => occ(d).length === 0 && g[d.k] !== true && !usedAsCar.has(d.k));
+        if (!lonely) break;
+        const tgt = drivers().filter(x => x !== lonely && free(x) > 0).sort((a, b) => occ(a).length - occ(b).length)[0];
+        if (!tgt) break;
+        lonely.guida = false;
+        lonely.con = tgt.k;
+      }
+      // Equilibrio: si spostano passeggeri (non fissati a mano e senza compagni) dalle auto più piene a quelle più vuote.
+      for (let guard = 0; guard < 50; guard++) {
+        const ds = drivers().slice().sort((a, b) => occ(b).length - occ(a).length);
+        const full = ds[0], light = ds[ds.length - 1];
+        if (!full || full === light || occ(full).length - occ(light).length < 2 || free(light) <= 0) break;
+        const mover = occ(full).find(p => !p.fixed && !(p.amici || []).length);
+        if (!mover) break;
+        mover.con = light.k;
+      }
+      return { punto, atR, drivers: drivers(), left: unplaced() };
+      };
+      const keys = [...new Set(atRAll.map(p => p.punto))].sort((x, y) => (x === "") - (y === "") || x.localeCompare(y, "it"));
+      const groups = keys.map(k => planGroup(atRAll.filter(p => p.punto === k), k));
+      return { P, by, posti, occ, free, s, atR: atRAll, groups, drivers: groups.flatMap(x => x.drivers),
+        direct: P.filter(p => p.diretto), left: groups.flatMap(x => x.left) };
     }
 
     // Chi parte dalla stessa città, per accordarsi sul viaggio fino al ritrovo.
@@ -2472,10 +2517,10 @@
     function carSummary(esc, plan) {
       const L = [`🥾 ${formatNomeUscita(esc.titolo)}`];
       L.push(`📍 Ritrovo: ${plan.ritrovo || "da definire"}`);
-      if (plan.drivers.length) {
-        L.push("", "🚗 Dal ritrovo alla partenza:");
-        plan.drivers.forEach(d => { const o = plan.occ(d); L.push(`🚗 ${d.nome}` + (o.length ? ": " + o.map(p => p.nome).join(", ") : "")); });
-      }
+      plan.groups.forEach(gr => {
+        L.push("", gr.punto ? `📍 Ritrovo intermedio a ${gr.punto}:` : (plan.groups.length > 1 ? "🚗 Dal ritrovo principale:" : "🚗 Dal ritrovo alla partenza:"));
+        gr.drivers.forEach(d => { const o = plan.occ(d); L.push(`🚗 ${d.nome}` + (o.length ? ": " + o.map(p => p.nome).join(", ") : "")); });
+      });
       if (plan.left.length) L.push(`⚠️ Ancora senza posto: ${plan.left.map(p => p.nome).join(", ")}`);
       if (plan.direct.length) L.push("", `🥾 Direttamente alla partenza: ${plan.direct.map(p => p.nome).join(", ")}`);
       const cities = carCities(plan).filter(c => c.citta !== CAR_NO_ZONE && c.conAuto.length + c.senza.length > 1);
@@ -2504,7 +2549,7 @@
       const plan = planCars(people, s);
       plan.ritrovo = ritrovo;
       carView = { escId: esc.id, esc, plan };
-      const manual = ["guida", "con", "posti"].reduce((t, k) => t + Object.keys(s[k] || {}).length, 0);
+      const manual = ["guida", "con", "posti", "punti"].reduce((t, k) => t + Object.keys(s[k] || {}).length, 0);
 
       byId("excCarsSummary").innerHTML = icon("map", "ico-sm") +
         `<span>Auto per l'uscita · ${plan.drivers.length} auto dal ritrovo${plan.left.length ? ` · <span style="color:var(--danger-fg)">${plan.left.length} senza posto</span>` : ""}</span>`;
@@ -2526,7 +2571,7 @@
           <div class="car-kpis"><span class="car-kpi"><b>${plan.atR.length}</b> al ritrovo</span><span class="car-kpi"><b>${plan.drivers.length}</b> auto</span>${plan.direct.length ? `<span class="car-kpi"><b>${plan.direct.length}</b> alla partenza</span>` : ""}<span class="car-kpi">${manual ? "corrette a mano" : "calcolo automatico"}</span></div>
         </div>`;
 
-      const cars = plan.drivers.map(d => {
+      const carCard = (d) => {
         const o = plan.occ(d), n = plan.posti(d) + 1, a = o.length + 1;
         const alt = o.filter(p => p.haAuto);
         return `<div class="car-card">
@@ -2535,9 +2580,23 @@
           ${alt.length ? `<select class="car-swap" data-car-swap="${escapeHtml(d.k)}" aria-label="Chi guida">
               <option value="${escapeHtml(d.k)}" selected>Guida ${escapeHtml(d.nome)}</option>${alt.map(p => `<option value="${escapeHtml(p.k)}">Fai guidare ${escapeHtml(p.nome)}</option>`).join("")}</select>` : ""}
         </div>`;
+      };
+      const groupsHtml = plan.groups.map(gr => {
+        const titolo = gr.punto ? `Ritrovo intermedio a ${escapeHtml(gr.punto)}` : (plan.groups.length > 1 ? `Dal ritrovo principale${ritrovo ? " · " + escapeHtml(ritrovo) : ""}` : "Dal ritrovo alla partenza");
+        return `<div class="car-sec">${titolo} <span style="text-transform:none;letter-spacing:0;font-weight:500;">· ${gr.atR.length} ${gr.atR.length === 1 ? "persona" : "persone"}, ${gr.drivers.length} auto</span></div>` +
+          (gr.drivers.length ? `<div class="car-grid">${gr.drivers.map(carCard).join("")}</div>` : `<p class="car-empty">Nessuno qui ha messo l'auto a disposizione.</p>`) +
+          (gr.left.length ? `<p class="car-empty" style="color:var(--danger-fg)">Senza posto: ${gr.left.map(p => escapeHtml(p.nome)).join(", ")}</p>` : "");
       }).join("");
 
-      const cities = carCities(plan).map(c => `<div class="car-city"><strong>${escapeHtml(c.citta)}</strong><div class="car-chips">
+      const puntiNoti = [...new Set(Object.values(s.punti || {}).concat(carCities(plan).map(c => c.citta).filter(x => x !== CAR_NO_ZONE)))].sort((a, b) => a.localeCompare(b, "it"));
+      const puntoSel = (c) => {
+        if (c.citta === CAR_NO_ZONE) return "";
+        const cur = (s.punti || {})[carNorm(c.citta)] || "";
+        return `<select class="car-swap" data-car-punto="${escapeHtml(c.citta)}" aria-label="Dove si ritrovano">
+            <option value="" ${cur ? "" : "selected"}>al ritrovo principale</option>
+            ${puntiNoti.map(x => `<option value="${escapeHtml(x)}" ${x === cur ? "selected" : ""}>si ritrovano a ${escapeHtml(x)}</option>`).join("")}</select>`;
+      };
+      const cities = carCities(plan).map(c => `<div class="car-city"><div><strong>${escapeHtml(c.citta)}</strong><div style="margin-top:4px;">${puntoSel(c)}</div></div><div class="car-chips">
           ${c.conAuto.map(p => `<span class="car-chip plain">🚗 ${escapeHtml(p.nome)}</span>`).join("")}
           ${c.senza.map(p => `<span class="car-chip need" title="Cerca un passaggio fino al ritrovo">🙋 ${escapeHtml(p.nome)}</span>`).join("")}</div></div>`).join("");
 
@@ -2547,7 +2606,7 @@
       }).join("");
       const editRows = plan.atR.slice().sort((a, b) => a.nome.localeCompare(b.nome, "it")).map(p => p.guida
         ? `<div class="car-person"><span>🚗 <strong>${escapeHtml(p.nome)}</strong> guida</span>
-            <select data-car-posti="${escapeHtml(p.k)}" aria-label="Posti liberi">${[1, 2, 3, 4, 5, 6, 7, 8].map(x => `<option value="${x}" ${x === plan.posti(p) ? "selected" : ""}>${x} ${x === 1 ? "posto libero" : "posti liberi"}</option>`).join("")}</select>
+            <select data-car-posti="${escapeHtml(p.k)}" aria-label="Posti dell'auto">${[...new Set([3, 4, plan.posti(p)])].sort().map(x => `<option value="${x}" ${x === plan.posti(p) ? "selected" : ""}>auto da ${x + 1} posti</option>`).join("")}</select>
             <button type="button" class="exc-mini-btn" data-car-nodrive="${escapeHtml(p.k)}">Non guida</button></div>`
         : `<div class="car-person"><span>${escapeHtml(p.nome)}</span>
             ${p.haAuto ? `<button type="button" class="exc-mini-btn" data-car-drive="${escapeHtml(p.k)}">Guida</button>` : ""}
@@ -2555,11 +2614,10 @@
 
       body.innerHTML = top +
         (warn.length ? `<ul class="alert-list" style="margin:10px 0 0;">${warn.map(w => `<li>${escapeHtml(w)}</li>`).join("")}</ul>` : "") +
-        `<div class="car-sec">Dal ritrovo alla partenza</div>` +
-        (cars ? `<div class="car-grid">${cars}</div>` : `<p class="car-empty">Nessuno ha messo l'auto a disposizione.</p>`) +
+        groupsHtml +
         (plan.direct.length ? `<div class="car-sec">Direttamente alla partenza</div><div class="car-chips">${plan.direct.map(p => chip(p, "plain")).join("")}</div>` : "") +
-        `<div class="car-sec">Per arrivare al ritrovo</div><div>${cities}</div>
-         <p class="car-empty" style="margin:6px 0 0;">🚗 ha l'auto · 🙋 cerca un passaggio fino al ritrovo</p>` +
+        `<div class="car-sec">Per arrivare al ritrovo · chi parte da dove</div><div>${cities}</div>
+         <p class="car-empty" style="margin:6px 0 0;">🚗 ha l'auto · 🙋 cerca un passaggio fino al ritrovo · dal menu sotto la città scegli se quella città si ritrova in un punto intermedio</p>` +
         `<div class="mail-actions" style="margin-top:14px;"><button type="button" class="primary" data-car-copy="1">${icon("copy", "ico-sm")}Copia riepilogo per il gruppo</button></div>` +
         `<details class="car-cols"><summary>Correggi a mano</summary>${editRows}
           ${manual ? `<div class="mail-actions" style="margin-top:8px;"><button type="button" class="ghost" data-car-reset="1">${icon("refresh", "ico-sm")}Annulla le correzioni (${manual})</button></div>` : ""}</details>`;
@@ -2569,9 +2627,9 @@
       if (!carView) return;
       const id = carView.escId;
       const s = JSON.parse(JSON.stringify(carSettings[id] || {}));
-      ["guida", "con", "posti"].forEach(k => { if (!s[k]) s[k] = {}; });
+      ["guida", "con", "posti", "punti"].forEach(k => { if (!s[k]) s[k] = {}; });
       fn(s, carView.plan);
-      ["guida", "con", "posti"].forEach(k => { if (!Object.keys(s[k]).length) delete s[k]; });
+      ["guida", "con", "posti", "punti"].forEach(k => { if (!Object.keys(s[k]).length) delete s[k]; });
       const empty = !Object.keys(s).length;
       if (empty) delete carSettings[id]; else carSettings[id] = s;
       saveCarSettings();
@@ -2594,6 +2652,9 @@
             Object.keys(s.con).forEach(k => { if (s.con[k] === oldK) s.con[k] = newK; });
             if (s.posti[oldK]) { s.posti[newK] = s.posti[oldK]; delete s.posti[oldK]; }
           });
+        } else if (t.dataset.carPunto) {
+          const city = carNorm(t.dataset.carPunto), v = t.value;
+          updateCarSettings((s) => { if (v) s.punti[city] = v; else delete s.punti[city]; });
         } else if (t.dataset.carRit) {
           const v = t.value;
           updateCarSettings((s) => { if (v && v !== carRitrovoFromScheda(carView.esc)) s.ritrovo = v; else delete s.ritrovo; });
@@ -2613,7 +2674,7 @@
         else if (b.dataset.carDrive) { const k = b.dataset.carDrive; updateCarSettings((s) => { s.guida[k] = true; delete s.con[k]; }); }
         else if (b.dataset.carReset) {
           if (!b.dataset.armed) { b.dataset.armed = "1"; b.lastChild.textContent = "Clicca di nuovo per confermare"; return; }
-          updateCarSettings((s) => { s.guida = {}; s.con = {}; s.posti = {}; delete s.ritrovo; });
+          updateCarSettings((s) => { s.guida = {}; s.con = {}; s.posti = {}; s.punti = {}; delete s.ritrovo; });
         }
       });
     }
@@ -3965,6 +4026,6 @@
       return s.replace(/\(Risposte\)\s*$/i, "").trim();
     }
 </script>
-<script src="js/app.js?v=2.6.1"></script>
+<script src="js/app.js?v=2.6.2"></script>
 </body>
 </html>
