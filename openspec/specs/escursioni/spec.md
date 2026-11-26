@@ -82,15 +82,15 @@ Il sistema SHALL permettere di copiare le email di tutti gli iscritti all'uscita
 Il sistema SHALL esportare in CSV gli iscritti all'uscita scelta con contatti, stato socio, conferme e note.
 
 #### Scenario: Export partecipanti
-- **WHEN** l'utente preme "Esporta partecipanti"
+- **WHEN** l'utente preme "Esporta"
 - **THEN** il sistema scarica un CSV con una riga per iscritto
 
 ### Requirement: Contatore partecipazioni
-Il sistema SHALL calcolare, su tutti i fogli dei form, il numero di uscite di ogni escursionista e il loro elenco, contando ogni persona una sola volta per uscita e unendo le iscrizioni della stessa persona riconosciuta come socio. Il conteggio SHALL alimentare la colonna "N° escursioni" delle adesioni, il riquadro "Escursionisti unici" e il curriculum nella scheda socio quando le statistiche non sono disponibili. La scheda Escursioni MUST NOT mostrare una tabella separata con la classifica degli escursionisti.
+Il sistema SHALL calcolare, su tutti i fogli dei form, il numero di uscite di ogni escursionista e il loro elenco, contando ogni persona una sola volta per uscita e unendo le iscrizioni della stessa persona riconosciuta come socio. Il conteggio SHALL comparire accanto al nome di ogni iscritto ("prima uscita" oppure "N uscite") e alimentare il curriculum nella scheda socio quando le statistiche non sono disponibili. La scheda Escursioni MUST NOT mostrare una tabella separata con la classifica degli escursionisti.
 
 #### Scenario: Nessuna tabella contatore
 - **WHEN** l'utente apre la scheda Escursioni
-- **THEN** vede le adesioni dell'uscita selezionata con la colonna "N° escursioni", ma non la tabella "Contatore partecipazioni per escursionista"
+- **THEN** vede gli iscritti dell'uscita selezionata con il numero di uscite accanto al nome, ma non la tabella "Contatore partecipazioni per escursionista"
 
 #### Scenario: Doppia iscrizione alla stessa uscita
 - **WHEN** la stessa persona compare due volte nel foglio di un'uscita
@@ -114,3 +114,11 @@ Il sistema SHALL ricavare la data dell'uscita dalla data AAAA.MM.GG che segue il
 #### Scenario: Nome con trattini o apostrofi
 - **WHEN** il foglio si chiama "Iscrizioni 2024.11.30 - L'acquedotto Leopoldino (Risposte)"
 - **THEN** l'uscita si chiama "L'acquedotto Leopoldino"
+
+### Requirement: Scheda Escursioni essenziale
+La scheda Escursioni SHALL mostrare in alto, su una riga, la scelta dell'uscita e i pulsanti "Aggiorna", "Esporta" e "Nuova uscita" (solo icone su schermi piccoli), poi la ricerca e un riepilogo testuale in una riga ("N iscritti · N soci · N confermati"), senza riquadri numerici. L'elenco "Iscritti" SHALL avere tre colonne: partecipante (con stato socio, numero di uscite, "Confermato" e "Disdetto"), contatti e nota.
+
+#### Scenario: Telefono
+- **WHEN** l'utente apre la scheda Escursioni su uno schermo stretto
+- **THEN** vede uscita e tre pulsanti a icona sulla stessa riga, e per ogni iscritto una scheda compatta con la nota a tutta larghezza
+

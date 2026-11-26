@@ -1,6 +1,15 @@
 {
-  "version": "2.7.2",
+  "version": "2.7.3",
   "releases": [
+    {
+      "version": "2.7.3",
+      "date": "26/11/2026",
+      "notes": [
+        "Auto con ritrovi intermedi: in fondo compare «In partenza da …» con tutte le auto come partono dal ritrovo principale, chi c'è a bordo e i posti occupati (es. 5/5)",
+        "Nei punti intermedi si vede solo chi si trova lì; anche il messaggio «Copia per il gruppo» segue le stesse due tappe",
+        "Scheda Escursioni più snella: pulsanti Aggiorna, Esporta e Nuova uscita in una riga, riepilogo in una riga al posto dei riquadri, elenco «Iscritti» con stato socio e numero di uscite sotto il nome e la nota a tutta larghezza sul telefono"
+      ]
+    },
     {
       "version": "2.7.2",
       "date": "26/11/2026",
