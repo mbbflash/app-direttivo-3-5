@@ -116,7 +116,7 @@ Le auto formate in un ritrovo intermedio SHALL proseguire con le stesse persone 
 
 #### Scenario: Posti liberi da Pisa
 - **WHEN** un'auto parte da Pisa con 2 persone e ha 5 posti
-- **THEN** al ritrovo principale ci salgono fino a 3 persone, elencate a parte sotto "Al ritrovo principale sale", e chi era a bordo da Pisa resta nella stessa auto
+- **THEN** al ritrovo principale ci salgono fino a 3 persone, e chi era a bordo da Pisa resta nella stessa auto
 
 ### Requirement: Compagno abituale e suggerimenti
 Nella scheda il compagno di viaggio abituale SHALL potersi cercare scrivendo il nome. Il compagno abituale SHALL valere in automatico solo quando la persona si iscrive dalla stessa città da cui è stato impostato; altrimenti SHALL essere solo suggerito. La scheda SHALL suggerire anche chi ha l'auto e parte dallo stesso comune o entro 10 km (posizioni approssimate dei paesi).
@@ -159,4 +159,11 @@ Se una persona compila il modulo più volte, il sistema SHALL usare la sua ultim
 #### Scenario: Due risposte
 - **WHEN** Anna risponde prima "senza auto" e poi "automunita e disponibile"
 - **THEN** per le auto vale la seconda risposta
+
+### Requirement: Vista in due tappe
+Quando almeno un punto intermedio ha auto che passano dal ritrovo principale, il sistema SHALL mostrare per ogni punto intermedio solo chi si trova lì e, sotto il titolo "In partenza da <ritrovo principale>", tutte le auto che partono dal ritrovo principale con la composizione completa e i posti occupati. Il testo "Copia per il gruppo" MUST seguire la stessa struttura.
+
+#### Scenario: Auto da Pisa e dal ritrovo principale
+- **WHEN** Bruno parte da Pisa con Anna e al ritrovo principale salgono altre due persone
+- **THEN** sotto "Si trovano a Pisa" c'è l'auto di Bruno con Anna, e sotto "In partenza da" c'è l'auto di Bruno con tutte e quattro le persone, insieme alle auto che partono dal ritrovo principale
 

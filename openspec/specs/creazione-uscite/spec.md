@@ -7,7 +7,7 @@ Permette al direttivo di creare dall'app una nuova escursione programmata: form 
 ## Requirements
 
 ### Requirement: Pulsante nuova escursione
-La scheda Escursioni SHALL offrire il pulsante "Nuova escursione programmata (Crea Form + Foglio risposte)". Il pulsante SHALL chiedere il nome dell'escursione e la data, e facoltativamente una data di fine per le uscite di più giorni, e SHALL inviare la richiesta di creazione allo script di automazione.
+La scheda Escursioni SHALL offrire il pulsante "Nuova uscita" (solo icona "+" su schermi piccoli), che crea form e foglio risposte. Il pulsante SHALL chiedere il nome dell'escursione e la data, e facoltativamente una data di fine per le uscite di più giorni, e SHALL inviare la richiesta di creazione allo script di automazione.
 
 #### Scenario: Richiesta di creazione
 - **WHEN** l'utente inserisce "giro di prova" e 22/11/2026 e conferma
